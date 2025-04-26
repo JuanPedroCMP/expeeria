@@ -1,0 +1,37 @@
+.MenuRecolhivel {
+  position: relative;
+  display: inline-block;
+}
+
+.MenuRecolhivel button {
+  background-color: #2d333b;
+  color: #ffffff;
+  padding: 10px 15px;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.MenuRecolhivel button:hover {
+  background-color: #444c56;
+}
+
+.MenuRecolhivel .menu {
+  position: absolute;
+  background-color: #f6f8fa;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+  border-radius: 5px;
+}
+
+.MenuRecolhivel  a {
+  color: rgb(255, 255, 255);
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+.MenuRecolhivel  a:hover {
+  background-color: #ddd;
+}
