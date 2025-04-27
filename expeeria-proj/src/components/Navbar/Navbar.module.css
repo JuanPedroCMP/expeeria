@@ -11,7 +11,7 @@
   backdrop-filter: blur(5px);
 
   min-height: 60px;
-  padding: 10px 5%;
+  padding: 5px 2rem;
 
   border-bottom: 0.1rem solid var(--cinzaAzulado);
 }

@@ -2,11 +2,11 @@
 
 :root {
   /* Cores */
-  --preto: #010203;
-  --cinzaEscuro: #1A202C;
-  --azulEletrico: #00AEEF;
-  --brancoSuave: #F7FAFC;
-  --cinzaAzulado: #A0AEC0;
+  --preto: rgb(3, 2, 8);
+  --cinzaEscuro: rgb(10, 12, 17);
+  --azulEletrico: rgb(15, 147, 196);
+  --brancoSuave: rgb(247, 250, 252);
+  --cinzaAzulado: rgb(160, 174, 192);
 
   /* Fontes */
   --fonte-titulos: 'Orbitron', sans-serif;

@@ -1,0 +1,80 @@
+.Button[tipo="primario"] {
+    color: var(--preto);
+    font-family: var(--fonte-titulos);
+    background-color: var(--brancoSuave);
+    cursor: pointer;
+    padding: 1rem 2rem;
+    border: 1px solid;
+    border-radius: 0.8rem;
+    margin: 1rem;
+    z-index: 1;
+    transition: background-color 0.3s ease-in-out;
+}
+
+.Button:hover[tipo="primario"] {
+    background-color: var(--azulEletrico)
+}
+
+
+/* TODO Resolver o problema do botão destaque com o menu */
+
+
+.Button[tipo="destaque"] {
+    position: relative;
+    overflow: hidden;
+    color: var(--brancoSuave);
+    font-family: var(--fonte-titulos);
+    background-color: var(--cinzaEscuro);
+    cursor: pointer;
+    padding: 1rem 2rem;
+    border: 1px solid;
+    border-radius: 0.8rem;
+    margin: 1rem;
+    z-index: 10;
+    transition: color 0.3s ease-in-out;
+}
+
+.Button[tipo="destaque"]::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -150%;
+    width: 300%;
+    height: 100%;
+    background: linear-gradient(120deg, #00f260, #0575e6, #ff0080, #ff8c00);
+    background-size: 200% 200%;
+    z-index: -1;
+    transition: transform 0.3s ease-in-out;
+    transform: translateX(-100%);
+}
+
+.Button[tipo="destaque"]:hover::before {
+    transform: translateX(0);
+    animation: gradienteMovimentacao 3s infinite linear;
+}
+
+.Button[tipo="destaque"]:hover {
+    color: var(--preto);
+}
+
+@keyframes gradienteMovimentacao {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+@keyframes respirar {
+    from {
+        padding: 0.5rem;
+    }
+
+    to {
+        padding: 0.7rem;
+    }
+}

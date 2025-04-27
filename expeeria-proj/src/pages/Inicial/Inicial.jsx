@@ -1,3 +1,5 @@
+import { Button, TIPO_BOTAO } from "../../components/Button";
+
 const Inicial = () => {
   return (
     <>
@@ -9,6 +11,8 @@ const Inicial = () => {
         magni atque, tenetur quae iure aspernatur neque sequi blanditiis placeat
         eligendi? Debitis.
       </p>
+      <Button destino="des" texto="Página inesistente" />
+      <Button destino="tes" texto="Página inesistente" tipo={TIPO_BOTAO.DESTAQUE}/>
     </>
   );
 };

@@ -1,2 +1,1 @@
-export * from "./Inicial";
 export * from "./NotFound";
