@@ -1,0 +1,32 @@
+.Card {
+    overflow: hidden;
+
+    background-color: var(--cinzaEscuro);
+
+    width: 80%;
+
+    min-height: 5rem;
+    max-height: 7rem;
+
+    border: 1px solid var(--cinzaAzulado);
+    border-radius: 1.2rem;
+
+    margin-bottom: 0.2rem;
+    margin-top: 0.2rem;
+
+    padding: 0.8rem;
+
+    transition: box-shadow 0.15s ease-in-out;
+}
+
+.Card:hover {
+    box-shadow: 0 0 0.3rem 0.05rem var(--azulEletrico);
+}
+
+.Card p {
+    font-size: 0.8rem;
+}
+
+.Card div {
+   overflow: hidden;
+}

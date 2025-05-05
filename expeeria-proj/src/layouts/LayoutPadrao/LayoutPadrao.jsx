@@ -8,7 +8,7 @@ const LayoutPadrao = () => {
       <Navbar />
 
       <div className={style.LayoutPadrao}>
-      <Outlet />
+        <Outlet />
       </div>
     </>
   );
