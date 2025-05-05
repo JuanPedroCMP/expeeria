@@ -24,5 +24,4 @@ dist-ssr
 *.sw?
 
 # Arquivos secretos
-note.md
 tokens.env
