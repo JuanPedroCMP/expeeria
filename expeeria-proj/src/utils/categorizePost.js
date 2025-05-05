@@ -1,7 +1,7 @@
 import { categoriasPadrao } from "./categoriasPadrao";
 
 export async function categorizePost(content, candidate_labels = []) {
-    const HF_TOKEN = "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";
+    const HF_TOKEN = import.meta.env.VITE_HF_TOKEN; 
     const API_URL = "https://api-inference.huggingface.co/models/facebook/bart-large-mnli";
   
     if (!candidate_labels.length) {
