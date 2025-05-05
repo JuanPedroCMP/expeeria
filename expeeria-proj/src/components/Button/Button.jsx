@@ -6,7 +6,9 @@ const Button = (props) => {
   const { destino, texto, tipo = TIPO_BOTAO.PRIMARIO, ...outrasProps } = props;
   return (  
       
-        <Link to={ destino }><button tipo={tipo} className={style.Button} {...outrasProps}>{ texto }</button></Link>
+        <span>
+          <Link to={ destino }><button tipo={tipo} className={style.Button} {...outrasProps}>{ texto }</button></Link>
+        </span>
       
   );
 };

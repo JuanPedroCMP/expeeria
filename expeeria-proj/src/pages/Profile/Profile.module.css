@@ -1,0 +1,54 @@
+.profileBox {
+    background: #23283a;
+    border-radius: 0.7rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    padding: 2rem 2.5rem;
+    margin: 2rem auto;
+    max-width: 80%;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+  }
+  .avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 1rem;
+  }
+  .profileBox textarea,
+  .profileBox input,
+  .profileBox select {
+    width: 100%;
+    margin-bottom: 1rem;
+    border-radius: 0.4rem;
+    border: none;
+    padding: 0.7rem 1rem;
+    background: #181c24;
+    color: #fff;
+  }
+  .profileBox button {
+    background: linear-gradient(90deg, #0575e6, #00f260);
+    color: #fff;
+    border: none;
+    border-radius: 0.4rem;
+    padding: 0.5rem 1.2rem;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-right: 0.5rem;
+    margin-bottom: 0.5rem;
+    transition: filter 0.2s;
+  }
+  .profileBox button:hover {
+    filter: brightness(1.1);
+  }
+  .profileBox ul {
+    list-style: none;
+    padding: 0;
+  }
+  .profileBox li {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+  }

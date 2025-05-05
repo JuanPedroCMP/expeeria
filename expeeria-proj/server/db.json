@@ -1,0 +1,155 @@
+{
+    "posts": [
+      {
+        "id": "1",
+        "title": "Primeiro post do admin",
+        "caption": "Bem-vindo ao Expeeria!",
+        "content": "Este é o primeiro post criado pelo administrador.",
+        "imageUrl": "",
+        "author": "admin@expeeria.com",
+        "userId": "adm001",
+        "area": "Tecnologia",
+        "createdAt": "2025-05-05T10:00:00.000Z",
+        "likes": 10,
+        "comments": [
+          {
+            "id": "c1",
+            "user": "user@exemplo.com",
+            "text": "Parabéns pelo projeto!"
+          }
+        ]
+      },
+      {
+        "id": "2",
+        "title": "Dicas de estudo",
+        "caption": "Como estudar melhor",
+        "content": "Organize seu tempo, faça pausas e revise sempre.",
+        "imageUrl": "",
+        "author": "user@exemplo.com",
+        "userId": "usr001",
+        "area": "Educação",
+        "createdAt": "2025-05-05T11:00:00.000Z",
+        "likes": 3,
+        "comments": []
+      },
+      {
+        "id": "3",
+        "title": "Moda sustentável: o futuro das roupas",
+        "caption": "Como a moda pode ser amiga do planeta",
+        "content": "A moda sustentável busca reduzir o impacto ambiental da indústria têxtil. Prefira marcas que usam materiais reciclados e valorizam o trabalho justo.",
+        "imageUrl": "https://images.unsplash.com/photo-1512436991641-6745cdb1723f",
+        "author": "juan@gmail.com",
+        "userId": "632d",
+        "area": "Moda",
+        "createdAt": "2025-05-06T09:00:00.000Z",
+        "likes": 7,
+        "comments": [
+          {
+            "id": "c2",
+            "user": "ana@arte.com",
+            "text": "Muito importante esse tema!"
+          }
+        ]
+      },
+      {
+        "id": "4",
+        "title": "Como desenhar melhor: dicas práticas",
+        "caption": "Melhore seu desenho com exercícios diários",
+        "content": "Desenhe todos os dias, estude referências e não tenha medo de errar. O progresso vem com a prática!",
+        "imageUrl": "https://images.unsplash.com/photo-1464983953574-0892a716854b",
+        "author": "ana@arte.com",
+        "userId": "ana001",
+        "area": "Artes",
+        "createdAt": "2025-05-07T14:30:00.000Z",
+        "likes": 12,
+        "comments": [
+          {
+            "id": "c3",
+            "user": "user@exemplo.com",
+            "text": "Vou tentar essas dicas!"
+          }
+        ]
+      },
+      {
+        "id": "5",
+        "title": "Como aprender inglês sozinho",
+        "caption": "Ferramentas e métodos para estudar idiomas",
+        "content": "Use aplicativos, assista filmes legendados e pratique com amigos. A constância é o segredo!",
+        "imageUrl": "https://images.unsplash.com/photo-1503676382389-4809596d5290",
+        "author": "maria@idiomas.com",
+        "userId": "maria001",
+        "area": "Educação",
+        "createdAt": "2025-05-08T08:00:00.000Z",
+        "likes": 8,
+        "comments": [
+          {
+            "id": "c4",
+            "user": "adm001",
+            "text": "Ótimas dicas, Maria!"
+          }
+        ]
+      }
+    ],
+    "users": [
+      {
+        "id": "adm001",
+        "email": "admin@expeeria.com",
+        "password": "admin123",
+        "name": "Administrador",
+        "bio": "Sou o admin do Expeeria.",
+        "avatar": "https://i.pravatar.cc/150?u=admin@expeeria.com",
+        "interests": ["Tecnologia", "Educação"],
+        "followers": ["632d", "ana001"],
+        "following": ["632d", "ana001", "maria001"],
+        "role": "admin"
+      },
+      {
+        "id": "usr001",
+        "email": "user@exemplo.com",
+        "password": "usuario123",
+        "name": "Usuário Exemplo",
+        "bio": "Apaixonado por aprender coisas novas.",
+        "avatar": "https://i.pravatar.cc/150?u=user@exemplo.com",
+        "interests": ["Educação", "Artes"],
+        "followers": ["632d", "ana001"],
+        "following": ["ana001"],
+        "role": "user"
+      },
+      {
+        "id": "632d",
+        "email": "juan@gmail.com",
+        "password": "juan@gmail.com",
+        "name": "Juan Pedro",
+        "bio": "Curioso sobre moda e sustentabilidade.",
+        "avatar": "https://i.pravatar.cc/150?u=juan@gmail.com",
+        "interests": ["Moda", "Sustentabilidade"],
+        "followers": ["adm001"],
+        "following": ["usr001", "adm001"],
+        "role": "user"
+      },
+      {
+        "id": "ana001",
+        "email": "ana@arte.com",
+        "password": "arte123",
+        "name": "Ana Artista",
+        "bio": "Desenhista e pintora apaixonada.",
+        "avatar": "https://i.pravatar.cc/150?u=ana@arte.com",
+        "interests": ["Artes", "Educação"],
+        "followers": ["usr001", "adm001"],
+        "following": ["usr001", "adm001"],
+        "role": "user"
+      },
+      {
+        "id": "maria001",
+        "email": "maria@idiomas.com",
+        "password": "ingles456",
+        "name": "Maria Poliglota",
+        "bio": "Amo aprender e ensinar idiomas.",
+        "avatar": "https://i.pravatar.cc/150?u=maria@idiomas.com",
+        "interests": ["Educação", "Idiomas"],
+        "followers": ["adm001"],
+        "following": [],
+        "role": "user"
+      }
+    ]
+  }

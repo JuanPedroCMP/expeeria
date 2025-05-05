@@ -1,72 +1,39 @@
-import { Button, Card, UploadImage } from "../../components";
+import { PostProvider } from "../../contexts/PostContext";
+import { Feed } from "../../components/Feed/Feed";
+import { Recomendacoes } from "../../components/Recomendacoes/Recomendacoes";
+import { useAuth } from "../../contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
+import style from "./Inicial.module.css";
 
 const Inicial = () => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
   return (
-    <>
-
-      <UploadImage/>
-
-      <h1>Teste</h1>
-      <Card
-        TituloCard="Lorem Lorens?"
-        SubTitulo="É isso que todos dizem"
-        Descrisao="Lorem ipsum dolor sit amet consectetur adipisicing elit. Rem nobis
-        architecto, asperiores voluptas quasi autem adipisci aperiam obcaecati
-        magni atque, tenetur quae iure aspernatur neque sequi blanditiis placeat
-        eligendi? Debitis."
-      />
-
-      <h3>Pequeno texto</h3>
-      <h2></h2>
-      <h3></h3>
-      <p>
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Rem nobis
-        architecto, asperiores voluptas quasi autem adipisci aperiam obcaecati
-        magni atque, tenetur quae iure aspernatur neque sequi blanditiis placeat
-        eligendi? Debitis.
-      </p>
-      <Button destino="des" texto="Página inesistente" />
-
-      <p>
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Rem nobis
-        architecto, asperiores voluptas quasi autem adipisci aperiam obcaecati
-        magni atque, tenetur quae iure aspernatur neque sequi blanditiis placeat
-        eligendi? Debitis.
-      </p>
-      <Button destino="des" texto="Página inesistente" />
-
-      <p>
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Rem nobis
-        architecto, asperiores voluptas quasi autem adipisci aperiam obcaecati
-        magni atque, tenetur quae iure aspernatur neque sequi blanditiis placeat
-        eligendi? Debitis.
-      </p>
-      <Button destino="des" texto="Página inesistente" />
-
-      <p>
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Rem nobis
-        architecto, asperiores voluptas quasi autem adipisci aperiam obcaecati
-        magni atque, tenetur quae iure aspernatur neque sequi blanditiis placeat
-        eligendi? Debitis.
-      </p>
-      <Button destino="des" texto="Página inesistente" />
-
-      <p>
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Rem nobis
-        architecto, asperiores voluptas quasi autem adipisci aperiam obcaecati
-        magni atque, tenetur quae iure aspernatur neque sequi blanditiis placeat
-        eligendi? Debitis.
-      </p>
-      <Button destino="des" texto="Página inesistente" />
-
-      <p>
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Rem nobis
-        architecto, asperiores voluptas quasi autem adipisci aperiam obcaecati
-        magni atque, tenetur quae iure aspernatur neque sequi blanditiis placeat
-        eligendi? Debitis.
-      </p>
-      <Button destino="des" texto="Página inesistente" />
-    </>
+    <PostProvider>
+      <div className={style.homeContainer}>
+        <div className={style.welcomeBox}>
+          <h2>
+            {user
+              ? `Bem-vindo(a), ${user.name || user.email}!`
+              : "Bem-vindo ao Expeeria!"}
+          </h2>
+          <p>
+            {user
+              ? "Veja recomendações personalizadas, explore novos conteúdos e compartilhe suas experiências!"
+              : "Faça login para receber recomendações personalizadas e interagir com a comunidade."}
+          </p>
+          <button
+            className={style.criarPostBtn}
+            onClick={() => navigate("/criar_post")}
+          >
+            + Criar novo post
+          </button>
+        </div>
+        <Recomendacoes />
+        <Feed />
+      </div>
+    </PostProvider>
   );
 };
 

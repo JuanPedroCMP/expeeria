@@ -6,7 +6,7 @@
   --cinzaEscuro: rgb(10, 12, 17);
   --azulEletrico: rgb(15, 147, 196);
   --brancoSuave: rgb(247, 250, 252);
-  --cinzaAzulado: rgb(160, 174, 192);
+  --cinzaAzulado: rgb(195, 211, 231);
 
   /* Fontes */
   --fonte-titulos: 'Orbitron', sans-serif;
@@ -18,6 +18,8 @@
   margin:  0;
   padding: 0;
   box-sizing: border-box;
+
+  color: var(--cinzaAzulado);
 }
 body {
   font-family: var(--fonte-corpo);

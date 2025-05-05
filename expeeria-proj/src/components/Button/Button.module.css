@@ -6,10 +6,10 @@
     padding: 1rem 2rem;
     border: 1px solid;
     border-radius: 0.8rem;
-    margin: 1rem;
+    margin-block-end: 1rem;
     z-index: 1;
     transition: background-color 0.3s ease-in-out;
-    
+    flex-direction: column;
 }
 
 .Button:hover[tipo="primario"] {

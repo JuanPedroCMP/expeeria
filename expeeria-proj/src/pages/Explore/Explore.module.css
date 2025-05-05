@@ -1,0 +1,51 @@
+.exploreContainer {
+  max-width: 80%;
+  margin: 0 auto;
+  align-items: center;
+}
+
+.title {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #fff;
+  font-size: 2rem;
+  letter-spacing: 1px;
+}
+
+.filtros {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 2rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.input,
+.select {
+  padding: 0.5rem 1rem;
+  border-radius: 0.4rem;
+  border: 1px solid var(--cinzaAzulado, #444);
+  background: #23283a;
+  color: #fff;
+  font-size: 1rem;
+  min-width: 30%;
+}
+
+.cardsGrid {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.cardsGrid > div {
+  width: 100%;
+}
+
+.nenhum {
+  color: #aaa;
+  text-align: center;
+  grid-column: 1/-1;
+  margin-top: 2rem;
+  font-size: 1.1rem;
+}
