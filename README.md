@@ -8,20 +8,27 @@
 
   ⚠️  **O sitema de usuario (visualizar perfil, etc.) não está funcionando corretamente pois ainda não está utilizando um banco de dados, isso será corrigido.**
 
+  Para poder testar o sitema de usuario use um usuarío já feito:
+
+      email: "carol@eco.com"
+      password: "carol123"
+      name: "Carol Verde"
+
 ---
 
 ## Índice
 
-1. [Visão Geral](#visão-geral)
-2. [Funcionalidades](#funcionalidades)
-3. [Tecnologias Utilizadas](#tecnologias-utilizadas)
-4. [Como Rodar o Projeto](#como-rodar-o-projeto)
-5. [Estrutura de Pastas](#estrutura-de-pastas)
-6. [Principais Componentes e Páginas](#principais-componentes-e-páginas)
-7. [Fluxo de Usuário](#fluxo-de-usuário)
-8. [Permissões e Papéis](#permissões-e-papéis)
-9. [Padrões de Código e Boas Práticas](#padrões-de-código-e-boas-práticas)
-10. [Integrantes do Grupo](#integrantes-do-grupo)
+1. [Visão Geral](#1-visão-geral)
+2. [Funcionalidades](#2-funcionalidades)
+3. [Tecnologias Utilizadas](#3-tecnologias-utilizadas)
+4. [Como Rodar o Projeto](#4-como-rodar-o-projeto)
+5. [Estrutura de Pastas](#5-estrutura-de-pastas)
+6. [Principais Componentes e Páginas](#6-principais-componentes-e-páginas)
+7. [Fluxo de Usuário](#7-fluxo-de-usuário)
+8. [Permissões e Papéis](#8-permissões-e-papéis)
+9. [Padrões de Código e Boas Práticas](#9-padrões-de-código-e-boas-práticas)
+10. [Integrantes do Grupo](#10-integrantes-do-grupo)
+11. [Planos Futuros](#11-planos-futuros)
 
 ---
 
@@ -85,25 +92,44 @@ npm run dev
 
 ```
 expeeria-proj/
-  public/
-  server/
-    db.json
-  src/
-    assets/
-    components/
-    contexts/
-    hooks/
-    layouts/
-    pages/
-    utils/
-    App.jsx
-    main.jsx
-    Router.jsx
-    index.css
-    App.css
-  package.json
-  vite.config.js
-  README.md
+├── public/
+│   └── vite.svg
+├── server/
+│   └── db.json
+├── src/
+│   ├── assets/
+│   ├── components/
+│   │   ├── Button/
+│   │   ├── Card/
+│   │   ├── CardBox/
+│   │   ├── EditPost/
+│   │   ├── Feed/
+│   │   ├── HeadInfoUsuario/
+│   │   ├── Navbar/
+│   │   │   └── MenuRecolhivel/
+│   │   ├── NewPost/
+│   │   ├── PrivateRoute/
+│   │   ├── Recomendacoes/
+│   │   └── UploadImage/
+│   ├── contexts/
+│   ├── hooks/
+│   ├── layouts/
+│   │   └── LayoutPadrao/
+│   ├── pages/
+│   │   ├── CreatePost/
+│   │   ├── Explore/
+│   │   ├── Home/
+│   │   ├── Login/
+│   │   ├── NotFound/
+│   │   ├── PostPage/
+│   │   ├── Profile/
+│   │   └── SignUp/
+│   ├── services/
+│   └── utils/
+├── package.json
+├── vite.config.js
+├── README.md
+└── ...
 ```
 
 ---
@@ -182,4 +208,22 @@ expeeria-proj/
 
 ---
 
+## 11. Planos Futuros
+
+- **Integrar a um banco de dados real** (ex: MongoDB, PostgreSQL, Supabase) para persistência dos dados dos usuários e posts.
+- **Aprimorar a segurança e autenticação**: adicionar autenticação JWT, redefinição de senha, verificação de e-mail e permissões avançadas.
+- **Melhorar o sistema de usuários**: perfis públicos/privados, badges, níveis de experiência, notificações e sistema de mensagens diretas.
+- **Aprimorar posts**: adicionar ferramentas de formatação avançada (editor WYSIWYG, suporte a vídeos, enquetes, anexos, etc).
+- **Integração com GitHub e outras plataformas**: login social, compartilhamento de posts, integração com LinkedIn, Google e Discord.
+- **Construir uma plataforma de cursos gratuitos**: área de cursos, trilhas de aprendizado, quizzes, certificados e gamificação.
+- **Sistema de comentários em tempo real** e notificações instantâneas.
+- **Feed personalizado com IA**: recomendações baseadas em interesses, histórico e engajamento.
+- **Aplicativo mobile (React Native)** para ampliar o acesso.
+- **Dashboard administrativo**: moderação de conteúdo, analytics e relatórios.
+- **Sistema de eventos e webinars**: calendário, inscrições e transmissão ao vivo.
+- **Marketplace de serviços e mentorias**.
+- **API pública para desenvolvedores**.
+- **Acessibilidade e internacionalização**: suporte a múltiplos idiomas e recursos para PCD.
+
+---
 

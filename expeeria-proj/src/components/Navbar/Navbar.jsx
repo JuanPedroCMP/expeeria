@@ -13,9 +13,23 @@ const Navbar = () => {
         <h6>Expeeria</h6>
         <div>
           {user ? (
-            <Link to="/perfil" className={style.profileBtn}>
-              Meu Perfil
-            </Link>
+            <>
+              <Link to="/perfil" className={style.profileBtn}>
+                Meu Perfil
+              </Link>
+              <button
+                className={style.loginBtn}
+                style={{ marginLeft: 8 }}
+                onClick={() => {
+                  if (window.confirm('Deseja realmente sair da conta?')) {
+                    window.localStorage.removeItem('user');
+                    window.location.href = '/login';
+                  }
+                }}
+              >
+                Sair
+              </button>
+            </>
           ) : (
             <Link to="/login" className={style.loginBtn}>
               Entrar

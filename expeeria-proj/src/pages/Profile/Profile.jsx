@@ -79,14 +79,13 @@ export function Profile() {
         } else {
           setError("Perfil não encontrado.");
         }
-      } catch (err) {
+      } catch{
         setError("Erro ao carregar perfil. Tente novamente.");
       }
       setLoading(false);
     };
     fetchProfile();
     fetchAllUsers();
-    // eslint-disable-next-line
   }, [user, id]);
 
   // Função para seguir outro usuário
@@ -196,7 +195,7 @@ export function Profile() {
           })
         );
       }
-    } catch (err) {
+    } catch{
       setError("Erro ao salvar perfil. Tente novamente.");
     }
   };

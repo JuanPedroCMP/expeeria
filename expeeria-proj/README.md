@@ -128,21 +128,3 @@ CLOUDINARY_CLOUD_NAME=deepc0do7
 
 ---
 
-## 8. Planos Futuros
-
-- **Integrar a um banco de dados real** (ex: MongoDB, PostgreSQL, Supabase) para persistência dos dados dos usuários e posts.
-- **Aprimorar a segurança e autenticação**: adicionar autenticação JWT, redefinição de senha, verificação de e-mail e permissões avançadas.
-- **Melhorar o sistema de usuários**: perfis públicos/privados, badges, níveis de experiência, notificações e sistema de mensagens diretas.
-- **Aprimorar posts**: adicionar ferramentas de formatação avançada (editor WYSIWYG, suporte a vídeos, enquetes, anexos, etc).
-- **Integração com GitHub e outras plataformas**: login social, compartilhamento de posts, integração com LinkedIn, Google e Discord.
-- **Construir uma plataforma de cursos gratuitos**: área de cursos, trilhas de aprendizado, quizzes, certificados e gamificação.
-- **Sistema de comentários em tempo real** e notificações instantâneas.
-- **Feed personalizado com IA**: recomendações baseadas em interesses, histórico e engajamento.
-- **Aplicativo mobile (React Native)** para ampliar o acesso.
-- **Dashboard administrativo**: moderação de conteúdo, analytics e relatórios.
-- **Sistema de eventos e webinars**: calendário, inscrições e transmissão ao vivo.
-- **Marketplace de serviços e mentorias**.
-- **API pública para desenvolvedores**.
-- **Acessibilidade e internacionalização**: suporte a múltiplos idiomas e recursos para PCD.
-
----
