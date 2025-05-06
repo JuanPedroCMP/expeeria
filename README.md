@@ -1,4 +1,3 @@
-
 # Expeeria
 
 ## Índice
@@ -13,7 +12,8 @@
 8. [Permissões e Papéis](#permissões-e-papéis)
 9. [Padrões de Código e Boas Práticas](#padrões-de-código-e-boas-práticas)
 10. [Como Contribuir](#como-contribuir)
-11. [Contato](#contato)
+11. [Integrantes do Grupo](#integrantes-do-grupo)
+12. [Contato](#contato)
 
 ---
 
@@ -25,22 +25,22 @@ O **Expeeria** é uma plataforma web colaborativa para compartilhar experiência
 
 ## 2. Funcionalidades
 
-- **Cadastro e login de usuários**
-- **Edição de perfil** (nome, email, avatar, bio, interesses)
-- **Nome de usuário único e fixo**
-- **Criação, edição e exclusão de posts**
-- **Upload de imagens para posts e perfil (Cloudinary)**
-- **Comentários em posts**
-- **Sistema de seguidores/seguindo**
-- **Exploração de posts por categorias, pesquisa e ordenação**
-- **Recomendações personalizadas na página inicial**
-- **Permissão de administrador (admin)**
-- **Proteção de rotas privadas**
-- **Design responsivo e acessível**
-- **Preview de Markdown nos posts**
-- **Seleção de múltiplos interesses/categorias (até 3)**
-- **Menu lateral recolhível acessível**
-- **Feedback visual em todas as ações**
+- Cadastro e login de usuários
+- Edição de perfil (nome, email, avatar, bio, interesses)
+- Nome de usuário único e fixo
+- Criação, edição e exclusão de posts
+- Upload de imagens para posts e perfil (Cloudinary)
+- Comentários em posts
+- Sistema de seguidores/seguindo
+- Exploração de posts por categorias, pesquisa e ordenação
+- Recomendações personalizadas na página inicial
+- Permissão de administrador (admin)
+- Proteção de rotas privadas
+- Design responsivo e acessível
+- Preview de Markdown nos posts
+- Seleção de múltiplos interesses/categorias (até 3)
+- Menu lateral recolhível acessível
+- Feedback visual em todas as ações
 
 ---
 
@@ -56,6 +56,8 @@ O **Expeeria** é uma plataforma web colaborativa para compartilhar experiência
 ---
 
 ## 4. Como Rodar o Projeto
+
+```bash
 # Instale as dependências
 npm install
 
@@ -81,37 +83,11 @@ expeeria-proj/
   src/
     assets/
     components/
-      Button/
-      Card/
-      CardBox/
-      EditPost/
-      Feed/
-      HeadInfoUsuario/
-      Navbar/
-        MenuRecolhivel/
-      NewPost/
-      PrivateRoute/
-      Recomendacoes/
-      UploadImage/
     contexts/
-      AppContext.jsx
-      AuthContext.jsx
-      PostContext.jsx
     hooks/
     layouts/
-      LayoutPadrao/
     pages/
-      CreatePost/
-      Explore/
-      Home/
-      Login/
-      NotFound/
-      PostPage/
-      Profile/
-      SignUp/
     utils/
-      categoriasPadrao.js
-      categorizePost.js
     App.jsx
     main.jsx
     Router.jsx
@@ -120,39 +96,40 @@ expeeria-proj/
   package.json
   vite.config.js
   README.md
+```
 
 ---
 
 ## 6. Principais Componentes e Páginas
 
-### **Navbar/MenuRecolhivel**
+### Navbar/MenuRecolhivel
 - Navegação principal, menu lateral responsivo, fecha ao clicar fora ou pressionar ESC.
 
-### **Profile**
+### Profile
 - Página de perfil do usuário, edição de nome, email, avatar, bio, interesses (checkboxes), visualização de seguidores/seguindo, posts do usuário.
 
-### **NewPost**
+### NewPost
 - Criação e edição de posts, upload de banner (Cloudinary), seleção de até 3 categorias (checkboxes), preview de Markdown.
 
-### **PostPage**
+### PostPage
 - Visualização detalhada de um post, banner, conteúdo em Markdown, comentários (com nome automático se logado), likes, botões de editar/excluir (se dono ou admin).
 
-### **Feed**
+### Feed
 - Lista de posts, cards centralizados, botão de like, visualização rápida.
 
-### **Recomendacoes**
+### Recomendacoes
 - Recomendações personalizadas na home, baseadas em quem o usuário segue e seus interesses.
 
-### **Explore**
+### Explore
 - Página de exploração de posts, com pesquisa, filtro por categoria, ordenação (recentes/populares), cards centralizados.
 
-### **SignUp/Login**
+### SignUp/Login
 - Cadastro e login, com validação, geração de username único, feedback de erro.
 
-### **UploadImage**
+### UploadImage
 - Upload de imagem para Cloudinary, preview, botão de remover, estilos modernos.
 
-### **PrivateRoute**
+### PrivateRoute
 - Protege rotas privadas, redireciona para login se não autenticado.
 
 ---
@@ -189,11 +166,22 @@ expeeria-proj/
 
 ---
 
-## 12. Observações Finais
+## 10. Como Contribuir
 
-- **Upload de imagens:** Use o preset correto do Cloudinary para avatar e banner.
-- **Banco de dados:** O arquivo `db.json` simula o backend, pode ser editado manualmente para testes.
-- **Segurança:** Nunca suba tokens ou segredos no repositório (use `.env`).
-- **Extensibilidade:** O projeto está pronto para receber novas áreas, categorias e funcionalidades.
+1. Faça um fork do projeto
+2. Crie uma branch: `git checkout -b minha-feature`
+3. Commit suas alterações: `git commit -m 'feat: minha feature'`
+4. Push para o fork: `git push origin minha-feature`
+5. Abra um Pull Request
 
 ---
+
+## 11. Integrantes do Grupo
+
+- **Juan Pedro** (2°DS)
+- **Rafael Sales** (2°DS)
+- **Ricardo Costa** (2°DS)
+
+---
+
+
