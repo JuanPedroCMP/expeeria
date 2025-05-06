@@ -1,4 +1,4 @@
-```markdown
+
 # Expeeria
 
 ## Índice
@@ -56,8 +56,6 @@ O **Expeeria** é uma plataforma web colaborativa para compartilhar experiência
 ---
 
 ## 4. Como Rodar o Projeto
-
-```bash
 # Instale as dependências
 npm install
 
@@ -122,7 +120,6 @@ expeeria-proj/
   package.json
   vite.config.js
   README.md
-```
 
 ---
 
