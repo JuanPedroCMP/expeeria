@@ -1,5 +1,11 @@
 # Expeeria
 
+## 🌐 Acesse o site online
+
+👉 **Acesse agora:** [https://expeeria.vercel.app](https://expeeria.vercel.app)
+
+---
+
 ## Índice
 
 1. [Visão Geral](#visão-geral)
