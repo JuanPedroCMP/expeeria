@@ -232,7 +232,7 @@ expeeria-proj/
 
 ## 12. Sobre a Ideia da startup
 
-O **Expeeria** é uma plataforma digital onde pessoas compartilham, trocam e adquirem conhecimentos práticos diretamente com outras pessoas — uma verdadeira rede de trocas de experiências e habilidades. O nome nasce da união de "Experience" (experiência) e "Peer" (par), refletindo o conceito central de aprendizado entre iguais.
+O **Expeeria** é uma plataforma digital onde pessoas compartilham, trocam e adquirem conhecimentos práticos diretamente com outras pessoas — uma verdadeira rede de trocas de experiências e habilidades. O nome nasce da união de **"Experience" (experiência) e "Peer" (par)**, refletindo o conceito central de aprendizado entre iguais.
 
 ### Proposta de Valor
 - Conectar pessoas com habilidades complementares.
@@ -241,7 +241,6 @@ O **Expeeria** é uma plataforma digital onde pessoas compartilham, trocam e adq
 
 ### Problemas que o Expeeria resolve
 - Dificuldade de encontrar alguém para trocar habilidades específicas (ex: “eu te ensino Photoshop e você me ensina Excel”).
-- Cursos teóricos sem prática e sem personalização.
 - Falta de rede para aprender habilidades de forma gratuita e colaborativa.
 - Isolamento de talentos com potencial de ensinar e colaborar.
 
@@ -258,7 +257,7 @@ O **Expeeria** é uma plataforma digital onde pessoas compartilham, trocam e adq
 - Autodidatas e criadores de conteúdo que valorizam trocas diretas.
 - Comunidades locais e grupos de estudo.
 
-### Recursos-Chave (Visão Futura)
+### Recursos-Chave (Para o futuro)
 - Sistema de Match de Habilidades: estilo "Tinder para aprendizado", onde usuários indicam o que sabem e o que querem aprender.
 - Perfis com portfólios, reputação e histórico de trocas.
 - Chat e agendamento direto na plataforma.
@@ -268,7 +267,6 @@ O **Expeeria** é uma plataforma digital onde pessoas compartilham, trocam e adq
 
 ### Modelo de Uso
 - 100% gratuito para os usuários.
-- Possível modelo freemium: recursos premium para perfis profissionais, aulas gravadas, mentorias, etc.
 - Potencial para se tornar uma plataforma de networking educativo.
 
 ### Inspiração e Diferenciais
