@@ -1,6 +1,6 @@
 import { useAuth } from "../../contexts/AuthContext";
 import { useState, useEffect } from "react";
-import axios from "axios";
+import { api } from "../../services/api";
 import style from "./Profile.module.css";
 import { categoriasPadrao } from "../../utils/categoriasPadrao";
 import { useParams, useNavigate } from "react-router-dom";
@@ -39,7 +39,7 @@ export function Profile() {
 
   // Função para buscar todos os usuários
   const fetchAllUsers = async () => {
-    const res = await axios.get("http://localhost:5000/users");
+    const res = await api.get("/users");
     setAllUsers(res.data);
   };
 
@@ -47,11 +47,9 @@ export function Profile() {
     const fetchProfile = async () => {
       let res;
       if (id) {
-        res = await axios.get(`http://localhost:5000/users?id=${id}`);
+        res = await api.get(`/users?id=${id}`);
       } else if (user) {
-        res = await axios.get(
-          `http://localhost:5000/users?email=${user.email}`
-        );
+        res = await api.get(`/users?email=${user.email}`);
       }
       if (res && res.data && res.data[0]) {
         setProfile(res.data[0]);
@@ -61,9 +59,7 @@ export function Profile() {
         setName(res.data[0]?.name || "");
         setEmail(res.data[0]?.email || "");
         // Busca posts do usuário
-        const postsRes = await axios.get(
-          `http://localhost:5000/posts?userId=${res.data[0].id}`
-        );
+        const postsRes = await api.get(`/posts?userId=${res.data[0].id}`);
         setUserPosts(postsRes.data);
       }
     };
@@ -76,35 +72,31 @@ export function Profile() {
     if (!user || !profile || user.id === targetId) return;
 
     // Atualiza o usuário logado (following)
-    const userRes = await axios.get(`http://localhost:5000/users/${user.id}`);
+    const userRes = await api.get(`/users/${user.id}`);
     const userFollowing = userRes.data.following || [];
     if (!userFollowing.includes(targetId)) {
-      await axios.patch(`http://localhost:5000/users/${user.id}`, {
+      await api.patch(`/users/${user.id}`, {
         following: [...userFollowing, targetId],
       });
     }
 
     // Atualiza o perfil visitado (followers)
-    const profileRes = await axios.get(
-      `http://localhost:5000/users/${targetId}`
-    );
+    const profileRes = await api.get(`/users/${targetId}`);
     const profileFollowers = profileRes.data.followers || [];
     if (!profileFollowers.includes(user.id)) {
-      await axios.patch(`http://localhost:5000/users/${targetId}`, {
+      await api.patch(`/users/${targetId}`, {
         followers: [...profileFollowers, user.id],
       });
     }
 
     // Atualiza estados locais
     if (profile.id === targetId) {
-      const res = await axios.get(`http://localhost:5000/users?id=${targetId}`);
+      const res = await api.get(`/users?id=${targetId}`);
       setProfile(res.data[0]);
     }
     await fetchAllUsers();
     // Atualiza usuário logado no localStorage/contexto
-    const updatedUserRes = await axios.get(
-      `http://localhost:5000/users/${user.id}`
-    );
+    const updatedUserRes = await api.get(`/users/${user.id}`);
     localStorage.setItem("user", JSON.stringify(updatedUserRes.data));
     if (typeof setUser === "function") setUser(updatedUserRes.data);
   };
@@ -114,42 +106,38 @@ export function Profile() {
     if (!user || !profile || user.id === targetId) return;
 
     // Atualiza o usuário logado (following)
-    const userRes = await axios.get(`http://localhost:5000/users/${user.id}`);
+    const userRes = await api.get(`/users/${user.id}`);
     const userFollowing = userRes.data.following || [];
     if (userFollowing.includes(targetId)) {
-      await axios.patch(`http://localhost:5000/users/${user.id}`, {
+      await api.patch(`/users/${user.id}`, {
         following: userFollowing.filter((id) => id !== targetId),
       });
     }
 
     // Atualiza o perfil visitado (followers)
-    const profileRes = await axios.get(
-      `http://localhost:5000/users/${targetId}`
-    );
+    const profileRes = await api.get(`/users/${targetId}`);
     const profileFollowers = profileRes.data.followers || [];
     if (profileFollowers.includes(user.id)) {
-      await axios.patch(`http://localhost:5000/users/${targetId}`, {
+      await api.patch(`/users/${targetId}`, {
         followers: profileFollowers.filter((id) => id !== user.id),
       });
     }
 
     // Atualiza estados locais
     if (profile.id === targetId) {
-      const res = await axios.get(`http://localhost:5000/users?id=${targetId}`);
+      const res = await api.get(`/users?id=${targetId}`);
       setProfile(res.data[0]);
     }
     await fetchAllUsers();
     // Atualiza usuário logado no localStorage/contexto
-    const updatedUserRes = await axios.get(
-      `http://localhost:5000/users/${user.id}`
-    );
+    const updatedUserRes = await api.get(`/users/${user.id}`);
     localStorage.setItem("user", JSON.stringify(updatedUserRes.data));
     if (typeof setUser === "function") setUser(updatedUserRes.data);
   };
 
   // Função para salvar edição do perfil
   const handleSave = async () => {
-    await axios.patch(`http://localhost:5000/users/${profile.id}`, {
+    await api.patch(`/users/${profile.id}`, {
       name,
       email,
       bio,
@@ -158,7 +146,7 @@ export function Profile() {
     });
     setEditing(false);
     // Atualiza perfil
-    const res = await axios.get(`http://localhost:5000/users?id=${profile.id}`);
+    const res = await api.get(`/users?id=${profile.id}`);
     setProfile(res.data[0]);
     // Se o usuário editou o próprio perfil, atualize o contexto/localStorage
     if (user && user.id === profile.id) {

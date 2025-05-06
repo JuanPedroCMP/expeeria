@@ -1,5 +1,5 @@
 import { createContext, useContext, useState } from "react";
-import axios from "axios";
+import { api } from "../services/api";
 
 const AuthContext = createContext();
 
@@ -13,14 +13,12 @@ export function AuthProvider({ children }) {
   const signUp = async (email, password, name, username) => {
     try {
       // Verifica se já existe email ou username
-      const res = await axios.get(`http://localhost:5000/users?email=${email}`);
-      const resUser = await axios.get(
-        `http://localhost:5000/users?username=${username}`
-      );
+      const res = await api.get(`/users?email=${email}`);
+      const resUser = await api.get(`/users?username=${username}`);
       if (res.data.length > 0 || resUser.data.length > 0) return false; // Já existe
 
       const newUser = { email, password, name, username, role: "user" };
-      const postRes = await axios.post("http://localhost:5000/users", newUser);
+      const postRes = await api.post("/users", newUser);
       setUser({
         email: postRes.data.email,
         id: postRes.data.id,
@@ -47,9 +45,7 @@ export function AuthProvider({ children }) {
   // Login
   const signIn = async (email, password) => {
     try {
-      const res = await axios.get(
-        `http://localhost:5000/users?email=${email}&password=${password}`
-      );
+      const res = await api.get(`/users?email=${email}&password=${password}`);
       if (res.data.length > 0) {
         const userData = res.data[0];
         setUser({

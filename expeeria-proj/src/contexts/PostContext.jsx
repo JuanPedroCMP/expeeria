@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import axios from "axios";
+import { api } from "../services/api";
 
 const PostContext = createContext();
 
@@ -13,7 +13,7 @@ export const PostProvider = ({ children }) => {
   const fetchPosts = async () => {
     setLoading(true);
     try {
-      const res = await axios.get("http://localhost:5000/posts");
+      const res = await api.get("/posts");
       setPosts(res.data);
     } catch {
       setPosts([]);
@@ -27,7 +27,7 @@ export const PostProvider = ({ children }) => {
 
   // Adiciona novo post
   const addPost = async (post) => {
-    const res = await axios.post("http://localhost:5000/posts", post);
+    const res = await api.post("/posts", post);
     setPosts([res.data, ...posts]);
   };
 
@@ -35,7 +35,7 @@ export const PostProvider = ({ children }) => {
     const post = posts.find((p) => String(p.id) === String(id));
     if (!post) return;
     const updatedLikes = (post.likes || 0) + 1;
-    await axios.patch(`http://localhost:5000/posts/${id}`, {
+    await api.patch(`/posts/${id}`, {
       likes: updatedLikes,
     });
     setPosts(
@@ -50,7 +50,7 @@ export const PostProvider = ({ children }) => {
     if (!post) return;
     const newComment = { id: `${Date.now()}-${Math.random()}`, ...comment };
     const updatedComments = [...(post.comments || []), newComment];
-    await axios.patch(`http://localhost:5000/posts/${postId}`, {
+    await api.patch(`/posts/${postId}`, {
       comments: updatedComments,
     });
     setPosts(
@@ -78,12 +78,12 @@ export const PostProvider = ({ children }) => {
     : posts;
 
   const deletePost = async (id) => {
-    await axios.delete(`http://localhost:5000/posts/${id}`);
+    await api.delete(`/posts/${id}`);
     fetchPosts();
   };
 
   const editPost = async (id, updatedData) => {
-    await axios.put(`http://localhost:5000/posts/${id}`, updatedData);
+    await api.put(`/posts/${id}`, updatedData);
     fetchPosts();
   };
 
