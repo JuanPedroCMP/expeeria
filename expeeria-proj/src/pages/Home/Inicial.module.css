@@ -1,0 +1,29 @@
+.homeContainer {
+  margin: 0 auto;
+  padding: 32px 16px;
+}
+
+.welcomeBox {
+  background: #23283a;
+  border-radius: 0.7rem;
+  padding: 2rem 2.5rem;
+  margin-bottom: 2rem;
+  text-align: center;
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.criarPostBtn {
+  margin-top: 1rem;
+  background: linear-gradient(90deg, #0575e6, #00f260);
+  color: #fff;
+  border: none;
+  border-radius: 0.4rem;
+  padding: 0.6rem 1.5rem;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: filter 0.2s;
+}
+.criarPostBtn:hover {
+  filter: brightness(1.1);
+}

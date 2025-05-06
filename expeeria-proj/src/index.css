@@ -1,0 +1,45 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Montserrat:wght@400;600&family=Orbitron:wght@700&display=swap');
+
+:root {
+  /* Cores */
+  --preto: rgb(3, 2, 8);
+  --cinzaEscuro: rgb(10, 12, 17);
+  --azulEletrico: rgb(15, 147, 196);
+  --brancoSuave: rgb(247, 250, 252);
+  --cinzaAzulado: rgb(195, 211, 231);
+
+  /* Fontes */
+  --fonte-titulos: 'Orbitron', sans-serif;
+  --fonte-subtitulos: 'Montserrat', sans-serif;
+  --fonte-corpo: 'Inter', sans-serif;
+}
+
+* {
+  margin:  0;
+  padding: 0;
+  box-sizing: border-box;
+
+  color: var(--cinzaAzulado);
+}
+body {
+  font-family: var(--fonte-corpo);
+  color: var(--brancoSuave);
+  background-color: var(--preto);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--fonte-titulos);
+  color: var(--brancoSuave);
+  margin: 0;
+}
+
+nav, .subtitle {
+  font-family: var(--fonte-subtitulos);
+  color: var(--cinzaAzulado);
+}
+
+p, span {
+  font-family: var(--fonte-corpo);
+  color: var(--cinzaAzulado);
+}
+

@@ -1,0 +1,159 @@
+.postContainer {
+  background: #181c24;
+  border-radius: 1rem;
+  padding: 3rem;
+  max-width: 80%;
+  margin: 2rem auto;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.1);
+  color: #fff;
+
+  overflow: hidden;
+}
+
+.postImage {
+  width: 100%;
+  max-width: 400px;
+  border-radius: 0.8rem;
+  margin-bottom: 1rem;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.postTitle {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.postMeta {
+  color: #8ecae6;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.postCaption {
+  font-style: italic;
+  color: #bdbdbd;
+  margin-bottom: 1rem;
+}
+
+.postContent {
+  margin: 1.5rem 0;
+  line-height: 1.6;
+}
+
+.likeBtn {
+  background: none;
+  border: none;
+  color: #e74c3c;
+  font-size: 1.3rem;
+  cursor: pointer;
+  margin-bottom: 1rem;
+  transition: transform 0.1s;
+}
+.likeBtn:hover {
+  transform: scale(1.15);
+}
+
+.postDate {
+  font-size: 0.9rem;
+  color: #aaa;
+  margin-bottom: 1rem;
+}
+
+.commentsTitle {
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  color: #fff;
+}
+
+.commentForm {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.commentForm input {
+  flex: 1;
+  padding: 0.5rem;
+  border-radius: 0.4rem;
+  border: none;
+  background: #23283a;
+  color: #fff;
+}
+
+.commentForm button {
+  background: linear-gradient(90deg, #0575e6, #00f260);
+  color: #fff;
+  border: none;
+  border-radius: 0.4rem;
+  padding: 0.5rem 1rem;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.commentsList {
+  list-style: none;
+  padding: 0;
+}
+
+.commentsList li {
+  background: #23283a;
+  border-radius: 0.4rem;
+  margin-bottom: 0.5rem;
+  padding: 0.5rem 1rem;
+  color: #fff;
+}
+
+.bannerBox {
+  width: 100%;
+  max-height: 260px;
+  overflow: hidden;
+  border-radius: 1rem 1rem 0 0;
+  margin-bottom: 1.5rem;
+  background: #23283a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bannerImage {
+  width: 100%;
+  object-fit: cover;
+  max-height: 260px;
+  display: block;
+}
+
+.editBtn {
+    background: #0f97f1;
+    color: var(--brancoSuave);
+    border: none;
+    padding: 1rem 2rem;
+    border: 1px solid;
+    border-radius: 0.8rem;
+    margin-block-end: 1rem;
+    margin-bottom: 0.7rem;
+    margin-right: 0.7rem;
+    cursor: pointer;
+    transition: filter 0.2s;
+  }
+  .editBtn:hover {
+    filter: brightness(1.1);
+  }
+
+  .deleteBtn {
+    background: #e74c3c;
+    color: var(--brancoSuave);
+    border: none;
+    cursor: pointer;
+    padding: 1rem 2rem;
+    border: 1px solid;
+    border-radius: 0.8rem;
+    margin-block-end: 1rem;
+    margin-bottom: 0.7rem;
+    margin-right: 0.7rem;
+    transition: filter 0.2s;
+  }
+  .deleteBtn:hover {
+    filter: brightness(1.1);
+  }

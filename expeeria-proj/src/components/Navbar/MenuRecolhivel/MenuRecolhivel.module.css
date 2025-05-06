@@ -1,0 +1,78 @@
+/* Estilo atualizado para recriar o menu inspirado no GitHub */
+.menuRecolhivel {
+  position: relative;
+}
+
+.dropdownButton {
+  background-color: #00000000;
+  color: var(--brancoSuave);
+  padding: 2px;
+  border: none;
+  cursor: pointer;
+  border-radius: 2px;
+  font-size: 1rem;
+  z-index: 1001; /* Mantém o botão acima do conteúdo até o menu abrir */
+}
+
+/* Corrigi o estilo para garantir que o blur funcione corretamente */
+.menu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 300px;
+  height: 100vh;
+  background-color: var(--cinzaEscuro); /* Fundo cinza com transparência */
+  backdrop-filter: blur(10px); /* Efeito de desfoque */
+  -webkit-backdrop-filter: blur(10px); /* Suporte para navegadores baseados em WebKit */
+  border-right: 1px solid var(--cinzaAzulado);
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(-100%);
+  transition: transform 0.4s ease-in-out; 
+}
+
+.menu.open {
+  transform: translateX(0); 
+}
+
+.menuHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background-color: var(--azulEletrico);
+  color: var(--brancoSuave);
+  font-weight: bold;
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  color: #8a0b0b;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.menuLink {
+  display: block;
+  padding: 10px 15px;
+  color: var(--brancoSuave);
+  text-decoration: none;
+  font-family: var(--fonte-subtitulos);
+}
+
+.menuLink:hover {
+  background-color: var(--azulEletrico);
+  color: var(--preto);
+}
+
+.menuOverlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.35);
+  z-index: 999;
+  cursor: pointer;
+  transition: background 0.2s;
+}
