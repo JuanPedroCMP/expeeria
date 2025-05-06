@@ -121,4 +121,3 @@ CLOUDINARY_CLOUD_NAME=deepc0do7
 - Teste uploads, login, permissões de admin e responsividade em diferentes navegadores.
 
 ---
-

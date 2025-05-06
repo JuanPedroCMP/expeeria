@@ -1,4 +1,4 @@
-# Expeeria
+# Expeeria – Conectando pessoas através do conhecimento
 
 ## 🌐 Acesse o site online
 
@@ -31,6 +31,7 @@
 9. [Padrões de Código e Boas Práticas](#9-padrões-de-código-e-boas-práticas)
 10. [Integrantes do Grupo](#10-integrantes-do-grupo)
 11. [Planos Futuros](#11-planos-futuros)
+11. [Ideia da startup](#12-sobre-a-ideia-da-startup)
 
 ---
 
@@ -226,6 +227,61 @@ expeeria-proj/
 - **Marketplace de serviços e mentorias**.
 - **API pública para desenvolvedores**.
 - **Acessibilidade e internacionalização**: suporte a múltiplos idiomas e recursos para PCD.
+
+---
+
+## 12. Sobre a Ideia da startup
+
+O **Expeeria** é uma plataforma digital onde pessoas compartilham, trocam e adquirem conhecimentos práticos diretamente com outras pessoas — uma verdadeira rede de trocas de experiências e habilidades. O nome nasce da união de "Experience" (experiência) e "Peer" (par), refletindo o conceito central de aprendizado entre iguais.
+
+### Proposta de Valor
+- Conectar pessoas com habilidades complementares.
+- Facilitar a troca de conhecimento real e aplicável, sem intermediários ou cursos longos.
+- Valorizar experiências de vida, estudo e profissão como formas legítimas de ensino.
+
+### Problemas que o Expeeria resolve
+- Dificuldade de encontrar alguém para trocar habilidades específicas (ex: “eu te ensino Photoshop e você me ensina Excel”).
+- Cursos teóricos sem prática e sem personalização.
+- Falta de rede para aprender habilidades de forma gratuita e colaborativa.
+- Isolamento de talentos com potencial de ensinar e colaborar.
+
+### Filosofia do Projeto
+- Conhecimento é uma moeda social.
+- Todos têm algo a ensinar.
+- Aprender pode ser humano, direto e colaborativo.
+- Experiências reais valem tanto quanto diplomas.
+- A educação pode ser descentralizada e mais acessível.
+
+### Público-Alvo
+- Estudantes que querem reforçar habilidades específicas e compartilhar o que sabem.
+- Profissionais iniciantes que querem aprender de quem já está na área.
+- Autodidatas e criadores de conteúdo que valorizam trocas diretas.
+- Comunidades locais e grupos de estudo.
+
+### Recursos-Chave (Visão Futura)
+- Sistema de Match de Habilidades: estilo "Tinder para aprendizado", onde usuários indicam o que sabem e o que querem aprender.
+- Perfis com portfólios, reputação e histórico de trocas.
+- Chat e agendamento direto na plataforma.
+- Gamificação: conquistas por ensinar, aprender, avaliar.
+- Integração com GitHub, Behance, LinkedIn etc. para validar experiências.
+- Feed de microaulas e experiências compartilhadas.
+
+### Modelo de Uso
+- 100% gratuito para os usuários.
+- Possível modelo freemium: recursos premium para perfis profissionais, aulas gravadas, mentorias, etc.
+- Potencial para se tornar uma plataforma de networking educativo.
+
+### Inspiração e Diferenciais
+Diferente de plataformas como Udemy ou Coursera, o Expeeria não é focado em cursos longos, mas sim em trocas rápidas, pontuais e práticas entre pessoas reais.
+
+**Inspirações:** Tinder (match), Discord (comunidades), Duolingo (gamificação), Behance (portfólio de habilidades).
+
+### Mensagem Principal 
+> “Compartilhe conhecimento. Aprenda com experiências reais.”
+>
+> “Você ensina. Você aprende. Você cresce.”
+>
+> “Transforme o que você sabe em uma ponte para o que quer aprender.”
 
 ---
 
