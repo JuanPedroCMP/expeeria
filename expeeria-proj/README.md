@@ -29,6 +29,7 @@ CLOUDINARY_CLOUD_NAME=deepc0do7
   - `preset`: nome do preset do Cloudinary.
   - `previewStyle`: objeto de estilos para o preview.
 - Exemplo de uso:
+
   ```jsx
   <UploadImage
     onUpload={setAvatar}
