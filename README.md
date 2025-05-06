@@ -269,11 +269,6 @@ O **Expeeria** é uma plataforma digital onde pessoas compartilham, trocam e adq
 - 100% gratuito para os usuários.
 - Potencial para se tornar uma plataforma de networking educativo.
 
-### Inspiração e Diferenciais
-Diferente de plataformas como Udemy ou Coursera, o Expeeria não é focado em cursos longos, mas sim em trocas rápidas, pontuais e práticas entre pessoas reais.
-
-**Inspirações:** Tinder (match), Discord (comunidades), Duolingo (gamificação), Behance (portfólio de habilidades).
-
 ### Mensagem Principal 
 > “Compartilhe conhecimento. Aprenda com experiências reais.”
 >
