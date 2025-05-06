@@ -11,9 +11,7 @@
 7. [Fluxo de Usuário](#fluxo-de-usuário)
 8. [Permissões e Papéis](#permissões-e-papéis)
 9. [Padrões de Código e Boas Práticas](#padrões-de-código-e-boas-práticas)
-10. [Como Contribuir](#como-contribuir)
-11. [Integrantes do Grupo](#integrantes-do-grupo)
-12. [Contato](#contato)
+10. [Integrantes do Grupo](#integrantes-do-grupo)
 
 ---
 
@@ -166,17 +164,7 @@ expeeria-proj/
 
 ---
 
-## 10. Como Contribuir
-
-1. Faça um fork do projeto
-2. Crie uma branch: `git checkout -b minha-feature`
-3. Commit suas alterações: `git commit -m 'feat: minha feature'`
-4. Push para o fork: `git push origin minha-feature`
-5. Abra um Pull Request
-
----
-
-## 11. Integrantes do Grupo
+## 10. Integrantes do Grupo
 
 - **Juan Pedro** (2°DS)
 - **Rafael Sales** (2°DS)
