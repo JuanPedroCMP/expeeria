@@ -17,27 +17,43 @@ export function AuthProvider({ children }) {
       const resUser = await api.get(`/users?username=${username}`);
       if (res.data.length > 0 || resUser.data.length > 0) return false; // Já existe
 
-      const newUser = { email, password, name, username, role: "user" };
+      const newUser = { email, password, name, username, role: "user", followers: [], following: [], bio: "", avatar: "", interests: [] };
       const postRes = await api.post("/users", newUser);
+      const userData = postRes.data;
+      if (!userData || !userData.id) {
+        console.error("Usuário não retornado corretamente pelo backend:", userData);
+        return false;
+      }
       setUser({
-        email: postRes.data.email,
-        id: postRes.data.id,
-        role: postRes.data.role,
-        name: postRes.data.name,
-        username: postRes.data.username,
+        email: userData.email,
+        id: userData.id,
+        role: userData.role,
+        name: userData.name,
+        username: userData.username,
+        bio: userData.bio,
+        avatar: userData.avatar,
+        interests: userData.interests,
+        followers: userData.followers,
+        following: userData.following,
       });
       localStorage.setItem(
         "user",
         JSON.stringify({
-          email: postRes.data.email,
-          id: postRes.data.id,
-          role: postRes.data.role,
-          name: postRes.data.name,
-          username: postRes.data.username,
+          email: userData.email,
+          id: userData.id,
+          role: userData.role,
+          name: userData.name,
+          username: userData.username,
+          bio: userData.bio,
+          avatar: userData.avatar,
+          interests: userData.interests,
+          followers: userData.followers,
+          following: userData.following,
         })
       );
       return true;
-    } catch {
+    } catch (err) {
+      console.error("Erro no cadastro:", err);
       return false;
     }
   };

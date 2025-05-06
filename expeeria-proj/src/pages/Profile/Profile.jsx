@@ -19,6 +19,9 @@ export function Profile() {
   const [userPosts, setUserPosts] = useState([]);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   function toMultiArray(val) {
     if (!val) return [];
@@ -37,34 +40,53 @@ export function Profile() {
   const isOwnerOrAdmin =
     user && profile && (user.email === profile.email || user.role === "admin");
 
-  // Função para buscar todos os usuários
+  // Busca todos os usuários
   const fetchAllUsers = async () => {
-    const res = await api.get("/users");
-    setAllUsers(res.data);
+    try {
+      const res = await api.get("/users");
+      setAllUsers(res.data);
+    } catch {
+      setAllUsers([]);
+    }
   };
 
   useEffect(() => {
     const fetchProfile = async () => {
-      let res;
-      if (id) {
-        res = await api.get(`/users?id=${id}`);
-      } else if (user) {
-        res = await api.get(`/users?email=${user.email}`);
+      setLoading(true);
+      setError("");
+      try {
+        let res;
+        if (!user && !id) {
+          setError("Você precisa estar logado para acessar o perfil.");
+          setLoading(false);
+          return;
+        }
+        if (id) {
+          res = await api.get(`/users?id=${id}`);
+        } else if (user) {
+          res = await api.get(`/users?email=${user.email}`);
+        }
+        if (res && res.data && res.data[0]) {
+          setProfile(res.data[0]);
+          setBio(res.data[0]?.bio || "");
+          setAvatar(res.data[0]?.avatar || "");
+          setInterests(toMultiArray(res.data[0]?.interests));
+          setName(res.data[0]?.name || "");
+          setEmail(res.data[0]?.email || "");
+          // Busca posts do usuário
+          const postsRes = await api.get(`/posts?userId=${res.data[0].id}`);
+          setUserPosts(postsRes.data);
+        } else {
+          setError("Perfil não encontrado.");
+        }
+      } catch (err) {
+        setError("Erro ao carregar perfil. Tente novamente.");
       }
-      if (res && res.data && res.data[0]) {
-        setProfile(res.data[0]);
-        setBio(res.data[0]?.bio || "");
-        setAvatar(res.data[0]?.avatar || "");
-        setInterests(toMultiArray(res.data[0]?.interests));
-        setName(res.data[0]?.name || "");
-        setEmail(res.data[0]?.email || "");
-        // Busca posts do usuário
-        const postsRes = await api.get(`/posts?userId=${res.data[0].id}`);
-        setUserPosts(postsRes.data);
-      }
+      setLoading(false);
     };
     fetchProfile();
     fetchAllUsers();
+    // eslint-disable-next-line
   }, [user, id]);
 
   // Função para seguir outro usuário
@@ -137,42 +159,51 @@ export function Profile() {
 
   // Função para salvar edição do perfil
   const handleSave = async () => {
-    await api.patch(`/users/${profile.id}`, {
-      name,
-      email,
-      bio,
-      avatar,
-      interests,
-    });
-    setEditing(false);
-    // Atualiza perfil
-    const res = await api.get(`/users?id=${profile.id}`);
-    setProfile(res.data[0]);
-    // Se o usuário editou o próprio perfil, atualize o contexto/localStorage
-    if (user && user.id === profile.id) {
-      setUser({
-        ...user,
+    setError("");
+    setSuccess("");
+    try {
+      await api.patch(`/users/${profile.id}`, {
         name,
         email,
         bio,
         avatar,
         interests,
       });
-      localStorage.setItem(
-        "user",
-        JSON.stringify({
+      setEditing(false);
+      setSuccess("Perfil salvo com sucesso!");
+      // Atualiza perfil
+      const res = await api.get(`/users?id=${profile.id}`);
+      setProfile(res.data[0]);
+      // Se o usuário editou o próprio perfil, atualize o contexto/localStorage
+      if (user && user.id === profile.id) {
+        setUser({
           ...user,
           name,
           email,
           bio,
           avatar,
           interests,
-        })
-      );
+        });
+        localStorage.setItem(
+          "user",
+          JSON.stringify({
+            ...user,
+            name,
+            email,
+            bio,
+            avatar,
+            interests,
+          })
+        );
+      }
+    } catch (err) {
+      setError("Erro ao salvar perfil. Tente novamente.");
     }
   };
 
-  if (!profile) return <p>Carregando perfil...</p>;
+  if (loading) return <p>Carregando perfil...</p>;
+  if (error) return <p style={{ color: "red" }}>{error}</p>;
+  if (!profile) return <p>Perfil não encontrado.</p>;
 
   return (
     <div className={style.profileBox}>
@@ -270,6 +301,8 @@ export function Profile() {
           </div>
           <button onClick={handleSave}>Salvar</button>
           <button onClick={() => setEditing(false)}>Cancelar</button>
+          {error && <p style={{ color: "red", marginTop: 8 }}>{error}</p>}
+          {success && <p style={{ color: "green", marginTop: 8 }}>{success}</p>}
         </>
       ) : (
         <>
