@@ -3,7 +3,7 @@ import { usePosts } from "../../contexts/PostContext";
 import ReactMarkdown from "react-markdown";
 import style from "./NewPost.module.css";
 import { Button } from "../Button";
-import { categorizePost } from "../../utils/categorizePost";
+// import { categorizePost } from "../../utils/categorizePost";
 import { categoriasPadrao } from "../../utils/categoriasPadrao";
 import { useAuth } from "../../contexts/AuthContext";
 import { UploadImage } from "../UploadImage/UploadImage";
@@ -22,8 +22,8 @@ export const NewPost = ({
   // eslint-disable-next-line no-unused-vars
   const [author, setAuthor] = useState(postOriginal?.author || "");
   const [area, setArea] = useState(postOriginal?.area || []);
-  const [categorias, setCategorias] = useState(categoriasPadrao);
-  const [loadingCategoria, setLoadingCategoria] = useState(false);
+//   const [categorias, setCategorias] = useState(categoriasPadrao);
+//   const [loadingCategoria, setLoadingCategoria] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [categoriasOpen, setCategoriasOpen] = useState(false);
@@ -39,15 +39,15 @@ export const NewPost = ({
     }
   }, [postOriginal]);
 
-  const handleCategorize = async () => {
-    setLoadingCategoria(true);
-    const categoria = await categorizePost(content, categorias);
-    setLoadingCategoria(false);
-    setArea([categoria]);
-    if (!categorias.includes(categoria)) {
-      setCategorias([...categorias, categoria]);
-    }
-  };
+//   const handleCategorize = async () => {
+//     setLoadingCategoria(true);
+//     const categoria = await categorizePost(content, categorias);
+//     setLoadingCategoria(false);
+//     setArea([categoria]);
+//     if (!categorias.includes(categoria)) {
+//       setCategorias([...categorias, categoria]);
+//     }
+//   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -183,14 +183,14 @@ export const NewPost = ({
               <p style={{ fontSize: 12, color: "#aaa", marginLeft: 8 }}>
                 Selecione até 3 categorias
               </p>
-              <button
+              {/* <button
                 type="button"
                 onClick={handleCategorize}
                 disabled={loadingCategoria || !content}
                 style={{ marginLeft: 12 }}
               >
                 {loadingCategoria ? "Analisando..." : "Categorizar com IA (Ainda não está funcionando)"}
-              </button>
+              </button> */}
             </div>
           )}
         </div>

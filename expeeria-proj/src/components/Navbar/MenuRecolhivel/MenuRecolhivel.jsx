@@ -65,9 +65,22 @@ const MenuRecolhivel = () => {
             <Link to="/explorar" className={style.menuLink} onClick={closeMenu}>
               Explorar posts
             </Link>
-            <Link to="/criar_post" className={style.menuLink} onClick={closeMenu}>
+            <Link
+              to="/criar_post"
+              className={style.menuLink}
+              onClick={closeMenu}
+            >
               Criar Post
             </Link>
+            <a
+              href="https://github.com/JuanPedroCMP/expeeria/blob/main/README.md"
+              className={style.menuLink}
+              onClick={closeMenu}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Documentação
+            </a>
           </nav>
         </div>
       )}
