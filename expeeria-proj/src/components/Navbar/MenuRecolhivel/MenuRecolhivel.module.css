@@ -4,12 +4,12 @@
 }
 
 .dropdownButton {
-  background-color: #093596be;
+  background-color: #0936962a;
   color: var(--brancoSuave);
   padding: 2px;
   border: none;
   cursor: pointer;
-  border-radius: 2px;
+  border-radius: 3px;
   font-size: 1rem;
   z-index: 1001; /* Mantém o botão acima do conteúdo até o menu abrir */
 }

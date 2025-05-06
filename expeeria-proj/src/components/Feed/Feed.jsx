@@ -23,9 +23,9 @@ export const Feed = () => {
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
   // Paginação
-  const [page, setPage] = useState(1);
   const [showCount, setShowCount] = useState(PAGE_SIZE);
   const loader = useRef();
+  const [showCategories, setShowCategories] = useState(false);
 
   // Salva filtros no localStorage
   useEffect(() => {
@@ -105,9 +105,17 @@ export const Feed = () => {
     setShowCount(PAGE_SIZE);
   };
 
+  // Loading visual
+  const [loadingVisual, setLoadingVisual] = useState(false);
+  useEffect(() => {
+    setLoadingVisual(true);
+    const timeout = setTimeout(() => setLoadingVisual(false), 400);
+    return () => clearTimeout(timeout);
+  }, [search, selectedAreas, author, order, dateFrom, dateTo, posts]);
+
   return (
     <div>
-      <div className={style.filtroArea}>
+      <div className={style.filtrosPainel}>
         <input
           type="text"
           placeholder="Buscar por título, conteúdo ou autor..."
@@ -116,24 +124,32 @@ export const Feed = () => {
             setSearch(e.target.value);
             setShowCount(PAGE_SIZE);
           }}
-          style={{ borderRadius: 6, border: "none", padding: "0.5rem 1rem", background: "#23283a", color: "#fff", minWidth: 180 }}
         />
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-          {categoriasPadrao.map((cat) => (
-            <label key={cat} style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 13 }}>
-              <input
-                type="checkbox"
-                checked={selectedAreas.includes(cat)}
-                onChange={e => {
-                  setShowCount(PAGE_SIZE);
-                  if (e.target.checked) setSelectedAreas([...selectedAreas, cat]);
-                  else setSelectedAreas(selectedAreas.filter(a => a !== cat));
-                }}
-              />
-              {cat}
-            </label>
-          ))}
-        </div>
+        <button
+          type="button"
+          className={style.categoriasToggle}
+          onClick={() => setShowCategories((v) => !v)}
+        >
+          {showCategories ? "Ocultar categorias" : "Filtrar por categorias"}
+        </button>
+        {showCategories && (
+          <div className={style.categoriasBox}>
+            {categoriasPadrao.map((cat) => (
+              <label key={cat} className={style.categoriaLabel}>
+                <input
+                  type="checkbox"
+                  checked={selectedAreas.includes(cat)}
+                  onChange={e => {
+                    setShowCount(PAGE_SIZE);
+                    if (e.target.checked) setSelectedAreas([...selectedAreas, cat]);
+                    else setSelectedAreas(selectedAreas.filter(a => a !== cat));
+                  }}
+                />
+                {cat}
+              </label>
+            ))}
+          </div>
+        )}
         <input
           type="text"
           placeholder="Filtrar por autor"
@@ -142,9 +158,9 @@ export const Feed = () => {
             setAuthor(e.target.value);
             setShowCount(PAGE_SIZE);
           }}
-          style={{ borderRadius: 6, border: "none", padding: "0.5rem 1rem", background: "#23283a", color: "#fff", minWidth: 120 }}
+          style={{ minWidth: 120 }}
         />
-        <label style={{ fontSize: 13 }}>
+        <label className={style.dataLabel}>
           De:
           <input
             type="date"
@@ -153,10 +169,9 @@ export const Feed = () => {
               setDateFrom(e.target.value);
               setShowCount(PAGE_SIZE);
             }}
-            style={{ marginLeft: 4 }}
           />
         </label>
-        <label style={{ fontSize: 13 }}>
+        <label className={style.dataLabel}>
           Até:
           <input
             type="date"
@@ -165,7 +180,6 @@ export const Feed = () => {
               setDateTo(e.target.value);
               setShowCount(PAGE_SIZE);
             }}
-            style={{ marginLeft: 4 }}
           />
         </label>
         <select value={order} onChange={e => { setOrder(e.target.value); setShowCount(PAGE_SIZE); }}>
@@ -178,10 +192,10 @@ export const Feed = () => {
         </button>
       </div>
       <div className={style.feed}>
-        {loading ? (
-          <p>Carregando recomendações...</p>
+        {loading || loadingVisual ? (
+          <div className={style.spinner}></div>
         ) : paginated.length === 0 ? (
-          <p>Nenhum post encontrado com os filtros atuais.</p>
+          <p style={{ textAlign: "center", color: "#8ecae6", fontSize: 18 }}>Nenhum post encontrado com os filtros atuais.</p>
         ) : (
           paginated.map((post) => (
             <Link
@@ -206,7 +220,7 @@ export const Feed = () => {
         )}
         {/* Loader para carregamento infinito */}
         <div ref={loader} />
-        {!loading && paginated.length < filtered.length && (
+        {!loading && !loadingVisual && paginated.length < filtered.length && (
           <button
             style={{ margin: "1rem auto", display: "block" }}
             onClick={() => setShowCount((prev) => prev + PAGE_SIZE)}

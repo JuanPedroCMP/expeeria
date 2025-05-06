@@ -9,9 +9,7 @@ const PAGE_SIZE = 8;
 
 export function Explore() {
   const { posts } = usePosts();
-  const [search, setSearch] = useState(
-    () => localStorage.getItem("explore_search") || ""
-  );
+  const [search, setSearch] = useState(() => localStorage.getItem("explore_search") || "");
   const [selectedAreas, setSelectedAreas] = useState(() => {
     try {
       return JSON.parse(localStorage.getItem("explore_areas")) || [];
@@ -19,15 +17,14 @@ export function Explore() {
       return [];
     }
   });
-  const [author, setAuthor] = useState(
-    () => localStorage.getItem("explore_author") || ""
-  );
+  const [author, setAuthor] = useState(() => localStorage.getItem("explore_author") || "");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
   const [showCount, setShowCount] = useState(PAGE_SIZE);
   const loader = useRef();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [showCategories, setShowCategories] = useState(false);
 
   // Salva filtros no localStorage
   useEffect(() => {
@@ -85,9 +82,7 @@ export function Explore() {
   }
 
   // Ordenação: sempre mais recentes primeiro
-  filtered = filtered
-    .slice()
-    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  filtered = filtered.slice().sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
   // Paginação
   const paginated = filtered.slice(0, showCount);
@@ -110,77 +105,62 @@ export function Explore() {
 
   return (
     <div className={style.exploreContainer}>
-      <br />
       <h2 className={style.title}>Explorar Posts</h2>
-      <form className={style.filtros} onSubmit={(e) => e.preventDefault()}>
+      <form className={style.filtros} onSubmit={e => e.preventDefault()}>
         <input
           type="text"
-          placeholder="Pesquisar por título, conteúdo..."
+          placeholder="Buscar por título, conteúdo..."
           value={search}
-          onChange={(e) => {
-            setSearch(e.target.value);
-            setShowCount(PAGE_SIZE);
-          }}
+          onChange={e => { setSearch(e.target.value); setShowCount(PAGE_SIZE); }}
           className={style.input}
         />
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-          {categoriasPadrao.map((cat) => (
-            <label
-              key={cat}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 4,
-                fontSize: 13,
-              }}
-            >
-              <input
-                type="checkbox"
-                checked={selectedAreas.includes(cat)}
-                onChange={(e) => {
-                  setShowCount(PAGE_SIZE);
-                  if (e.target.checked)
-                    setSelectedAreas([...selectedAreas, cat]);
-                  else setSelectedAreas(selectedAreas.filter((a) => a !== cat));
-                }}
-              />
-              {cat}
-            </label>
-          ))}
-        </div>
+        <button
+          type="button"
+          className={style.categoriasToggle}
+          onClick={() => setShowCategories((v) => !v)}
+        >
+          {showCategories ? "Ocultar categorias" : "Filtrar por categorias"}
+        </button>
+        {showCategories && (
+          <div className={style.categoriasBox}>
+            {categoriasPadrao.map((cat) => (
+              <label key={cat} className={style.categoriaLabel}>
+                <input
+                  type="checkbox"
+                  checked={selectedAreas.includes(cat)}
+                  onChange={e => {
+                    setShowCount(PAGE_SIZE);
+                    if (e.target.checked) setSelectedAreas([...selectedAreas, cat]);
+                    else setSelectedAreas(selectedAreas.filter(a => a !== cat));
+                  }}
+                />
+                {cat}
+              </label>
+            ))}
+          </div>
+        )}
         <input
           type="text"
           placeholder="Filtrar por autor"
           value={author}
-          onChange={(e) => {
-            setAuthor(e.target.value);
-            setShowCount(PAGE_SIZE);
-          }}
+          onChange={e => { setAuthor(e.target.value); setShowCount(PAGE_SIZE); }}
           className={style.input}
           style={{ minWidth: 120 }}
         />
-        <label style={{ fontSize: 13 }}>
+        <label className={style.dataLabel}>
           De:
           <input
             type="date"
             value={dateFrom}
-            onChange={(e) => {
-              setDateFrom(e.target.value);
-              setShowCount(PAGE_SIZE);
-            }}
-            style={{ marginLeft: 4 }}
+            onChange={e => { setDateFrom(e.target.value); setShowCount(PAGE_SIZE); }}
           />
         </label>
-        <label style={{ fontSize: 13 }}>
+        <label className={style.dataLabel}>
           Até:
           <input
             type="date"
             value={dateTo}
-            onChange={(e) => {
-              setDateTo(e.target.value);
-              setShowCount(PAGE_SIZE);
-            }}
-            style={{ marginLeft: 4 }}
+            onChange={e => { setDateTo(e.target.value); setShowCount(PAGE_SIZE); }}
           />
         </label>
         <button
