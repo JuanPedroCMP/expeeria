@@ -33,10 +33,14 @@ export const PostPage = () => {
 
   const handleComment = (e) => {
     e.preventDefault();
-    if (!userInput || !comment) return;
-    addComment(post.id, { user: userInput, text: comment });
+    if (!(user || userInput) || !comment) return;
+    addComment(post.id, {
+      id: `${Date.now()}-${Math.random()}`,
+      user: user ? user.name || user.email : userInput,
+      text: comment,
+    });
     setComment("");
-    setUserInput("");
+    if (!user) setUserInput("");
   };
 
   return (
@@ -70,9 +74,27 @@ export const PostPage = () => {
           </div>
         )}
         <h2 className={style.postTitle}>{post.title}</h2>
-        <h4 className={style.postMeta}>
-          {post.area ? `${post.area} • ${post.author}` : post.author}
-        </h4>
+        {Array.isArray(post.area)
+          ? post.area.map((cat) => (
+              <span
+                key={cat}
+                style={{
+                  background: "#8ecae6",
+                  color: "#23283a",
+                  borderRadius: 12,
+                  padding: "2px 12px",
+                  fontSize: 14,
+                  marginRight: 6,
+                  marginBottom: 2,
+                  display: "inline-block",
+                }}
+              >
+                {cat}
+              </span>
+            ))
+          : post.area}
+        {" • "}
+        {post.author}
         <p className={style.postCaption}>{post.caption}</p>
         <div className={style.postContent}>
           <ReactMarkdown>{post.content}</ReactMarkdown>
@@ -99,9 +121,11 @@ export const PostPage = () => {
           <input
             type="text"
             placeholder="Seu nome"
-            value={userInput}
+            value={user ? user.name || user.email : userInput}
             onChange={(e) => setUserInput(e.target.value)}
             required
+            disabled={!!user}
+            autoComplete="off"
           />
           <input
             type="text"
@@ -109,15 +133,21 @@ export const PostPage = () => {
             value={comment}
             onChange={(e) => setComment(e.target.value)}
             required
+            autoComplete="off"
+            maxLength={300}
           />
           <button type="submit">Comentar</button>
         </form>
         <ul className={style.commentsList}>
-          {(post.comments || []).map((c) => (
-            <li key={c.id}>
-              <b>{c.user}:</b> {c.text}
-            </li>
-          ))}
+          {Array.isArray(post.comments) && post.comments.length > 0 ? (
+            post.comments.map((c) => (
+              <li key={c.id || `${c.user}-${c.text}-${Math.random()}`}>
+                <b>{c.user}:</b> {c.text}
+              </li>
+            ))
+          ) : (
+            <li style={{ color: "#aaa" }}>Nenhum comentário ainda.</li>
+          )}
         </ul>
       </div>
     </>

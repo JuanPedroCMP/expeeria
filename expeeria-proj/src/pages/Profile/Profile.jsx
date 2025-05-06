@@ -4,6 +4,7 @@ import axios from "axios";
 import style from "./Profile.module.css";
 import { categoriasPadrao } from "../../utils/categoriasPadrao";
 import { useParams, useNavigate } from "react-router-dom";
+import { UploadImage } from "../../components/UploadImage";
 
 export function Profile() {
   const { user, signOut, setUser } = useAuth();
@@ -16,6 +17,22 @@ export function Profile() {
   const [interests, setInterests] = useState([]);
   const [allUsers, setAllUsers] = useState([]);
   const [userPosts, setUserPosts] = useState([]);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+
+  function toMultiArray(val) {
+    if (!val) return [];
+    if (Array.isArray(val)) return val.filter(Boolean);
+    if (typeof val === "string") {
+      try {
+        const arr = JSON.parse(val);
+        if (Array.isArray(arr)) return arr.filter(Boolean);
+      } catch {
+        return [val];
+      }
+    }
+    return [];
+  }
 
   const isOwnerOrAdmin =
     user && profile && (user.email === profile.email || user.role === "admin");
@@ -40,7 +57,9 @@ export function Profile() {
         setProfile(res.data[0]);
         setBio(res.data[0]?.bio || "");
         setAvatar(res.data[0]?.avatar || "");
-        setInterests(res.data[0]?.interests || []);
+        setInterests(toMultiArray(res.data[0]?.interests));
+        setName(res.data[0]?.name || "");
+        setEmail(res.data[0]?.email || "");
         // Busca posts do usuário
         const postsRes = await axios.get(
           `http://localhost:5000/posts?userId=${res.data[0].id}`
@@ -131,6 +150,8 @@ export function Profile() {
   // Função para salvar edição do perfil
   const handleSave = async () => {
     await axios.patch(`http://localhost:5000/users/${profile.id}`, {
+      name,
+      email,
       bio,
       avatar,
       interests,
@@ -139,13 +160,40 @@ export function Profile() {
     // Atualiza perfil
     const res = await axios.get(`http://localhost:5000/users?id=${profile.id}`);
     setProfile(res.data[0]);
+    // Se o usuário editou o próprio perfil, atualize o contexto/localStorage
+    if (user && user.id === profile.id) {
+      setUser({
+        ...user,
+        name,
+        email,
+        bio,
+        avatar,
+        interests,
+      });
+      localStorage.setItem(
+        "user",
+        JSON.stringify({
+          ...user,
+          name,
+          email,
+          bio,
+          avatar,
+          interests,
+        })
+      );
+    }
   };
 
   if (!profile) return <p>Carregando perfil...</p>;
 
   return (
     <div className={style.profileBox}>
-      <h2>Perfil de {profile.name || profile.email}</h2>
+      <h2>
+        {profile.name || profile.email}{" "}
+        <span style={{ color: "#8ecae6", fontSize: 16 }}>
+          @{profile.username}
+        </span>
+      </h2>
       <img
         src={avatar || "https://i.pravatar.cc/150?u=" + profile.email}
         alt="Avatar"
@@ -153,11 +201,51 @@ export function Profile() {
       />
       {editing && isOwnerOrAdmin ? (
         <>
-          <input
-            type="text"
-            placeholder="URL da foto de perfil"
-            value={avatar}
-            onChange={(e) => setAvatar(e.target.value)}
+          <label>
+            Nome:
+            <input
+              type="text"
+              value={name}
+              onChange={e => setName(e.target.value)}
+              required
+              style={{ marginLeft: 8, marginBottom: 8 }}
+            />
+          </label>
+          <label>
+            E-mail:
+            <input
+              type="email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              required
+              style={{ marginLeft: 8, marginBottom: 8 }}
+            />
+          </label>
+          <label>
+            Nome de usuário:
+            <input
+              type="text"
+              value={profile.username}
+              disabled
+              style={{
+                background: "#222",
+                color: "#aaa",
+                fontStyle: "italic",
+                marginLeft: 8,
+                marginBottom: 8,
+              }}
+            />
+          </label>
+          <UploadImage
+            onUpload={setAvatar}
+            preset="expeeria_avatar"
+            previewStyle={{
+              width: 120,
+              height: 120,
+              borderRadius: "50%",
+              objectFit: "cover",
+              marginTop: 8,
+            }}
           />
           <textarea
             placeholder="Sua bio"
@@ -167,21 +255,30 @@ export function Profile() {
           />
           <div>
             <label>Interesses:</label>
-            <select
-              multiple
-              value={interests}
-              onChange={(e) =>
-                setInterests(
-                  Array.from(e.target.selectedOptions, (o) => o.value)
-                )
-              }
-            >
+            <div className={style["interesses-checkboxes"]}>
               {categoriasPadrao.map((cat) => (
-                <option key={cat} value={cat}>
-                  {cat}
-                </option>
+                <label key={cat} className={style["interesse-label"]}>
+                  <input
+                    type="checkbox"
+                    value={cat}
+                    checked={interests.includes(cat)}
+                    disabled={!interests.includes(cat) && interests.length >= 3}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        if (interests.length < 3)
+                          setInterests([...interests, cat]);
+                      } else {
+                        setInterests(interests.filter((i) => i !== cat));
+                      }
+                    }}
+                  />
+                  <span>{cat}</span>
+                </label>
               ))}
-            </select>
+            </div>
+            <p style={{ fontSize: 12, color: "#aaa" }}>
+              Selecione até 3 interesses
+            </p>
           </div>
           <button onClick={handleSave}>Salvar</button>
           <button onClick={() => setEditing(false)}>Cancelar</button>
@@ -192,29 +289,47 @@ export function Profile() {
             <b>Email:</b> {profile.email}
           </p>
           <p>
-            <b>Bio:</b> {profile.bio || "Adicione uma bio!"}
+            <b>Nome:</b> {profile.name}
           </p>
           <p>
-            <select
-              multiple
-              value={interests}
-              onChange={(e) => {
-                const values = Array.from(
-                  e.target.selectedOptions,
-                  (o) => o.value
-                );
-                if (values.length <= 3) setInterests(values);
-              }}
-            >
-              {categoriasPadrao.map((cat) => (
-                <option key={cat} value={cat}>
+            <b>Nome de usuário:</b>{" "}
+            <span style={{ color: "#8ecae6" }}>@{profile.username}</span>
+          </p>
+          <p>
+            <b>Bio:</b> {profile.bio || "Adicione uma bio!"}
+          </p>
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: 8,
+              margin: "8px 0",
+            }}
+          >
+            {toMultiArray(profile.interests).length === 0 ? (
+              <span style={{ color: "#aaa" }}>
+                Nenhum interesse selecionado
+              </span>
+            ) : (
+              toMultiArray(profile.interests).map((cat) => (
+                <span
+                  key={cat}
+                  style={{
+                    background: "#8ecae6",
+                    color: "#23283a",
+                    borderRadius: 12,
+                    padding: "2px 12px",
+                    fontSize: 14,
+                    marginRight: 4,
+                  }}
+                >
                   {cat}
-                </option>
-              ))}
-            </select>
-            <p style={{ fontSize: 12, color: "#aaa" }}>
-              Selecione até 3 interesses
-            </p>
+                </span>
+              ))
+            )}
+          </div>
+          <p style={{ fontSize: 12, color: "#aaa" }}>
+            Principais interesses
           </p>
           {isOwnerOrAdmin && (
             <button onClick={() => setEditing(true)}>Editar perfil</button>

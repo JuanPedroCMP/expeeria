@@ -6,6 +6,7 @@ import { Button } from "../Button";
 import { categorizePost } from "../../utils/categorizePost";
 import { categoriasPadrao } from "../../utils/categoriasPadrao";
 import { useAuth } from "../../contexts/AuthContext";
+import { UploadImage } from "../UploadImage/UploadImage";
 
 export const NewPost = ({
   modoEdicao = false,
@@ -18,14 +19,15 @@ export const NewPost = ({
   const [caption, setCaption] = useState(postOriginal?.caption || "");
   const [content, setContent] = useState(postOriginal?.content || "");
   const [imageUrl, setImageUrl] = useState(postOriginal?.imageUrl || "");
+  // eslint-disable-next-line no-unused-vars
   const [author, setAuthor] = useState(postOriginal?.author || "");
-  const [area, setArea] = useState(postOriginal?.area || "");
+  const [area, setArea] = useState(postOriginal?.area || []);
   const [categorias, setCategorias] = useState(categoriasPadrao);
   const [loadingCategoria, setLoadingCategoria] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [categoriasOpen, setCategoriasOpen] = useState(false);
 
-  // Atualiza campos se postOriginal mudar (ex: ao carregar post para edição)
   useEffect(() => {
     if (postOriginal) {
       setTitle(postOriginal.title || "");
@@ -33,7 +35,7 @@ export const NewPost = ({
       setContent(postOriginal.content || "");
       setImageUrl(postOriginal.imageUrl || "");
       setAuthor(postOriginal.author || "");
-      setArea(postOriginal.area || "");
+      setArea(postOriginal.area || []);
     }
   }, [postOriginal]);
 
@@ -41,7 +43,7 @@ export const NewPost = ({
     setLoadingCategoria(true);
     const categoria = await categorizePost(content, categorias);
     setLoadingCategoria(false);
-    setArea(categoria);
+    setArea([categoria]);
     if (!categorias.includes(categoria)) {
       setCategorias([...categorias, categoria]);
     }
@@ -52,7 +54,7 @@ export const NewPost = ({
     setError("");
     setSuccess("");
 
-    if (!title || !caption || !content || !author || !area) {
+    if (!title || !caption || !content || !user?.email || !area.length) {
       setError("Preencha todos os campos obrigatórios.");
       return;
     }
@@ -82,7 +84,7 @@ export const NewPost = ({
       setContent("");
       setImageUrl("");
       setAuthor("");
-      setArea("");
+      setArea([]);
     }
   };
 
@@ -97,12 +99,19 @@ export const NewPost = ({
         onChange={(e) => setTitle(e.target.value)}
         required
       />
-      <input
-        type="text"
-        placeholder="URL da imagem (opcional)"
-        value={imageUrl}
-        onChange={(e) => setImageUrl(e.target.value)}
-      />
+      <div style={{ margin: "12px 0" }}>
+        <UploadImage
+          onUpload={setImageUrl}
+          preset="expeeria_banner"
+          previewStyle={{
+            width: 400,
+            height: 140,
+            borderRadius: 8,
+            objectFit: "cover",
+            marginTop: 8,
+          }}
+        />
+      </div>
       <input
         type="text"
         placeholder="Descrição curta (caption)"
@@ -124,33 +133,66 @@ export const NewPost = ({
       </label>
       <div style={{ margin: "1rem 0" }}>
         <div className={style.categoriaPicker}>
-          <select
-            multiple
-            value={area}
-            onChange={(e) => {
-              const values = Array.from(
-                e.target.selectedOptions,
-                (o) => o.value
-              );
-              if (values.length <= 3) setArea(values);
-            }}
-          >
-            {categoriasPadrao.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat}
-              </option>
-            ))}
-          </select>
-          <p style={{ fontSize: 12, color: "#aaa" }}>
-            Selecione até 3 categorias
-          </p>
           <button
             type="button"
-            onClick={handleCategorize}
-            disabled={loadingCategoria || !content}
+            onClick={() => setCategoriasOpen((v) => !v)}
+            style={{
+              background: "#23283a",
+              color: "#8ecae6",
+              border: "none",
+              borderRadius: 8,
+              padding: "8px 16px",
+              fontWeight: "bold",
+              fontSize: "1rem",
+              cursor: "pointer",
+              marginBottom: 8,
+              marginRight: 8,
+            }}
           >
-            {loadingCategoria ? "Analisando..." : "Categorizar com IA"}
+            {categoriasOpen
+              ? "Ocultar categorias ▲"
+              : "Selecionar categorias ▼"}
           </button>
+          {categoriasOpen && (
+            <div>
+              <div className={style["interesses-checkboxes"]}>
+                {categoriasPadrao.map((cat) => (
+                  <label key={cat} className={style["interesse-label"]}>
+                    <input
+                      type="checkbox"
+                      value={cat}
+                      checked={Array.isArray(area) && area.includes(cat)}
+                      disabled={
+                        !(Array.isArray(area) && area.includes(cat)) &&
+                        Array.isArray(area) &&
+                        area.length >= 3
+                      }
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          if (Array.isArray(area) && area.length < 3)
+                            setArea([...area, cat]);
+                        } else {
+                          setArea(area.filter((i) => i !== cat));
+                        }
+                      }}
+                    />
+                    <span>{cat}</span>
+                  </label>
+                ))}
+              </div>
+              <p style={{ fontSize: 12, color: "#aaa", marginLeft: 8 }}>
+                Selecione até 3 categorias
+              </p>
+              <button
+                type="button"
+                onClick={handleCategorize}
+                disabled={loadingCategoria || !content}
+                style={{ marginLeft: 12 }}
+              >
+                {loadingCategoria ? "Analisando..." : "Categorizar com IA (Ainda não está funcionando)"}
+              </button>
+            </div>
+          )}
         </div>
       </div>
       <button type="submit">

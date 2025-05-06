@@ -123,59 +123,66 @@
   color: #fff;
 }
 
-.categoriaPicker {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-top: 0.7rem;
-  margin-bottom: 1.2rem;
-  padding: 0.7rem 1rem;
-  background: #181c24;
-  border-radius: 0.7rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-}
-
-.categoriaPicker button {
-  background: linear-gradient(90deg, #0575e6, #00f260);
-  color: #fff;
-  border: none;
-  border-radius: 0.4rem;
-  padding: 0.5rem 1.2rem;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: filter 0.2s, box-shadow 0.2s;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
-}
-
-.categoriaPicker button:disabled {
-  background: #888;
-  cursor: not-allowed;
-  filter: grayscale(0.4);
-}
-
-.categoriaPicker button:hover:not(:disabled) {
-  filter: brightness(1.1);
-}
-
-.categoriaPicker select {
-  background: #23283a;
-  color: #fff;
-  border: none;
-  border-radius: 0.4rem;
-  padding: 0.5rem 1.2rem;
-  font-size: 1rem;
-  outline: none;
-  transition: box-shadow 0.2s;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
-}
-
-.categoriaPicker select:focus {
-  box-shadow: 0 0 0 2px #0575e6;
-}
-
-.categoriaPicker label {
-  font-weight: bold;
-  color: #8ecae6;
-  font-size: 1rem;
-  margin-right: 0.5rem;
-}
+.interesses-checkboxes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px 18px; /* mais espaçamento entre linhas e colunas */
+    margin: 14px 0 10px 0;
+  }
+  
+  .interesse-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #181c24;
+    border-radius: 20px;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s, border 0.2s;
+    border: 2px solid transparent;
+    user-select: none;
+    margin-bottom: 4px;
+    min-width: 110px;
+    justify-content: center;
+  }
+  
+  .interesse-label input[type="checkbox"] {
+    accent-color: #00b4d8;
+    width: 20px;
+    height: 20px;
+    margin: 0;
+  }
+  
+  .interesse-label input[type="checkbox"]:checked + span {
+    color: #00b4d8;
+    font-weight: bold;
+  }
+  
+  .interesse-label input[type="checkbox"]:checked {
+    box-shadow: 0 0 0 2px #00b4d8;
+  }
+  
+  .interesse-label input[type="checkbox"]:disabled + span {
+    opacity: 0.5;
+  }
+  
+  .interesse-label input[type="checkbox"]:focus-visible {
+    outline: 2px solid #00b4d8;
+  }
+  
+  .interesse-label:hover {
+    background: #23283a;
+    border-color: #00b4d8;
+  }
+  
+  @media (max-width: 600px) {
+    .interesses-checkboxes {
+      gap: 10px 8px;
+    }
+    .interesse-label {
+      font-size: 0.95rem;
+      padding: 8px 12px;
+      min-width: 80px;
+    }
+  }

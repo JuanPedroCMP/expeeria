@@ -10,18 +10,33 @@ export function AuthProvider({ children }) {
   });
 
   // Cadastro
-  const signUp = async (email, password) => {
+  const signUp = async (email, password, name, username) => {
     try {
-      // Verifica se já existe
+      // Verifica se já existe email ou username
       const res = await axios.get(`http://localhost:5000/users?email=${email}`);
-      if (res.data.length > 0) return false; // Já existe
+      const resUser = await axios.get(
+        `http://localhost:5000/users?username=${username}`
+      );
+      if (res.data.length > 0 || resUser.data.length > 0) return false; // Já existe
 
-      const newUser = { email, password, role: "user" };
+      const newUser = { email, password, name, username, role: "user" };
       const postRes = await axios.post("http://localhost:5000/users", newUser);
-      setUser({ email, id: postRes.data.id, role: "user" });
+      setUser({
+        email: postRes.data.email,
+        id: postRes.data.id,
+        role: postRes.data.role,
+        name: postRes.data.name,
+        username: postRes.data.username,
+      });
       localStorage.setItem(
         "user",
-        JSON.stringify({ email, id: postRes.data.id, role: "user" })
+        JSON.stringify({
+          email: postRes.data.email,
+          id: postRes.data.id,
+          role: postRes.data.role,
+          name: postRes.data.name,
+          username: postRes.data.username,
+        })
       );
       return true;
     } catch {
@@ -41,6 +56,8 @@ export function AuthProvider({ children }) {
           email: userData.email,
           id: userData.id,
           role: userData.role,
+          name: userData.name,
+          username: userData.username,
         });
         localStorage.setItem(
           "user",
@@ -48,6 +65,8 @@ export function AuthProvider({ children }) {
             email: userData.email,
             id: userData.id,
             role: userData.role,
+            name: userData.name,
+            username: userData.username,
           })
         );
         return true;

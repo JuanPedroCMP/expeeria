@@ -1,155 +1,344 @@
 {
-    "posts": [
-      {
-        "id": "1",
-        "title": "Primeiro post do admin",
-        "caption": "Bem-vindo ao Expeeria!",
-        "content": "Este é o primeiro post criado pelo administrador.",
-        "imageUrl": "",
-        "author": "admin@expeeria.com",
-        "userId": "adm001",
-        "area": "Tecnologia",
-        "createdAt": "2025-05-05T10:00:00.000Z",
-        "likes": 10,
-        "comments": [
-          {
-            "id": "c1",
-            "user": "user@exemplo.com",
-            "text": "Parabéns pelo projeto!"
-          }
-        ]
-      },
-      {
-        "id": "2",
-        "title": "Dicas de estudo",
-        "caption": "Como estudar melhor",
-        "content": "Organize seu tempo, faça pausas e revise sempre.",
-        "imageUrl": "",
-        "author": "user@exemplo.com",
-        "userId": "usr001",
-        "area": "Educação",
-        "createdAt": "2025-05-05T11:00:00.000Z",
-        "likes": 3,
-        "comments": []
-      },
-      {
-        "id": "3",
-        "title": "Moda sustentável: o futuro das roupas",
-        "caption": "Como a moda pode ser amiga do planeta",
-        "content": "A moda sustentável busca reduzir o impacto ambiental da indústria têxtil. Prefira marcas que usam materiais reciclados e valorizam o trabalho justo.",
-        "imageUrl": "https://images.unsplash.com/photo-1512436991641-6745cdb1723f",
-        "author": "juan@gmail.com",
-        "userId": "632d",
-        "area": "Moda",
-        "createdAt": "2025-05-06T09:00:00.000Z",
-        "likes": 7,
-        "comments": [
-          {
-            "id": "c2",
-            "user": "ana@arte.com",
-            "text": "Muito importante esse tema!"
-          }
-        ]
-      },
-      {
-        "id": "4",
-        "title": "Como desenhar melhor: dicas práticas",
-        "caption": "Melhore seu desenho com exercícios diários",
-        "content": "Desenhe todos os dias, estude referências e não tenha medo de errar. O progresso vem com a prática!",
-        "imageUrl": "https://images.unsplash.com/photo-1464983953574-0892a716854b",
-        "author": "ana@arte.com",
-        "userId": "ana001",
-        "area": "Artes",
-        "createdAt": "2025-05-07T14:30:00.000Z",
-        "likes": 12,
-        "comments": [
-          {
-            "id": "c3",
-            "user": "user@exemplo.com",
-            "text": "Vou tentar essas dicas!"
-          }
-        ]
-      },
-      {
-        "id": "5",
-        "title": "Como aprender inglês sozinho",
-        "caption": "Ferramentas e métodos para estudar idiomas",
-        "content": "Use aplicativos, assista filmes legendados e pratique com amigos. A constância é o segredo!",
-        "imageUrl": "https://images.unsplash.com/photo-1503676382389-4809596d5290",
-        "author": "maria@idiomas.com",
-        "userId": "maria001",
-        "area": "Educação",
-        "createdAt": "2025-05-08T08:00:00.000Z",
-        "likes": 8,
-        "comments": [
-          {
-            "id": "c4",
-            "user": "adm001",
-            "text": "Ótimas dicas, Maria!"
-          }
-        ]
-      }
-    ],
-    "users": [
-      {
-        "id": "adm001",
-        "email": "admin@expeeria.com",
-        "password": "admin123",
-        "name": "Administrador",
-        "bio": "Sou o admin do Expeeria.",
-        "avatar": "https://i.pravatar.cc/150?u=admin@expeeria.com",
-        "interests": ["Tecnologia", "Educação"],
-        "followers": ["632d", "ana001"],
-        "following": ["632d", "ana001", "maria001"],
-        "role": "admin"
-      },
-      {
-        "id": "usr001",
-        "email": "user@exemplo.com",
-        "password": "usuario123",
-        "name": "Usuário Exemplo",
-        "bio": "Apaixonado por aprender coisas novas.",
-        "avatar": "https://i.pravatar.cc/150?u=user@exemplo.com",
-        "interests": ["Educação", "Artes"],
-        "followers": ["632d", "ana001"],
-        "following": ["ana001"],
-        "role": "user"
-      },
-      {
-        "id": "632d",
-        "email": "juan@gmail.com",
-        "password": "juan@gmail.com",
-        "name": "Juan Pedro",
-        "bio": "Curioso sobre moda e sustentabilidade.",
-        "avatar": "https://i.pravatar.cc/150?u=juan@gmail.com",
-        "interests": ["Moda", "Sustentabilidade"],
-        "followers": ["adm001"],
-        "following": ["usr001", "adm001"],
-        "role": "user"
-      },
-      {
-        "id": "ana001",
-        "email": "ana@arte.com",
-        "password": "arte123",
-        "name": "Ana Artista",
-        "bio": "Desenhista e pintora apaixonada.",
-        "avatar": "https://i.pravatar.cc/150?u=ana@arte.com",
-        "interests": ["Artes", "Educação"],
-        "followers": ["usr001", "adm001"],
-        "following": ["usr001", "adm001"],
-        "role": "user"
-      },
-      {
-        "id": "maria001",
-        "email": "maria@idiomas.com",
-        "password": "ingles456",
-        "name": "Maria Poliglota",
-        "bio": "Amo aprender e ensinar idiomas.",
-        "avatar": "https://i.pravatar.cc/150?u=maria@idiomas.com",
-        "interests": ["Educação", "Idiomas"],
-        "followers": ["adm001"],
-        "following": [],
-        "role": "user"
-      }
-    ]
-  }
+  "posts": [
+    {
+      "id": "p001",
+      "title": "Como começar a programar em Python",
+      "caption": "Dicas essenciais para iniciantes em programação.",
+      "content": "Python é uma das linguagens mais populares do mundo. Comece instalando o Python, depois explore conceitos como variáveis, loops e funções. Pratique resolvendo pequenos desafios e participe de comunidades online.",
+      "imageUrl": "https://images.unsplash.com/photo-1519389950473-47ba0277781c",
+      "author": "alice@dev.com",
+      "userId": "u001",
+      "area": ["Tecnologia", "Educação"],
+      "createdAt": "2025-05-05T09:00:00.000Z",
+      "likes": 15,
+      "comments": [
+        {
+          "id": "c001",
+          "user": "bob@art.com",
+          "text": "Ótimas dicas, Alice! Python é incrível."
+        },
+        {
+          "id": "c002",
+          "user": "carol@eco.com",
+          "text": "Vou começar hoje mesmo, obrigado!"
+        }
+      ]
+    },
+    {
+      "id": "p002",
+      "title": "A importância da arte na educação",
+      "caption": "Como a arte pode transformar o aprendizado.",
+      "content": "A arte estimula a criatividade e o pensamento crítico. Integrar atividades artísticas nas escolas melhora o desempenho dos alunos e promove o desenvolvimento emocional.",
+      "imageUrl": "https://images.unsplash.com/photo-1465101046530-73398c7f28ca",
+      "author": "bob@art.com",
+      "userId": "u002",
+      "area": ["Artes", "Educação"],
+      "createdAt": "2025-05-06T10:30:00.000Z",
+      "likes": 12,
+      "comments": [
+        {
+          "id": "c003",
+          "user": "alice@dev.com",
+          "text": "Concordo totalmente, Bob!"
+        }
+      ]
+    },
+    {
+      "id": "p003",
+      "title": "Sustentabilidade no dia a dia",
+      "caption": "Pequenas ações, grande impacto.",
+      "content": "Separar o lixo, economizar água e energia, e optar por produtos recicláveis são atitudes simples que ajudam o planeta. Faça sua parte!",
+      "imageUrl": "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
+      "author": "carol@eco.com",
+      "userId": "u003",
+      "area": ["Sustentabilidade"],
+      "createdAt": "2025-05-07T14:00:00.000Z",
+      "likes": 18,
+      "comments": [
+        {
+          "id": "c004",
+          "user": "daniel@fit.com",
+          "text": "Excelentes dicas, Carol!"
+        }
+      ]
+    },
+    {
+      "id": "p004",
+      "title": "Como manter uma rotina saudável",
+      "caption": "Saúde física e mental em equilíbrio.",
+      "content": "Durma bem, alimente-se de forma equilibrada e pratique exercícios regularmente. Não esqueça de cuidar da mente com momentos de lazer e relaxamento.",
+      "imageUrl": "https://images.unsplash.com/photo-1519864600265-abb23847ef2c",
+      "author": "daniel@fit.com",
+      "userId": "u004",
+      "area": ["Saúde", "Desenvolvimento Pessoal"],
+      "createdAt": "2025-05-08T08:45:00.000Z",
+      "likes": 21,
+      "comments": [
+        {
+          "id": "c005",
+          "user": "eva@travel.com",
+          "text": "Adorei as dicas, Daniel!"
+        }
+      ]
+    },
+    {
+      "id": "p005",
+      "title": "Dicas para aprender novos idiomas",
+      "caption": "Como se tornar poliglota.",
+      "content": "Pratique todos os dias, assista filmes legendados e converse com nativos. Use aplicativos e não tenha medo de errar.",
+      "imageUrl": "https://images.unsplash.com/photo-1503676382389-4809596d5290",
+      "author": "eva@travel.com",
+      "userId": "u005",
+      "area": ["Idiomas", "Educação"],
+      "createdAt": "2025-05-09T11:20:00.000Z",
+      "likes": 17,
+      "comments": [
+        {
+          "id": "c006",
+          "user": "bob@art.com",
+          "text": "Vou tentar essas dicas, obrigado!"
+        }
+      ]
+    },
+    {
+      "id": "p006",
+      "title": "Viagem sustentável: como reduzir seu impacto",
+      "caption": "Viaje pelo mundo sem prejudicar o planeta.",
+      "content": "Escolha meios de transporte menos poluentes, hospede-se em locais que respeitam o meio ambiente e consuma produtos locais.",
+      "imageUrl": "https://images.unsplash.com/photo-1465101178521-c1a9136a3b99",
+      "author": "eva@travel.com",
+      "userId": "u005",
+      "area": ["Sustentabilidade", "Viagens"],
+      "createdAt": "2025-05-10T13:10:00.000Z",
+      "likes": 14,
+      "comments": [
+        {
+          "id": "c007",
+          "user": "carol@eco.com",
+          "text": "Ótimas dicas para quem ama viajar!"
+        }
+      ]
+    },
+    {
+      "id": "p007",
+      "title": "Como desenhar rostos realistas",
+      "caption": "Técnicas para aprimorar seu desenho.",
+      "content": "Estude anatomia, pratique observação e use referências. O segredo é praticar todos os dias e não desistir diante das dificuldades.",
+      "imageUrl": "https://images.unsplash.com/photo-1512436991641-6745cdb1723f",
+      "author": "bob@art.com",
+      "userId": "u002",
+      "area": ["Artes"],
+      "createdAt": "2025-05-11T15:00:00.000Z",
+      "likes": 19,
+      "comments": [
+        {
+          "id": "c008",
+          "user": "alice@dev.com",
+          "text": "Vou praticar mais, obrigado pelas dicas!"
+        }
+      ]
+    },
+    {
+      "id": "p008",
+      "title": "Desenvolvimento pessoal: como criar bons hábitos",
+      "caption": "Transforme sua rotina para melhor.",
+      "content": "Comece com pequenas mudanças, seja consistente e celebre cada conquista. Bons hábitos levam ao sucesso a longo prazo.",
+      "imageUrl": "https://images.unsplash.com/photo-1464983953574-0892a716854b",
+      "author": "daniel@fit.com",
+      "userId": "u004",
+      "area": ["Desenvolvimento Pessoal"],
+      "createdAt": "2025-05-12T17:30:00.000Z",
+      "likes": 22,
+      "comments": [
+        {
+          "id": "c009",
+          "user": "alice@dev.com",
+          "text": "Inspirador, Daniel!"
+        }
+      ]
+    },
+    {
+      "id": "p009",
+      "title": "Tecnologia e futuro do trabalho",
+      "caption": "Como a tecnologia está mudando as profissões.",
+      "content": "Automação, inteligência artificial e novas ferramentas digitais estão transformando o mercado de trabalho. Prepare-se estudando e se adaptando às mudanças.",
+      "imageUrl": "https://images.unsplash.com/photo-1519389950473-47ba0277781c",
+      "author": "alice@dev.com",
+      "userId": "u001",
+      "area": ["Tecnologia"],
+      "createdAt": "2025-05-13T09:40:00.000Z",
+      "likes": 16,
+      "comments": [
+        {
+          "id": "c010",
+          "user": "daniel@fit.com",
+          "text": "Muito interessante, Alice!"
+        }
+      ]
+    },
+    {
+      "id": "p010",
+      "title": "Como planejar uma viagem internacional",
+      "caption": "Dicas para viajar com segurança e economia.",
+      "content": "Pesquise sobre o destino, faça um roteiro, reserve hospedagem com antecedência e tenha sempre um seguro viagem.",
+      "imageUrl": "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
+      "author": "eva@travel.com",
+      "userId": "u005",
+      "area": ["Viagens"],
+      "createdAt": "2025-05-14T19:00:00.000Z",
+      "likes": 13,
+      "comments": [
+        {
+          "id": "c011",
+          "user": "carol@eco.com",
+          "text": "Adorei as dicas, Eva!"
+        }
+      ]
+    }
+  ],
+  "users": [
+    {
+      "id": "u001",
+      "email": "alice@dev.com",
+      "password": "alice123",
+      "name": "Alice Developer",
+      "username": "alicedev",
+      "bio": "Apaixonada por tecnologia e educação.",
+      "avatar": "https://i.pravatar.cc/150?u=alice@dev.com",
+      "interests": ["Tecnologia", "Educação"],
+      "followers": ["u002", "u003"],
+      "following": ["u002", "u003", "u004"],
+      "role": "user"
+    },
+    {
+      "id": "u002",
+      "email": "bob@art.com",
+      "password": "bob123",
+      "name": "Bob Artista",
+      "username": "bobart",
+      "bio": "Artista visual e educador.",
+      "avatar": "https://i.pravatar.cc/150?u=bob@art.com",
+      "interests": ["Artes", "Educação"],
+      "followers": ["u001", "u003"],
+      "following": ["u001", "u003"],
+      "role": "user"
+    },
+    {
+      "id": "u003",
+      "email": "carol@eco.com",
+      "password": "carol123",
+      "name": "Carol Verde",
+      "username": "carolverde",
+      "bio": "Defensora da sustentabilidade e do meio ambiente.",
+      "avatar": "https://i.pravatar.cc/150?u=carol@eco.com",
+      "interests": ["Sustentabilidade", "Tecnologia"],
+      "followers": ["u001", "u002"],
+      "following": ["u001", "u002", "u005"],
+      "role": "user"
+    },
+    {
+      "id": "u004",
+      "email": "daniel@fit.com",
+      "password": "daniel123",
+      "name": "Daniel Fitness",
+      "username": "danfit",
+      "bio": "Personal trainer e coach de desenvolvimento pessoal.",
+      "avatar": "https://i.pravatar.cc/150?u=daniel@fit.com",
+      "interests": ["Saúde", "Desenvolvimento Pessoal"],
+      "followers": ["u001", "u005"],
+      "following": ["u001", "u005"],
+      "role": "user"
+    },
+    {
+      "id": "u005",
+      "email": "eva@travel.com",
+      "password": "eva123",
+      "name": "Eva Viajante",
+      "username": "evaviaja",
+      "bio": "Aventureira, poliglota e apaixonada por viagens.",
+      "avatar": "https://i.pravatar.cc/150?u=eva@travel.com",
+      "interests": ["Viagens", "Idiomas", "Sustentabilidade"],
+      "followers": ["u003", "u004"],
+      "following": ["u003", "u004"],
+      "role": "user"
+    },
+    {
+      "id": "u006",
+      "email": "lucas@tech.com",
+      "password": "lucas123",
+      "name": "Lucas Tech",
+      "username": "lucastech",
+      "bio": "Desenvolvedor fullstack e entusiasta de IA.",
+      "avatar": "https://i.pravatar.cc/150?u=lucas@tech.com",
+      "interests": ["Tecnologia", "Educação", "Idiomas"],
+      "followers": ["u001", "u002", "u003"],
+      "following": ["u001", "u002", "u003", "u004", "u005"],
+      "role": "user"
+    },
+    {
+      "id": "u007",
+      "email": "marina@moda.com",
+      "password": "marina123",
+      "name": "Marina Fashion",
+      "username": "marifashion",
+      "bio": "Designer de moda e influenciadora.",
+      "avatar": "https://i.pravatar.cc/150?u=marina@moda.com",
+      "interests": ["Moda", "Artes"],
+      "followers": ["u002", "u005"],
+      "following": ["u002", "u005"],
+      "role": "user"
+    },
+    {
+      "id": "u008",
+      "email": "felipe@eng.com",
+      "password": "felipe123",
+      "name": "Felipe Engenheiro",
+      "username": "felipeeng",
+      "bio": "Engenheiro civil apaixonado por arquitetura.",
+      "avatar": "https://i.pravatar.cc/150?u=felipe@eng.com",
+      "interests": ["Engenharia", "Arquitetura"],
+      "followers": ["u001", "u003"],
+      "following": ["u001", "u003", "u007"],
+      "role": "user"
+    },
+    {
+      "id": "u009",
+      "email": "sofia@idiomas.com",
+      "password": "sofia123",
+      "name": "Sofia Poliglota",
+      "username": "sofiapoly",
+      "bio": "Professora de idiomas e viajante.",
+      "avatar": "https://i.pravatar.cc/150?u=sofia@idiomas.com",
+      "interests": ["Idiomas", "Viagens", "Educação"],
+      "followers": ["u005", "u006"],
+      "following": ["u005", "u006", "u001"],
+      "role": "user"
+    },
+    {
+      "id": "u010",
+      "email": "gustavo@eco.com",
+      "password": "gustavo123",
+      "name": "Gustavo Natureza",
+      "username": "gustanature",
+      "bio": "Biólogo e ativista ambiental.",
+      "avatar": "https://i.pravatar.cc/150?u=gustavo@eco.com",
+      "interests": ["Sustentabilidade", "Educação"],
+      "followers": ["u003", "u005"],
+      "following": ["u003", "u005", "u009"],
+      "role": "user"
+    },
+    {
+      "id": "bac8",
+      "email": "juan@juan.com",
+      "password": "juan@juan.com",
+      "name": "Juan Pedro CMP",
+      "username": "juanpedrocmp2663",
+      "role": "admin",
+      "bio": "",
+      "avatar": "https://res.cloudinary.com/deepc0do7/image/upload/v1746497738/birno5pdtaj9yap41fy2.jpg",
+      "interests": ["Tecnologia", "Segurança da Informação", "Startups"],
+      "followers": [],
+      "following": []
+    }
+  ]
+}

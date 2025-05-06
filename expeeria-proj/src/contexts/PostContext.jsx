@@ -48,7 +48,7 @@ export const PostProvider = ({ children }) => {
   const addComment = async (postId, comment) => {
     const post = posts.find((p) => String(p.id) === String(postId));
     if (!post) return;
-    const newComment = { id: Date.now(), ...comment };
+    const newComment = { id: `${Date.now()}-${Math.random()}`, ...comment };
     const updatedComments = [...(post.comments || []), newComment];
     await axios.patch(`http://localhost:5000/posts/${postId}`, {
       comments: updatedComments,
