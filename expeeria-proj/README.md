@@ -4,6 +4,10 @@
 
 👉 **Acesse agora:** [https://expeeria.vercel.app](https://expeeria.vercel.app)
 
+## ⚠️ IMPORTANTE ⚠️
+
+  ⚠️  **O sitema de usuario (visualizar perfil, etc.) não está funcionando corretamente pois ainda não está utilizando um banco de dados, isso será corrigido.**
+
 ---
 
 # 📖 Documentação Técnica — Expeeria
