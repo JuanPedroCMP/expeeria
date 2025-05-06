@@ -6,7 +6,7 @@
 
 ### ⚠️ IMPORTANTE ⚠️
 
-  ⚠️  **O sitema de usuario (visualizar perfil, etc.) pode não funcionar corretamente pois ainda não está utilizando um banco de dados, isso será corrigido.**
+  ⚠️  **O sitema de usuario (editar perfil, visualizar perfil, etc.) pode não funcionar corretamente pois ainda não está utilizando um banco de dados, isso será corrigido.**
 
   ⚠️  **Pode demorar até um minuto para carregar o site pela primeira vez, devido ao modo de suspenção automática do Render**
 
