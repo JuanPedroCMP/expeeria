@@ -6,9 +6,11 @@
 
 ### ⚠️ IMPORTANTE ⚠️
 
-  ⚠️  **O sitema de usuario (visualizar perfil, etc.) não está funcionando corretamente pois ainda não está utilizando um banco de dados, isso será corrigido.**
+  ⚠️  **O sitema de usuario (visualizar perfil, etc.) pode não funcionar corretamente pois ainda não está utilizando um banco de dados, isso será corrigido.**
 
-  Para poder testar o sitema de usuario use um usuarío já feito:
+  ⚠️  **Pode demorar até um minuto para carregar o site pela primeira vez, devido ao modo de suspenção automática do Render**
+
+  Caso o sistema de usuario não esteja funcionando, para poder testar o sitema de usuario use um usuarío já feito, mas tente criar uma conta primero, se não der usse essa:
 
       email: "carol@eco.com"
       password: "carol123"
