@@ -1,5 +1,5 @@
-import { usePosts } from "../../contexts/PostContext";
-import { useAuth } from "../../contexts/AuthContext";
+import { usePost } from "../../hooks/usePost";
+import { useAuth } from "../../hooks/useAuth";
 import { LikeButton } from "../LikeButton/LikeButton";
 import styles from "./Card.module.css";
 
@@ -9,7 +9,7 @@ import styles from "./Card.module.css";
  */
 const Card = (props) => {
   const { TituloCard, SubTitulo, Descrisao, likes, id, imageUrl } = props;
-  const { likePost, unlikePost, hasLikedPost } = usePosts();
+  const { likePost, unlikePost, hasLikedPost } = usePost();
   const { user } = useAuth();
   
   const isLiked = hasLikedPost && hasLikedPost(id);
