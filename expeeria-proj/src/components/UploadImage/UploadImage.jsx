@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useNotification } from '../../hooks/useNotification';
-import Button from '../Button';
+import { Button } from '../Button';
 import styles from './UploadImage.module.css';
 import { isValidImage, errorMessages } from '../../utils/validation';
 
@@ -14,14 +14,14 @@ import { isValidImage, errorMessages } from '../../utils/validation';
  * @param {boolean} [props.preview=true] - Se deve mostrar pré-visualização
  * @param {string} [props.label] - Texto de rótulo para o upload
  */
-function UploadImage({
+export const UploadImage = ({
   onImageUpload,
   initialImage = '',
   maxSizeMB = 5,
   aspectRatio,
   preview = true,
   label = 'Carregue uma imagem',
-}) {
+}) => {
   const [image, setImage] = useState(initialImage);
   const [isLoading, setIsLoading] = useState(false);
   const [dragActive, setDragActive] = useState(false);
@@ -219,5 +219,3 @@ function UploadImage({
     </div>
   );
 }
-
-export default UploadImage;
