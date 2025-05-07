@@ -1,11 +1,7 @@
 import React from 'react';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../hooks/useAuth';
 import styles from './LikeButton.module.css';
 
-/**
- * Componente de botão de curtida reutilizável
- * Pode ser usado em posts, comentários ou qualquer outro elemento curtível
- */
 export const LikeButton = ({
   count = 0,
   isLiked = false,
