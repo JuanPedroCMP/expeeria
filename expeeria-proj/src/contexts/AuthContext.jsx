@@ -292,7 +292,7 @@ export function AuthProvider({ children }) {
     try {
       // Atualizar a relação de seguidor
       const { error } = await supabase
-        .from('follows')
+        .from('followers')
         .insert({
           follower_id: user.id,
           following_id: userId,
@@ -325,7 +325,7 @@ export function AuthProvider({ children }) {
     try {
       // Remover a relação de seguidor
       const { error } = await supabase
-        .from('follows')
+        .from('followers')
         .delete()
         .match({
           follower_id: user.id,
@@ -357,7 +357,7 @@ export function AuthProvider({ children }) {
     
     try {
       const { data, error } = await supabase
-        .from('follows')
+        .from('followers')
         .select()
         .match({
           follower_id: user.id,

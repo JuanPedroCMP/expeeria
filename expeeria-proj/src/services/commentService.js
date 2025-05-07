@@ -230,20 +230,32 @@ export const commentService = {
       if (!commentId) throw new Error('ID do comentário não fornecido');
       if (!userId) throw new Error('Usuário não autenticado');
       
-      // Verificar se o usuário já curtiu o comentário
-      const { data: existingLike, error: checkError } = await supabase
+      // Verifica primeiro se a tabela comment_likes existe, se não, tenta usar a tabela likes
+      const { error: checkTableError } = await supabase
         .from('comment_likes')
         .select('*')
-        .eq('comment_id', commentId)
+        .limit(1);
+      
+      // Se houver erro de tabela não encontrada, tente usar a tabela likes com campo adicional
+      const useGenericLikesTable = checkTableError && 
+        checkTableError.message.includes('does not exist');
+      
+      const tableName = useGenericLikesTable ? 'likes' : 'comment_likes';
+      
+      // Verificar se o usuário já curtiu o comentário
+      const { data: existingLike, error: checkError } = await supabase
+        .from(tableName)
+        .select('*')
+        .eq(useGenericLikesTable ? 'target_id' : 'comment_id', commentId)
         .eq('user_id', userId)
         .maybeSingle();
       
-      if (checkError) throw checkError;
+      if (checkError && checkError.code !== 'PGRST116') throw checkError;
       
       // Se já existe curtida, remover
       if (existingLike) {
         const { error: deleteError } = await supabase
-          .from('comment_likes')
+          .from(tableName)
           .delete()
           .eq('id', existingLike.id);
         
@@ -252,14 +264,23 @@ export const commentService = {
         return { liked: false };
       }
       
-      // Se não existe curtida, adicionar
+      // Se não existe, adicionar curtida
+      const insertData = useGenericLikesTable 
+        ? {
+            target_id: commentId,
+            user_id: userId,
+            target_type: 'comment',
+            created_at: new Date().toISOString()
+          }
+        : {
+            comment_id: commentId,
+            user_id: userId,
+            created_at: new Date().toISOString()
+          };
+      
       const { error: insertError } = await supabase
-        .from('comment_likes')
-        .insert({
-          comment_id: commentId,
-          user_id: userId,
-          created_at: new Date().toISOString()
-        });
+        .from(tableName)
+        .insert(insertData);
       
       if (insertError) throw insertError;
       
@@ -274,7 +295,7 @@ export const commentService = {
       throw new Error('Não foi possível processar sua curtida. Tente novamente.');
     }
   },
-  
+
   /**
    * Verifica se um usuário curtiu um comentário
    * @param {string} commentId - ID do comentário
@@ -285,14 +306,26 @@ export const commentService = {
     try {
       if (!commentId || !userId) return { liked: false };
       
-      const { data, error } = await supabase
+      // Verifica primeiro se a tabela comment_likes existe, se não, tenta usar a tabela likes
+      const { error: checkTableError } = await supabase
         .from('comment_likes')
         .select('*')
-        .eq('comment_id', commentId)
+        .limit(1);
+      
+      // Se houver erro de tabela não encontrada, tente usar a tabela likes com campo adicional
+      const useGenericLikesTable = checkTableError && 
+        checkTableError.message.includes('does not exist');
+      
+      const tableName = useGenericLikesTable ? 'likes' : 'comment_likes';
+      
+      const { data, error } = await supabase
+        .from(tableName)
+        .select('*')
+        .eq(useGenericLikesTable ? 'target_id' : 'comment_id', commentId)
         .eq('user_id', userId)
         .maybeSingle();
       
-      if (error) throw error;
+      if (error && error.code !== 'PGRST116') throw error;
       
       return { liked: !!data };
     } catch (error) {

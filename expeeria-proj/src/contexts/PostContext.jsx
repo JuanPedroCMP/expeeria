@@ -296,11 +296,6 @@ export function PostProvider({ children }) {
       
       if (likeError) throw likeError;
       
-      // Incrementar contador de curtidas no post
-      const { error: updateError } = await supabase.rpc('increment_likes', { post_id_param: postId });
-      
-      if (updateError) throw updateError;
-      
       // Atualizar os arrays locais para refletir o like
       const updateArrayWithLike = (array) => 
         array.map(post => {
@@ -346,11 +341,6 @@ export function PostProvider({ children }) {
         .match({ post_id: postId, user_id: user.id });
       
       if (unlikeError) throw unlikeError;
-      
-      // Decrementar contador de curtidas no post
-      const { error: updateError } = await supabase.rpc('decrement_likes', { post_id_param: postId });
-      
-      if (updateError) throw updateError;
       
       // Atualizar os arrays locais para refletir o unlike
       const updateArrayWithUnlike = (array) => 
@@ -419,8 +409,25 @@ export function PostProvider({ children }) {
       
       const newComment = await commentService.createComment(commentData);
       
-      // Incrementar contador de comentários no post
-      await supabase.rpc('increment_comments', { post_id_param: postId });
+      // Atualizar contador de comentários sem usar função RPC
+      try {
+        const { data: postToUpdate } = await supabase
+          .from('posts')
+          .select('comment_count')
+          .eq('id', postId)
+          .single();
+          
+        if (postToUpdate) {
+          const currentCount = postToUpdate.comment_count || 0;
+          await supabase
+            .from('posts')
+            .update({ comment_count: currentCount + 1 })
+            .eq('id', postId);
+        }
+      } catch (countError) {
+        console.error('Erro ao atualizar contador de comentários:', countError);
+        // Não interrompe o fluxo principal
+      }
       
       // Atualizar o post atual com o novo comentário
       if (currentPost?.id === postId) {
@@ -461,8 +468,25 @@ export function PostProvider({ children }) {
     try {
       await commentService.deleteComment(commentId);
       
-      // Decrementar contador de comentários no post
-      await supabase.rpc('decrement_comments', { post_id_param: postId });
+      // Decrementar contador de comentários sem usar função RPC
+      try {
+        const { data: postToUpdate } = await supabase
+          .from('posts')
+          .select('comment_count')
+          .eq('id', postId)
+          .single();
+          
+        if (postToUpdate) {
+          const currentCount = postToUpdate.comment_count || 0;
+          await supabase
+            .from('posts')
+            .update({ comment_count: Math.max(currentCount - 1, 0) })
+            .eq('id', postId);
+        }
+      } catch (countError) {
+        console.error('Erro ao atualizar contador de comentários:', countError);
+        // Não interrompe o fluxo principal
+      }
       
       // Atualizar o post atual com o comentário removido
       if (currentPost?.id === postId) {
