@@ -65,6 +65,7 @@ export const NewPost = ({
       };
 
       console.log("Enviando dados do post:", postData);
+      console.log("Função de criação de post disponível:", !!createPost);
 
       if (modoEdicao && onSubmitEdicao) {
         await onSubmitEdicao(postData);

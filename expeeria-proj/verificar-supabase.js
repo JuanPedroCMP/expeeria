@@ -1,5 +1,5 @@
-// Script para testar conexão com o Supabase (usando ES modules)
-import { createClient } from '@supabase/supabase-js';
+// Script para testar conexão com o Supabase (usando CommonJS para evitar problemas com Node.js)
+const { createClient } = require('@supabase/supabase-js');
 
 // Credenciais do Supabase diretamente no script (apenas para teste)
 const supabaseUrl = 'https://bqjsyidyxnhungvniyij.supabase.co';
@@ -28,7 +28,7 @@ async function testarConexaoSupabase() {
           .limit(1);
         
         if (error) {
-          console.log(`❌ Tabela '${tabela}': ${error.message} (${status || 'unknown status'})`);
+          console.log(`❌ Tabela '${tabela}': ${error.message} (${status}: ${statusText})`);
         } else {
           console.log(`✅ Tabela '${tabela}': OK (${data.length} registros recebidos)`);
           algumaTabelaExiste = true;

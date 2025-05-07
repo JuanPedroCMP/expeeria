@@ -20,7 +20,8 @@ export const useAuth = () => {
     logout, 
     register, 
     updateProfile, 
-    isAuthenticated 
+    isAuthenticated,
+    sessionChecked 
   } = authContext;
   
   // Verificar se o usuário é o autor do conteúdo
@@ -56,6 +57,7 @@ export const useAuth = () => {
     register,
     updateProfile,
     isAuthenticated,
+    sessionChecked,
     isOwner,
     hasPermission,
     canEdit,

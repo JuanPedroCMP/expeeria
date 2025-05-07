@@ -16,14 +16,14 @@ export const usePost = () => {
     posts, 
     loading, 
     error, 
-    fetchPosts, 
-    fetchPost, 
+    loadAllPosts, 
+    loadPost, 
     createPost, 
     updatePost, 
     deletePost, 
     likePost,
-    unlikePost,
-    hasLikedPost 
+    unlikePost, 
+    hasLiked 
   } = postContext;
   
   // Buscar um post por ID com cache local
@@ -34,12 +34,12 @@ export const usePost = () => {
       return Promise.resolve(post);
     }
     
-    return fetchPost(id);
-  }, [posts, fetchPost]);
+    return loadPost(id);
+  }, [posts, loadPost]);
   
   // Toggle de curtida em um post
   const toggleLikePost = useCallback(async (postId) => {
-    const isLiked = hasLikedPost(postId);
+    const isLiked = hasLiked(postId);
     
     try {
       if (isLiked) {
@@ -52,7 +52,7 @@ export const usePost = () => {
       console.error("Erro ao alternar curtida do post:", error);
       throw error;
     }
-  }, [hasLikedPost, unlikePost, likePost]);
+  }, [hasLiked, unlikePost, likePost]);
   
   // Filtragem de posts
   const filterPosts = useCallback((filterConfig) => {
@@ -145,14 +145,14 @@ export const usePost = () => {
     posts,
     loading,
     error,
-    fetchPosts,
-    fetchPost,
+    fetchPosts: loadAllPosts,
+    fetchPost: loadPost,
     createPost,
     updatePost,
     deletePost,
     likePost,
     unlikePost,
-    hasLikedPost,
+    hasLikedPost: hasLiked,
     getPostById,
     toggleLikePost,
     filterPosts
