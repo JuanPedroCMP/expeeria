@@ -1,12 +1,12 @@
-import { useAuth } from "../../contexts/AuthContext";
-import { usePosts } from "../../contexts/PostContext";
+import { useAuth } from "../../hooks/useAuth";
+import { usePost } from "../../hooks/usePost";
 import { useEffect, useState } from "react";
 import { Card } from "../Card/Card";
 import { useNavigate } from "react-router-dom";
 
 const Recomendacoes = () => {
   const { user } = useAuth();
-  const { posts } = usePosts();
+  const { posts } = usePost();
   const [recommended, setRecommended] = useState([]);
   const navigate = useNavigate();
 

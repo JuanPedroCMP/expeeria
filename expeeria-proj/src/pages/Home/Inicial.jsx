@@ -1,7 +1,7 @@
 import { PostProvider } from "../../contexts/PostContext";
 import { Feed } from "../../components/Feed/Feed";
 import { Recomendacoes } from "../../components/Recomendacoes/Recomendacoes";
-import { useAuth } from "../../contexts/AuthContext";
+import { useAuth } from "../../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import style from "./Inicial.module.css";
 

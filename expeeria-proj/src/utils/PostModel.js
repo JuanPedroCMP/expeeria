@@ -153,9 +153,9 @@ function convertLegacyPostToNewModel(legacyPost) {
     authorId: legacyPost.userId || legacyPost.author, // Adapta dependendo do campo usado
     categories: legacyPost.area || [],
     status: 'published',
-    createdAt: new Date(legacyPost.createdAt) || new Date(),
+    createdAt: legacyPost.createdAt ? new Date(legacyPost.createdAt) : new Date(),
     updatedAt: new Date(),
-    publishedAt: new Date(legacyPost.createdAt) || new Date(),
+    publishedAt: legacyPost.createdAt ? new Date(legacyPost.createdAt) : new Date(),
     likeCount: legacyPost.likes || 0,
     commentCount: (legacyPost.comments && legacyPost.comments.length) || 0,
     viewCount: 0,

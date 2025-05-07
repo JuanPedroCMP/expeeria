@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { usePosts } from "../../contexts/PostContext";
+import { usePost } from "../../hooks/usePost";
 import { NewPost } from "../NewPost/NewPost";
 
 export const EditPost = () => {
   const { id } = useParams();
-  const { posts, editPost } = usePosts();
+  const { posts, editPost } = usePost();
   const navigate = useNavigate();
   const [post, setPost] = useState(null);
 

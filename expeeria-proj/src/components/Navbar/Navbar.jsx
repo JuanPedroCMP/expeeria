@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from "react-router-dom";
 import { MenuRecolhivel } from "./MenuRecolhivel/MenuRecolhivel";
-import { useAuth } from "../../contexts/AuthContext";
+import { useAuth } from "../../hooks/useAuth";
 import { Avatar } from "../Avatar/Avatar";
 import styles from "./Navbar.module.css";
 

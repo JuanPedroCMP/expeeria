@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { usePosts } from "../../contexts/PostContext";
+import { usePost } from "../../hooks/usePost";
 import { Card } from "../../components/Card/Card";
 import style from "./Explore.module.css";
 import { categoriasPadrao } from "../../utils/categoriasPadrao";
@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 const PAGE_SIZE = 8;
 
 export function Explore() {
-  const { posts } = usePosts();
+  const { posts } = usePost();
   const [search, setSearch] = useState(() => localStorage.getItem("explore_search") || "");
   const [selectedAreas, setSelectedAreas] = useState(() => {
     try {

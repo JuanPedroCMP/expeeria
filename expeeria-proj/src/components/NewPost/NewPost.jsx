@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
-import { usePosts } from "../../contexts/PostContext";
+import { usePost } from "../../hooks/usePost";
 import ReactMarkdown from "react-markdown";
 import style from "./NewPost.module.css";
 import { Button } from "../Button";
 // import { categorizePost } from "../../utils/categorizePost";
 import { categoriasPadrao } from "../../utils/categoriasPadrao";
-import { useAuth } from "../../contexts/AuthContext";
+import { useAuth } from "../../hooks/useAuth";
 import { UploadImage } from "../UploadImage/UploadImage";
 
 export const NewPost = ({
@@ -13,7 +13,7 @@ export const NewPost = ({
   postOriginal = null,
   onSubmitEdicao,
 }) => {
-  const { addPost } = usePosts();
+  const { addPost } = usePost();
   const { user } = useAuth();
   const [title, setTitle] = useState(postOriginal?.title || "");
   const [caption, setCaption] = useState(postOriginal?.caption || "");

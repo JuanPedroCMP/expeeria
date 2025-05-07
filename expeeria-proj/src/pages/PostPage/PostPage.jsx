@@ -1,14 +1,14 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
-import { usePosts } from "../../contexts/PostContext";
+import { usePost } from "../../hooks/usePost";
 import ReactMarkdown from "react-markdown";
 import style from "./PostPage.module.css";
 import { Button } from "../../components";
-import { useAuth } from "../../contexts/AuthContext";
+import { useAuth } from "../../hooks/useAuth";
 
 export const PostPage = () => {
   const { id } = useParams();
-  const { posts, loading, likePost, addComment, deletePost } = usePosts();
+  const { posts, loading, likePost, addComment, deletePost } = usePost();
   const [comment, setComment] = useState("");
   const [userInput, setUserInput] = useState("");
   const { user } = useAuth();
