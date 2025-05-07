@@ -38,7 +38,67 @@ export function SignUp() {
     }
   };
 
+  // Função para validar o formato do e-mail
+  const isValidEmail = (email) => {
+    if (!email) return false;
+    
+    // Limpar espaços extras
+    email = email.trim();
+    
+    // Verificações básicas
+    const parts = email.split('@');
+    if (parts.length !== 2) return false;
+    
+    const [localPart, domainPart] = parts;
+    
+    // Verificar parte local (antes do @)
+    if (localPart.length === 0 || localPart.length > 64) return false;
+    
+    // Verificar domínio (após o @)
+    if (domainPart.length === 0 || domainPart.length > 255 || !domainPart.includes('.')) return false;
+    
+    // Verificar TLD (parte final do domínio)
+    const tld = domainPart.split('.').pop();
+    if (tld.length < 2) return false;
+    
+    return true;
+  };
+
   const validateForm = () => {
+    // Validar e-mail
+    if (!formData.email) {
+      setError("O e-mail é obrigatório");
+      return false;
+    }
+
+    if (!isValidEmail(formData.email)) {
+      setError("Formato de e-mail inválido. Verifique se digitou corretamente");
+      return false;
+    }
+
+    // Validar nome completo
+    if (!formData.fullName.trim()) {
+      setError("O nome completo é obrigatório");
+      return false;
+    }
+
+    // Validar nome de usuário
+    if (!formData.username) {
+      setError("O nome de usuário é obrigatório");
+      return false;
+    }
+
+    if (formData.username.length < 3) {
+      setError("O nome de usuário deve ter pelo menos 3 caracteres");
+      return false;
+    }
+
+    // Validar senha
+    if (!formData.password) {
+      setError("A senha é obrigatória");
+      return false;
+    }
+
     if (formData.password.length < 6) {
       setError("A senha deve ter pelo menos 6 caracteres");
       return false;
@@ -46,11 +106,6 @@ export function SignUp() {
 
     if (formData.password !== formData.confirmPassword) {
       setError("As senhas não coincidem");
-      return false;
-    }
-
-    if (formData.username.length < 3) {
-      setError("O nome de usuário deve ter pelo menos 3 caracteres");
       return false;
     }
 
@@ -64,8 +119,11 @@ export function SignUp() {
     if (!validateForm()) return;
 
     try {
+      // Certifica-se que o e-mail esteja sem espaços extras
+      const email = formData.email.trim();
+      
       await register({
-        email: formData.email,
+        email,
         password: formData.password,
         username: formData.username,
         fullName: formData.fullName
@@ -73,6 +131,7 @@ export function SignUp() {
       
       navigate("/login", { state: { message: "Cadastro realizado com sucesso! Faça login para continuar." } });
     } catch (err) {
+      console.error("Erro durante o cadastro:", err);
       setError(err.message || "Erro ao cadastrar. Por favor, tente novamente.");
     }
   };
@@ -119,6 +178,9 @@ export function SignUp() {
             onChange={handleChange}
             required
             disabled={loading}
+            placeholder="exemplo@dominio.com"
+            pattern="[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*"
+            title="Digite um e-mail válido como exemplo@dominio.com ou nome@etec.sp.gov.br"
           />
         </div>
         
@@ -131,6 +193,7 @@ export function SignUp() {
             value={formData.password}
             onChange={handleChange}
             required
+            minLength={6}
             disabled={loading}
             placeholder="Mínimo 6 caracteres"
           />

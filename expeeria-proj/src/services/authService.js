@@ -5,6 +5,53 @@ import supabase from './supabase';
  */
 export const authService = {
   /**
+   * Verifica se um email é válido
+   * @param {string} email - Email a ser validado
+   * @returns {boolean} - Se o email é válido
+   */
+  isValidEmail(email) {
+    if (!email) return false;
+    
+    // Limpar espaços extras
+    email = email.trim();
+    
+    // Regex melhorada para validação de email que suporta subdomínios múltiplos (.sp.gov, .co.uk, etc)
+    // e caracteres internacionais nos domínios
+    const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+    
+    // Verifica o formato e se tem pelo menos um ponto após o @
+    if (!emailRegex.test(email)) return false;
+    
+    // Verificações adicionais
+    const parts = email.split('@');
+    if (parts.length !== 2) return false;
+    
+    // Verificar parte local
+    const localPart = parts[0];
+    if (localPart.length === 0 || localPart.length > 64) return false;
+    
+    // Verificar domínio
+    const domainPart = parts[1];
+    if (domainPart.length === 0 || domainPart.length > 255 || !domainPart.includes('.')) return false;
+    
+    // Verificar se o TLD tem pelo menos 2 caracteres
+    const tld = domainPart.split('.').pop();
+    if (tld.length < 2) return false;
+    
+    return true;
+  },
+
+  /**
+   * Função segura para verificar se uma string contém um texto
+   * @param {string|undefined} text - Texto a ser verificado
+   * @param {string} searchString - String a ser procurada
+   * @returns {boolean} - Se a string contém o texto
+   */
+  safeIncludes(text, searchString) {
+    return typeof text === 'string' && text.includes(searchString);
+  },
+
+  /**
    * Registra um novo usuário
    * @param {Object} userData - Dados do usuário
    * @param {string} userData.email - Email do usuário
@@ -14,9 +61,23 @@ export const authService = {
    * @returns {Promise} - Resultado da operação
    */
   async signUp(userData) {
+    if (!userData) {
+      throw new Error("Dados do usuário não fornecidos");
+    }
+    
     const { email, password, username, fullName } = userData;
     
     try {
+      // Validar email antes de enviar para o Supabase
+      if (!this.isValidEmail(email)) {
+        throw new Error("Endereço de email inválido");
+      }
+      
+      // Validar senha
+      if (!password || password.length < 6) {
+        throw new Error("A senha deve ter pelo menos 6 caracteres");
+      }
+      
       // Registrar o usuário no serviço de autenticação
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
@@ -31,8 +92,13 @@ export const authService = {
 
       if (authError) throw authError;
 
-      // Criar o perfil do usuário
-      if (authData?.user) {
+      // Verificar se os dados do usuário foram retornados
+      if (!authData?.user?.id) {
+        throw new Error("Erro ao criar usuário: dados incompletos retornados");
+      }
+
+      try {
+        // Criar o perfil do usuário
         const { error: profileError } = await supabase
           .from('profiles')
           .insert({
@@ -44,7 +110,13 @@ export const authService = {
             created_at: new Date().toISOString(),
           });
 
-        if (profileError) throw profileError;
+        if (profileError) {
+          console.error("Erro ao criar perfil:", profileError);
+          // Não impede o fluxo principal, pois o usuário já foi criado
+        }
+      } catch (profileErr) {
+        console.error("Exceção ao criar perfil:", profileErr);
+        // Não impede o fluxo principal, pois o usuário já foi criado
       }
 
       return authData;
@@ -52,13 +124,21 @@ export const authService = {
       console.error("Erro no registro:", error);
       
       // Traduzir mensagens de erro comuns para português
-      if (error.message.includes("duplicate key value")) {
-        throw new Error("Este email ou nome de usuário já está em uso");
-      } else if (error.message.includes("password")) {
-        throw new Error("A senha deve ter pelo menos 6 caracteres");
+      if (error && error.message) {
+        if (this.safeIncludes(error.message, "duplicate key value")) {
+          throw new Error("Este email ou nome de usuário já está em uso");
+        } else if (this.safeIncludes(error.message, "password")) {
+          throw new Error("A senha deve ter pelo menos 6 caracteres");
+        } else if (this.safeIncludes(error.message, "email") || this.safeIncludes(error.message, "Email")) {
+          throw new Error("Endereço de email inválido. Verifique se está correto");
+        } else if (this.safeIncludes(error.message, "User already registered")) {
+          throw new Error("Este email já está registrado. Tente fazer login ou recuperar sua senha");
+        } else {
+          throw new Error(error.message);
+        }
       }
       
-      throw error;
+      throw new Error("Erro ao cadastrar usuário. Tente novamente mais tarde.");
     }
   },
 
@@ -70,9 +150,22 @@ export const authService = {
    * @returns {Promise} - Resultado da operação
    */
   async signIn(credentials) {
+    if (!credentials) {
+      throw new Error("Credenciais não fornecidas");
+    }
+    
     const { email, password } = credentials;
     
     try {
+      // Validar email antes de enviar para o Supabase
+      if (!this.isValidEmail(email)) {
+        throw new Error("Endereço de email inválido");
+      }
+
+      if (!password) {
+        throw new Error("A senha é obrigatória");
+      }
+
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -84,13 +177,19 @@ export const authService = {
       console.error("Erro no login:", error);
       
       // Traduzir mensagens de erro comuns para português
-      if (error.message.includes("Invalid login credentials")) {
-        throw new Error("Email ou senha incorretos");
-      } else if (error.message.includes("Email not confirmed")) {
-        throw new Error("Email não confirmado. Verifique sua caixa de entrada");
+      if (error && error.message) {
+        if (this.safeIncludes(error.message, "Invalid login credentials")) {
+          throw new Error("Email ou senha incorretos");
+        } else if (this.safeIncludes(error.message, "Email not confirmed")) {
+          throw new Error("Email não confirmado. Verifique sua caixa de entrada");
+        } else if (this.safeIncludes(error.message, "email") || this.safeIncludes(error.message, "Email")) {
+          throw new Error("Endereço de email inválido");
+        } else {
+          throw new Error(error.message);
+        }
       }
       
-      throw error;
+      throw new Error("Erro ao fazer login. Tente novamente mais tarde.");
     }
   },
 
@@ -105,7 +204,9 @@ export const authService = {
       return true;
     } catch (error) {
       console.error("Erro ao fazer logout:", error);
-      throw error;
+      throw error && error.message 
+        ? new Error(error.message)
+        : new Error("Erro ao fazer logout. Tente novamente mais tarde.");
     }
   },
 
@@ -120,7 +221,9 @@ export const authService = {
       return data;
     } catch (error) {
       console.error("Erro ao obter sessão:", error);
-      throw error;
+      throw error && error.message 
+        ? new Error(error.message)
+        : new Error("Erro ao obter sessão. Tente novamente mais tarde.");
     }
   },
 
@@ -149,7 +252,9 @@ export const authService = {
       return data?.user;
     } catch (error) {
       console.error("Erro ao obter usuário atual:", error);
-      throw error;
+      throw error && error.message 
+        ? new Error(error.message)
+        : new Error("Erro ao obter usuário atual. Tente novamente mais tarde.");
     }
   },
 
@@ -160,6 +265,10 @@ export const authService = {
    */
   async resetPassword(email) {
     try {
+      if (!this.isValidEmail(email)) {
+        throw new Error("Endereço de email inválido");
+      }
+      
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: `${window.location.origin}/reset-password`,
       });
@@ -181,6 +290,14 @@ export const authService = {
    */
   async updatePassword(newPassword) {
     try {
+      if (!newPassword) {
+        throw new Error("A nova senha é obrigatória");
+      }
+      
+      if (newPassword.length < 6) {
+        throw new Error("A senha deve ter pelo menos 6 caracteres");
+      }
+      
       const { error } = await supabase.auth.updateUser({
         password: newPassword,
       });
@@ -190,11 +307,13 @@ export const authService = {
     } catch (error) {
       console.error("Erro ao atualizar senha:", error);
       
-      if (error.message.includes("weak")) {
+      if (error && error.message && this.safeIncludes(error.message, "weak")) {
         throw new Error("A senha é muito fraca. Use pelo menos 6 caracteres com letras e números");
       }
       
-      throw error;
+      throw error && error.message 
+        ? new Error(error.message)
+        : new Error("Erro ao atualizar senha. Tente novamente mais tarde.");
     }
   },
 };
