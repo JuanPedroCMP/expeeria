@@ -2,7 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import { PostPage } from "./pages/PostPage/PostPage";
 import { LayoutPadrao } from "./layouts";
 import { Inicial, NotFound } from "./pages";
-import { CratePost } from "./pages/CreatePost";
+import { CreatePost } from "./pages/CreatePost";
 import { EditPost } from "./components/EditPost/EditPost";
 import { Login } from "./pages/Login/Login";
 import { SignUp } from "./pages/SignUp/SignUp";
@@ -22,7 +22,7 @@ const Router = () => {
           path="/criar_post"
           element={
             <PrivateRoute>
-              <CratePost />
+              <CreatePost />
             </PrivateRoute>
           }
         />

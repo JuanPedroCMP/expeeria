@@ -1,9 +1,8 @@
-
 import { PostProvider } from "../../contexts/PostContext";
 import { NewPost } from "../../components/NewPost/NewPost";
 import { Button } from "../../components";
 
-const CratePost = () => {
+const CreatePost = () => {
   return (
     <PostProvider>
       <NewPost />
@@ -11,4 +10,4 @@ const CratePost = () => {
   );
 };
 
-export { CratePost };
+export { CreatePost };

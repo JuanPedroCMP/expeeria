@@ -1,29 +1,146 @@
 .homeContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 1rem;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 32px 16px;
 }
 
 .welcomeBox {
-  background: #23283a;
-  border-radius: 0.7rem;
-  padding: 2rem 2.5rem;
-  margin-bottom: 2rem;
+  background: linear-gradient(135deg, #2c3e50, #1e293b);
+  border-radius: 12px;
+  padding: 2rem;
   text-align: center;
   color: #fff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.welcomeBox h2 {
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.welcomeBox p {
+  margin-bottom: 1.5rem;
+  font-size: 1.1rem;
+  opacity: 0.9;
 }
 
 .criarPostBtn {
-  margin-top: 1rem;
-  background: linear-gradient(90deg, #0575e6, #00f260);
-  color: #fff;
+  background-color: #3498db;
+  color: white;
   border: none;
-  border-radius: 0.4rem;
-  padding: 0.6rem 1.5rem;
-  font-size: 1.1rem;
+  padding: 0.8rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
   cursor: pointer;
-  transition: filter 0.2s;
+  transition: background-color 0.2s;
 }
+
 .criarPostBtn:hover {
-  filter: brightness(1.1);
+  background-color: #2980b9;
+}
+
+.trendingSection {
+  background-color: #181c24;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-top: 1rem;
+}
+
+.trendingSection h3 {
+  color: #fff;
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.trendingGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.trendingCard {
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.trendingCard:hover {
+  transform: translateY(-5px);
+}
+
+.exploreCallout {
+  background-color: #2c3e50;
+  border-radius: 12px;
+  padding: 2rem;
+  text-align: center;
+  margin-top: 1rem;
+  color: #fff;
+}
+
+.exploreCallout h3 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.exploreCallout p {
+  margin-bottom: 1.5rem;
+  opacity: 0.9;
+}
+
+.exploreBtn {
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.exploreBtn:hover {
+  background-color: #c0392b;
+}
+    
+.recentlyViewedSection {
+  background-color: #181c24;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-top: 1rem;
+}
+
+.recentlyViewedSection h3 {
+  color: #fff;
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.recentlyViewedGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.recentCard {
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.recentCard:hover {
+  transform: translateY(-5px);
+}
+
+@media (max-width: 768px) {
+  .trendingGrid {
+    grid-template-columns: 1fr;
+  }
 }

@@ -196,7 +196,9 @@ export function PostProvider({ children }) {
     } catch (error) {
       console.error('Erro ao criar post:', error);
       setError('Falha ao criar o post. Por favor, tente novamente.');
-      throw error;
+      // Removendo o "throw error" para evitar que o erro seja propagado 
+      // e cause problemas de carregamento infinito
+      return null; // Retornar null para indicar falha
     } finally {
       setLoading(false);
     }

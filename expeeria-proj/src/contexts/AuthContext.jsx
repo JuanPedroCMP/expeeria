@@ -13,16 +13,21 @@ export function AuthProvider({ children }) {
 
   // Verificar sessão ao iniciar
   useEffect(() => {
+    let isMounted = true; // Verificar se o componente está montado
+    let safetyTimeout; // Referência para o timeout de segurança
+
     const initAuth = async () => {
+      if (!isMounted) return;
       setLoading(true);
+      
       try {
         // Verificar se há uma sessão ativa e válida
         const hasSession = await authService.hasValidSession();
         
-        if (hasSession) {
+        if (hasSession && isMounted) {
           // Buscar dados do usuário
           const userData = await authService.getCurrentUser();
-          if (userData) {
+          if (userData && isMounted) {
             // Buscar perfil do usuário para dados adicionais
             const { data: profile } = await supabase
               .from('profiles')
@@ -35,13 +40,23 @@ export function AuthProvider({ children }) {
               ...profile
             });
           }
+        } else if (isMounted) {
+          // Explicitamente definir usuário como null se não houver sessão
+          setUser(null);
         }
       } catch (error) {
         console.error('Erro ao inicializar autenticação:', error);
-        setError('Houve um problema ao verificar sua autenticação');
+        if (isMounted) {
+          setError('Houve um problema ao verificar sua autenticação');
+          // Garantir que o usuário seja null em caso de erro
+          setUser(null);
+        }
       } finally {
-        setLoading(false);
-        setSessionChecked(true);
+        // Garantir que o loading seja sempre definido como false após a verificação
+        if (isMounted) {
+          setLoading(false);
+          setSessionChecked(true);
+        }
       }
     };
 
@@ -50,11 +65,16 @@ export function AuthProvider({ children }) {
     // Configurar listener para mudanças de autenticação
     const { data: { subscription }} = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        console.log("Auth state changed:", event, !!session);
+        
+        if (!isMounted) return;
+        
         if (event === 'SIGNED_IN' && session) {
+          setLoading(true); // Indicar carregamento quando o usuário fizer login
           // Buscar usuário atual
-          const userData = await authService.getCurrentUser();
-          if (userData) {
-            try {
+          try {
+            const userData = await authService.getCurrentUser();
+            if (userData && isMounted) {
               // Buscar perfil do usuário
               const { data: profile } = await supabase
                 .from('profiles')
@@ -66,20 +86,74 @@ export function AuthProvider({ children }) {
                 ...userData,
                 ...profile
               });
-            } catch (profileError) {
-              console.error('Erro ao buscar perfil:', profileError);
+            }
+          } catch (profileError) {
+            console.error('Erro ao buscar perfil:', profileError);
+            // Garantir que o usuário tenha pelo menos os dados básicos mesmo sem perfil
+            if (isMounted && session?.user) {
+              setUser(session.user);
+            }
+          } finally {
+            if (isMounted) {
+              setLoading(false); // Garantir que loading seja false mesmo após erro
+              setSessionChecked(true);
             }
           }
         } else if (event === 'SIGNED_OUT') {
-          setUser(null);
+          if (isMounted) {
+            setUser(null);
+            setLoading(false); // Garantir que loading seja false após logout
+            setSessionChecked(true);
+          }
+        } else {
+          // Garantir que loading seja false para outros eventos de autenticação
+          if (isMounted) {
+            setLoading(false);
+            setSessionChecked(true);
+          }
         }
       }
     );
     
-    // Limpar subscription
+    // Definir um timeout de segurança para garantir que loading não fique travado
+    safetyTimeout = setTimeout(() => {
+      if (isMounted && loading) {
+        console.log("Timeout de segurança acionado para AuthContext");
+        setLoading(false);
+        setSessionChecked(true);
+        
+        // Verificar sessão de forma simplificada
+        authService.hasValidSession().then(hasSession => {
+          if (!hasSession && isMounted) {
+            setUser(null);
+          }
+        }).catch(() => {
+          // Em caso de erro, assume que não há sessão
+          if (isMounted) {
+            setUser(null);
+          }
+        });
+      }
+    }, 2000); // Reduzir para 2 segundos para melhor experiência do usuário
+    
+    // Limpar subscription e state quando o componente for desmontado
     return () => {
+      isMounted = false;
+      clearTimeout(safetyTimeout);
       subscription?.unsubscribe();
     };
+  }, []);
+
+  // Função para reiniciar estado de autenticação em caso de problemas
+  const resetAuthState = useCallback(() => {
+    setLoading(false);
+    setSessionChecked(true);
+    // Verificar sessão atual
+    authService.hasValidSession().then(hasSession => {
+      if (!hasSession) {
+        setUser(null);
+      }
+    });
   }, []);
 
   // Função de login
@@ -330,6 +404,7 @@ export function AuthProvider({ children }) {
         isAuthenticated: !!user,
         isAdmin,
         isOwner,
+        resetAuthState, // Adicionando a nova função ao contexto
       }}
     >
       {children}

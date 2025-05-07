@@ -73,18 +73,29 @@ export const NewPost = ({
         setSuccess("Post editado com sucesso!");
         showSuccess("Post editado com sucesso!");
       } else {
-        const novoPost = await createPost(postData);
-        console.log("Resposta ao criar post:", novoPost);
-        if (novoPost) {
-          setSuccess("Post criado com sucesso!");
-          showSuccess("Post criado com sucesso!");
-          // Limpar formulário
-          setTitle("");
-          setCaption("");
-          setContent("");
-          setImageUrl("");
-          setAuthor("");
-          setArea([]);
+        try {
+          const novoPost = await createPost(postData);
+          console.log("Resposta ao criar post:", novoPost);
+          if (novoPost) {
+            setSuccess("Post criado com sucesso!");
+            showSuccess("Post criado com sucesso!");
+            // Limpar formulário
+            setTitle("");
+            setCaption("");
+            setContent("");
+            setImageUrl("");
+            setAuthor("");
+            setArea([]);
+          } else {
+            // Caso createPost retorne null (indicando erro)
+            setError("Não foi possível criar o post. Tente novamente.");
+            showError("Não foi possível criar o post. Tente novamente.");
+          }
+        } catch (createError) {
+          // Tratamento específico para erro de criação do post
+          console.error("Erro específico ao criar post:", createError);
+          setError(createError.message || "Erro ao criar o post.");
+          showError(createError.message || "Erro ao criar o post.");
         }
       }
     } catch (err) {
