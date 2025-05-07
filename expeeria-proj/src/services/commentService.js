@@ -11,17 +11,19 @@ export const commentService = {
    * @returns {Promise<Object>} - Comentários do post
    */
   async getCommentsByPost(postId, options = {}) {
-    const { 
-      page = 1, 
-      limit = 20,
-      orderBy = 'created_at',
-      orderDirection = 'desc'
-    } = options;
-    
-    const from = (page - 1) * limit;
-    const to = from + limit - 1;
-    
     try {
+      if (!postId) throw new Error('ID do post não fornecido');
+      
+      const { 
+        page = 1, 
+        limit = 20,
+        orderBy = 'created_at',
+        orderDirection = 'desc'
+      } = options;
+      
+      const from = (page - 1) * limit;
+      const to = from + limit - 1;
+      
       // Buscar apenas comentários do primeiro nível (sem parent_id)
       let query = supabase
         .from('comments')
@@ -29,7 +31,7 @@ export const commentService = {
           *,
           user:user_id(id, username, avatar_url),
           likes:comment_likes(count)
-        `)
+        `, { count: 'exact' })
         .eq('post_id', postId)
         .is('parent_id', null)
         .order(orderBy, { ascending: orderDirection === 'asc' })
@@ -56,13 +58,13 @@ export const commentService = {
         pagination: {
           page,
           limit,
-          total: count,
-          pages: Math.ceil(count / limit)
+          total: count || 0,
+          pages: Math.ceil((count || 0) / limit)
         }
       };
     } catch (error) {
       console.error('Erro ao buscar comentários do post:', error);
-      throw error;
+      throw new Error('Não foi possível carregar os comentários. Tente novamente mais tarde.');
     }
   },
   
@@ -73,12 +75,16 @@ export const commentService = {
    */
   async createComment(commentData) {
     try {
+      if (!commentData.post_id) throw new Error('ID do post não fornecido');
+      if (!commentData.user_id) throw new Error('Usuário não autenticado');
+      if (!commentData.content?.trim()) throw new Error('O conteúdo do comentário não pode estar vazio');
+      
       const { data, error } = await supabase
         .from('comments')
         .insert({
           post_id: commentData.post_id,
           user_id: commentData.user_id,
-          content: commentData.content,
+          content: commentData.content.trim(),
           parent_id: commentData.parent_id || null,
           created_at: new Date().toISOString()
         })
@@ -89,6 +95,7 @@ export const commentService = {
         .single();
       
       if (error) throw error;
+      if (!data) throw new Error('Erro ao criar comentário');
       
       return {
         id: data.id,
@@ -103,7 +110,14 @@ export const commentService = {
       };
     } catch (error) {
       console.error('Erro ao criar comentário:', error);
-      throw error;
+      
+      if (error.message === 'Usuário não autenticado') {
+        throw new Error('Você precisa estar logado para comentar.');
+      } else if (error.message.includes('conteúdo do comentário')) {
+        throw new Error(error.message);
+      }
+      
+      throw new Error('Não foi possível criar o comentário. Tente novamente.');
     }
   },
   
@@ -115,10 +129,13 @@ export const commentService = {
    */
   async updateComment(commentId, updates) {
     try {
+      if (!commentId) throw new Error('ID do comentário não fornecido');
+      if (!updates.content?.trim()) throw new Error('O conteúdo do comentário não pode estar vazio');
+      
       const { data, error } = await supabase
         .from('comments')
         .update({
-          content: updates.content,
+          content: updates.content.trim(),
           updated_at: new Date().toISOString()
         })
         .eq('id', commentId)
@@ -126,6 +143,7 @@ export const commentService = {
         .single();
       
       if (error) throw error;
+      if (!data) throw new Error('Comentário não encontrado');
       
       return {
         content: data.content,
@@ -133,7 +151,12 @@ export const commentService = {
       };
     } catch (error) {
       console.error('Erro ao atualizar comentário:', error);
-      throw error;
+      
+      if (error.message.includes('conteúdo do comentário')) {
+        throw new Error(error.message);
+      }
+      
+      throw new Error('Não foi possível atualizar o comentário. Tente novamente.');
     }
   },
   
@@ -144,7 +167,36 @@ export const commentService = {
    */
   async deleteComment(commentId) {
     try {
-      // Primeiro excluir todas as curtidas relacionadas
+      if (!commentId) throw new Error('ID do comentário não fornecido');
+      
+      // Primeiro verificar se há respostas e excluí-las
+      const { data: replies } = await supabase
+        .from('comments')
+        .select('id')
+        .eq('parent_id', commentId);
+        
+      // Excluir as respostas se existirem
+      if (replies && replies.length > 0) {
+        const replyIds = replies.map(reply => reply.id);
+        
+        // Excluir as curtidas das respostas
+        const { error: replyLikesError } = await supabase
+          .from('comment_likes')
+          .delete()
+          .in('comment_id', replyIds);
+          
+        if (replyLikesError) throw replyLikesError;
+        
+        // Excluir as respostas
+        const { error: repliesError } = await supabase
+          .from('comments')
+          .delete()
+          .in('id', replyIds);
+          
+        if (repliesError) throw repliesError;
+      }
+      
+      // Excluir curtidas do comentário principal
       const { error: likesError } = await supabase
         .from('comment_likes')
         .delete()
@@ -152,7 +204,7 @@ export const commentService = {
       
       if (likesError) throw likesError;
       
-      // Depois excluir o comentário
+      // Excluir o comentário principal
       const { error } = await supabase
         .from('comments')
         .delete()
@@ -163,7 +215,7 @@ export const commentService = {
       return true;
     } catch (error) {
       console.error('Erro ao excluir comentário:', error);
-      throw error;
+      throw new Error('Não foi possível excluir o comentário. Tente novamente.');
     }
   },
   
@@ -175,6 +227,9 @@ export const commentService = {
    */
   async toggleLike(commentId, userId) {
     try {
+      if (!commentId) throw new Error('ID do comentário não fornecido');
+      if (!userId) throw new Error('Usuário não autenticado');
+      
       // Verificar se o usuário já curtiu o comentário
       const { data: existingLike, error: checkError } = await supabase
         .from('comment_likes')
@@ -211,7 +266,12 @@ export const commentService = {
       return { liked: true };
     } catch (error) {
       console.error('Erro ao alternar curtida em comentário:', error);
-      throw error;
+      
+      if (error.message === 'Usuário não autenticado') {
+        throw new Error('Você precisa estar logado para curtir comentários.');
+      }
+      
+      throw new Error('Não foi possível processar sua curtida. Tente novamente.');
     }
   },
   
@@ -223,6 +283,8 @@ export const commentService = {
    */
   async checkLiked(commentId, userId) {
     try {
+      if (!commentId || !userId) return { liked: false };
+      
       const { data, error } = await supabase
         .from('comment_likes')
         .select('*')
@@ -235,7 +297,7 @@ export const commentService = {
       return { liked: !!data };
     } catch (error) {
       console.error('Erro ao verificar curtida em comentário:', error);
-      throw error;
+      return { liked: false };
     }
   },
   
@@ -246,6 +308,8 @@ export const commentService = {
    */
   async getReplies(parentId) {
     try {
+      if (!parentId) throw new Error('ID do comentário pai não fornecido');
+      
       const { data, error } = await supabase
         .from('comments')
         .select(`
@@ -272,7 +336,7 @@ export const commentService = {
       })) || [];
     } catch (error) {
       console.error('Erro ao buscar respostas do comentário:', error);
-      throw error;
+      throw new Error('Não foi possível carregar as respostas. Tente novamente mais tarde.');
     }
   },
   
@@ -285,7 +349,25 @@ export const commentService = {
    */
   async reportComment(commentId, userId, reason) {
     try {
-      const { data, error } = await supabase
+      if (!commentId) throw new Error('ID do comentário não fornecido');
+      if (!userId) throw new Error('Usuário não autenticado');
+      if (!reason) throw new Error('Motivo do report não fornecido');
+      
+      // Verificar se o usuário já reportou este comentário
+      const { data: existingReport, error: checkError } = await supabase
+        .from('comment_reports')
+        .select('*')
+        .eq('comment_id', commentId)
+        .eq('user_id', userId)
+        .maybeSingle();
+        
+      if (checkError) throw checkError;
+      
+      if (existingReport) {
+        throw new Error('Você já reportou este comentário anteriormente');
+      }
+      
+      const { error } = await supabase
         .from('comment_reports')
         .insert({
           comment_id: commentId,
@@ -296,10 +378,40 @@ export const commentService = {
       
       if (error) throw error;
       
-      return { success: true };
+      return { success: true, message: 'Comentário reportado com sucesso' };
     } catch (error) {
       console.error('Erro ao reportar comentário:', error);
-      throw error;
+      
+      if (error.message === 'Usuário não autenticado') {
+        throw new Error('Você precisa estar logado para reportar um comentário.');
+      } else if (error.message.includes('já reportou')) {
+        throw new Error(error.message);
+      }
+      
+      throw new Error('Não foi possível reportar o comentário. Tente novamente.');
+    }
+  },
+  
+  /**
+   * Conta o número de comentários de um post
+   * @param {string} postId - ID do post
+   * @returns {Promise<number>} - Número de comentários
+   */
+  async countCommentsByPost(postId) {
+    try {
+      if (!postId) return 0;
+      
+      const { count, error } = await supabase
+        .from('comments')
+        .select('*', { count: 'exact', head: true })
+        .eq('post_id', postId);
+      
+      if (error) throw error;
+      
+      return count || 0;
+    } catch (error) {
+      console.error('Erro ao contar comentários:', error);
+      return 0;
     }
   }
 };

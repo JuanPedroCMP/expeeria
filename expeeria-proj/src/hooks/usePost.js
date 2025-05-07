@@ -74,6 +74,7 @@ export const usePost = () => {
         post => 
           (post.title && post.title.toLowerCase().includes(searchLower)) ||
           (post.content && post.content.toLowerCase().includes(searchLower)) ||
+          (post.caption && post.caption.toLowerCase().includes(searchLower)) ||
           (post.author && post.author.toLowerCase().includes(searchLower))
       );
     }
@@ -98,25 +99,43 @@ export const usePost = () => {
     // Filtro por data
     if (dateFrom) {
       const fromDate = new Date(dateFrom);
-      filteredPosts = filteredPosts.filter(
-        post => new Date(post.createdAt) >= fromDate
-      );
+      fromDate.setHours(0, 0, 0, 0); // Início do dia
+      
+      filteredPosts = filteredPosts.filter(post => {
+        const postDate = new Date(post.createdAt || post.created_at);
+        return postDate >= fromDate;
+      });
     }
     
     if (dateTo) {
       const toDate = new Date(dateTo);
-      filteredPosts = filteredPosts.filter(
-        post => new Date(post.createdAt) <= toDate
-      );
+      toDate.setHours(23, 59, 59, 999); // Final do dia
+      
+      filteredPosts = filteredPosts.filter(post => {
+        const postDate = new Date(post.createdAt || post.created_at);
+        return postDate <= toDate;
+      });
     }
     
     // Ordenação
     if (orderBy === 'recentes') {
-      filteredPosts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      filteredPosts.sort((a, b) => {
+        const dateA = new Date(a.createdAt || a.created_at);
+        const dateB = new Date(b.createdAt || b.created_at);
+        return dateB - dateA;
+      });
     } else if (orderBy === 'curtidos') {
-      filteredPosts.sort((a, b) => (b.likes?.length || 0) - (a.likes?.length || 0));
+      filteredPosts.sort((a, b) => {
+        const likesA = typeof a.likes === 'number' ? a.likes : (a.likes?.length || 0);
+        const likesB = typeof b.likes === 'number' ? b.likes : (b.likes?.length || 0);
+        return likesB - likesA;
+      });
     } else if (orderBy === 'comentados') {
-      filteredPosts.sort((a, b) => (b.comments?.length || 0) - (a.comments?.length || 0));
+      filteredPosts.sort((a, b) => {
+        const commentsA = typeof a.comments === 'number' ? a.comments : (a.comments?.length || 0);
+        const commentsB = typeof b.comments === 'number' ? b.comments : (b.comments?.length || 0);
+        return commentsB - commentsA;
+      });
     }
     
     return filteredPosts;

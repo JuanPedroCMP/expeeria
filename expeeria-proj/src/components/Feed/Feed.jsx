@@ -96,6 +96,7 @@ export const Feed = () => {
         dateTo={dateTo}
         setDateTo={setDateTo}
         resetPageSize={resetPageSize}
+        onFiltersChanged={() => setLoadingVisual(true)}
       />
       
       <div className={style.feed}>
@@ -121,7 +122,7 @@ export const Feed = () => {
                     ? post.area.join(", ") + " • " + post.author
                     : post.area + " • " + post.author
                 }
-                Descrisao={post.caption}
+                Descricao={post.caption}
                 imageUrl={post.imageUrl}
                 likes={post.likes}
                 id={post.id}

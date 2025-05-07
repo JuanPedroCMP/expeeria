@@ -9,16 +9,17 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [sessionChecked, setSessionChecked] = useState(false);
 
   // Verificar sessão ao iniciar
   useEffect(() => {
     const initAuth = async () => {
       setLoading(true);
       try {
-        // Verificar se há uma sessão ativa no Supabase
-        const { data: session } = await authService.getSession();
+        // Verificar se há uma sessão ativa e válida
+        const hasSession = await authService.hasValidSession();
         
-        if (session?.session) {
+        if (hasSession) {
           // Buscar dados do usuário
           const userData = await authService.getCurrentUser();
           if (userData) {
@@ -40,10 +41,45 @@ export function AuthProvider({ children }) {
         setError('Houve um problema ao verificar sua autenticação');
       } finally {
         setLoading(false);
+        setSessionChecked(true);
       }
     };
 
     initAuth();
+    
+    // Configurar listener para mudanças de autenticação
+    const { data: { subscription }} = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (event === 'SIGNED_IN' && session) {
+          // Buscar usuário atual
+          const userData = await authService.getCurrentUser();
+          if (userData) {
+            try {
+              // Buscar perfil do usuário
+              const { data: profile } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', userData.id)
+                .single();
+                
+              setUser({
+                ...userData,
+                ...profile
+              });
+            } catch (profileError) {
+              console.error('Erro ao buscar perfil:', profileError);
+            }
+          }
+        } else if (event === 'SIGNED_OUT') {
+          setUser(null);
+        }
+      }
+    );
+    
+    // Limpar subscription
+    return () => {
+      subscription?.unsubscribe();
+    };
   }, []);
 
   // Função de login
@@ -86,11 +122,15 @@ export function AuthProvider({ children }) {
 
   // Função de logout
   const logout = useCallback(async () => {
+    setLoading(true);
     try {
       await authService.signOut();
       setUser(null);
     } catch (error) {
       console.error('Erro ao fazer logout:', error);
+      setError('Não foi possível sair. Tente novamente');
+    } finally {
+      setLoading(false);
     }
   }, []);
 
@@ -150,6 +190,26 @@ export function AuthProvider({ children }) {
       setLoading(false);
     }
   }, [user]);
+
+  // Função para resetar senha
+  const resetPassword = useCallback(async (email) => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      await authService.resetPassword(email);
+      return true;
+    } catch (error) {
+      console.error('Erro ao resetar senha:', error);
+      setError(
+        error.message || 
+        'Falha ao enviar email de recuperação. Tente novamente.'
+      );
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   // Função para seguir usuário
   const followUser = useCallback(async (userId) => {
@@ -258,10 +318,12 @@ export function AuthProvider({ children }) {
         user,
         loading,
         error,
+        sessionChecked,
         login,
         logout,
         register,
         updateProfile,
+        resetPassword,
         followUser,
         unfollowUser,
         isFollowing,

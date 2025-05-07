@@ -8,7 +8,7 @@ import styles from "./Card.module.css";
  * Versão melhorada com componentização do botão de curtida
  */
 const Card = (props) => {
-  const { TituloCard, SubTitulo, Descrisao, likes, id, imageUrl } = props;
+  const { TituloCard, SubTitulo, Descricao, likes, id, imageUrl } = props;
   const { likePost, unlikePost, hasLikedPost } = usePost();
   const { user } = useAuth();
   
@@ -34,7 +34,7 @@ const Card = (props) => {
       <div className={styles.cardContent}>
         <h3 className={styles.cardTitle}>{TituloCard}</h3>
         <h6 className={styles.cardSubtitle}>{SubTitulo}</h6>
-        <p className={styles.cardDescription}>{Descrisao}</p>
+        <p className={styles.cardDescription}>{Descricao}</p>
         <div className={styles.cardFooter}>
           <LikeButton 
             count={likes || 0}

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from "react-router-dom";
 import { MenuRecolhivel } from "./MenuRecolhivel/MenuRecolhivel";
+import { SearchBar } from "./SearchBar";
 import { useAuth } from "../../hooks/useAuth";
 import { Avatar } from "../Avatar/Avatar";
 import { ThemeToggle } from "../ThemeToggle";
@@ -20,6 +21,11 @@ export const Navbar = () => {
       navigate('/login');
     }
   };
+  
+  const handleSearch = (query) => {
+    // Redireciona para a página inicial com o termo de pesquisa
+    navigate(`/?search=${encodeURIComponent(query)}`);
+  };
 
   return (
     <nav className={styles.navbar}>
@@ -31,11 +37,7 @@ export const Navbar = () => {
       </div>
       
       <div className={styles.navbarSearch}>
-        <input 
-          type="text" 
-          placeholder="Pesquisar..."
-          className={styles.searchInput}
-        />
+        <SearchBar onSearch={handleSearch} />
       </div>
       
       <div className={styles.navbarRight}>

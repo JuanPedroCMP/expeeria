@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { categoriasPadrao } from "../../utils/categoriasPadrao";
 import styles from "./FeedFilters.module.css";
 
@@ -23,6 +23,16 @@ export const FeedFilters = ({
   resetPageSize
 }) => {
   const [showCategories, setShowCategories] = useState(false);
+  const [dateError, setDateError] = useState("");
+
+  // Validar datas quando mudam
+  useEffect(() => {
+    if (dateFrom && dateTo && new Date(dateFrom) > new Date(dateTo)) {
+      setDateError("A data inicial não pode ser posterior à data final");
+    } else {
+      setDateError("");
+    }
+  }, [dateFrom, dateTo]);
 
   // Limpar filtros
   const limparFiltros = () => {
@@ -32,11 +42,23 @@ export const FeedFilters = ({
     setOrder("recentes");
     setDateFrom("");
     setDateTo("");
+    setDateError("");
     resetPageSize();
     
     if (onFiltersChanged) {
       onFiltersChanged();
     }
+  };
+
+  // Gerenciar mudança de data
+  const handleDateFromChange = (e) => {
+    setDateFrom(e.target.value);
+    resetPageSize();
+  };
+
+  const handleDateToChange = (e) => {
+    setDateTo(e.target.value);
+    resetPageSize();
   };
 
   return (
@@ -85,28 +107,27 @@ export const FeedFilters = ({
         }}
         style={{ minWidth: 120 }}
       />
-      <label className={styles.dataLabel}>
-        De:
-        <input
-          type="date"
-          value={dateFrom}
-          onChange={e => {
-            setDateFrom(e.target.value);
-            resetPageSize();
-          }}
-        />
-      </label>
-      <label className={styles.dataLabel}>
-        Até:
-        <input
-          type="date"
-          value={dateTo}
-          onChange={e => {
-            setDateTo(e.target.value);
-            resetPageSize();
-          }}
-        />
-      </label>
+      <div className={styles.datesContainer}>
+        <label className={styles.dataLabel}>
+          De:
+          <input
+            type="date"
+            value={dateFrom}
+            onChange={handleDateFromChange}
+            max={dateTo || undefined}
+          />
+        </label>
+        <label className={styles.dataLabel}>
+          Até:
+          <input
+            type="date"
+            value={dateTo}
+            onChange={handleDateToChange}
+            min={dateFrom || undefined}
+          />
+        </label>
+        {dateError && <div className={styles.dateError}>{dateError}</div>}
+      </div>
       <select 
         value={order} 
         onChange={e => { 

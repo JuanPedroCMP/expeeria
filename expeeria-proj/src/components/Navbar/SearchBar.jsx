@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import styles from './Navbar.module.css';
 
 export const SearchBar = ({ onSearch }) => {
   const [query, setQuery] = useState("");
@@ -9,33 +10,19 @@ export const SearchBar = ({ onSearch }) => {
     e.preventDefault();
     if (query.trim()) {
       onSearch(query.trim());
-      navigate("/"); // Redireciona para home para mostrar resultados
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} style={{ display: "flex", gap: 8 }}>
+    <form onSubmit={handleSubmit} className={styles.searchForm}>
       <input
         type="text"
         placeholder="Pesquisar posts..."
         value={query}
         onChange={e => setQuery(e.target.value)}
-        style={{
-          borderRadius: 6,
-          border: "none",
-          padding: "0.5rem 1rem",
-          background: "#23283a",
-          color: "#fff"
-        }}
+        className={styles.searchInput}
       />
-      <button type="submit" style={{
-        borderRadius: 6,
-        border: "none",
-        background: "#0575e6",
-        color: "#fff",
-        padding: "0.5rem 1rem",
-        cursor: "pointer"
-      }}>
+      <button type="submit" className={styles.searchButton}>
         🔍
       </button>
     </form>
