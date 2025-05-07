@@ -15,7 +15,11 @@
 
 ### ⚠️ IMPORTANTE ⚠️
 
+<<<<<<< HEAD
   ⚠️  **O sistema de usuário (visualizar perfil, etc.) pode não funcionar corretamente pois ainda não está utilizando um banco de dados permanente, isso será corrigido.**
+=======
+  ⚠️  **O sitema de usuario (editar perfil, visualizar perfil, etc.) pode não funcionar corretamente pois ainda não está utilizando um banco de dados, isso será corrigido.**
+>>>>>>> 56591ee15f601b35fdd781c14ffc843ad06f54a3
 
   ⚠️  **Pode demorar até um minuto para carregar o site pela primeira vez, devido ao modo de suspensão automática do Render**
 
@@ -348,11 +352,6 @@ O **Expeeria** é uma plataforma digital onde pessoas compartilham, trocam e adq
 ### Modelo de Uso
 - 100% gratuito para os usuários.
 - Potencial para se tornar uma plataforma de networking educativo.
-
-### Inspiração e Diferenciais
-Diferente de plataformas como Udemy ou Coursera, o Expeeria não é focado em cursos longos, mas sim em trocas rápidas, pontuais e práticas entre pessoas reais.
-
-**Inspirações:** Tinder (match), Discord (comunidades), Duolingo (gamificação), Behance (portfólio de habilidades).
 
 ### Mensagem Principal 
 > “Compartilhe conhecimento. Aprenda com experiências reais.”
