@@ -117,18 +117,36 @@ export const postService = {
       if (!postData.title) throw new Error('O título do post é obrigatório');
       if (!postData.user_id) throw new Error('Usuário não autenticado');
       
+      // Garantir que os campos obrigatórios estejam presentes e formatados corretamente
+      const newPostData = {
+        title: postData.title.trim(),
+        caption: postData.caption.trim(),
+        content: postData.content,
+        area: postData.area,
+        user_id: postData.user_id,
+        imageUrl: postData.imageUrl || null,
+        created_at: postData.created_at || new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+      
+      console.log('Dados do post formatados para o Supabase:', newPostData);
+      
+      // Criando o post no Supabase
       const { data, error } = await supabase
         .from('posts')
-        .insert({
-          ...postData,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        })
+        .insert(newPostData)
         .select();
         
-      if (error) throw error;
-      if (!data || data.length === 0) throw new Error('Erro ao criar post');
+      if (error) {
+        console.error('Erro detalhado do Supabase ao criar post:', error);
+        throw new Error(`Erro ao criar post: ${error.message}`);
+      }
       
+      if (!data || data.length === 0) {
+        throw new Error('Erro ao criar post: nenhum dado retornado');
+      }
+      
+      console.log('Post criado com sucesso, resposta do Supabase:', data[0]);
       return data[0];
     } catch (error) {
       console.error('Erro ao criar post:', error);
@@ -137,7 +155,7 @@ export const postService = {
         throw new Error('Você precisa estar logado para criar um post.');
       }
       
-      throw new Error('Não foi possível criar o post. Tente novamente.');
+      throw new Error(error.message || 'Não foi possível criar o post. Tente novamente.');
     }
   },
 
@@ -151,12 +169,19 @@ export const postService = {
     try {
       if (!id) throw new Error('ID do post não fornecido');
       
+      const updateData = {
+        ...postData,
+        updated_at: new Date().toISOString()
+      };
+      
+      // Remove campos que não devem ser atualizados
+      delete updateData.id;
+      delete updateData.user_id;
+      delete updateData.created_at;
+      
       const { data, error } = await supabase
         .from('posts')
-        .update({
-          ...postData,
-          updated_at: new Date().toISOString()
-        })
+        .update(updateData)
         .eq('id', id)
         .select()
         .single();

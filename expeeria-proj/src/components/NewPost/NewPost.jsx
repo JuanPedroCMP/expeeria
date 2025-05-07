@@ -7,6 +7,7 @@ import { Button } from "../Button";
 import { categoriasPadrao } from "../../utils/categoriasPadrao";
 import { useAuth } from "../../hooks/useAuth";
 import { UploadImage } from "../UploadImage/UploadImage";
+import { useNotification } from "../../hooks/useNotification";
 
 export const NewPost = ({
   modoEdicao = false,
@@ -15,6 +16,7 @@ export const NewPost = ({
 }) => {
   const { createPost } = usePost();
   const { user } = useAuth();
+  const { showSuccess, showError } = useNotification();
   const [title, setTitle] = useState(postOriginal?.title || "");
   const [caption, setCaption] = useState(postOriginal?.caption || "");
   const [content, setContent] = useState(postOriginal?.content || "");
@@ -22,8 +24,7 @@ export const NewPost = ({
   // eslint-disable-next-line no-unused-vars
   const [author, setAuthor] = useState(postOriginal?.author || "");
   const [area, setArea] = useState(postOriginal?.area || []);
-//   const [categorias, setCategorias] = useState(categoriasPadrao);
-//   const [loadingCategoria, setLoadingCategoria] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [categoriasOpen, setCategoriasOpen] = useState(false);
@@ -39,57 +40,60 @@ export const NewPost = ({
     }
   }, [postOriginal]);
 
-//   const handleCategorize = async () => {
-//     setLoadingCategoria(true);
-//     const categoria = await categorizePost(content, categorias);
-//     setLoadingCategoria(false);
-//     setArea([categoria]);
-//     if (!categorias.includes(categoria)) {
-//       setCategorias([...categorias, categoria]);
-//     }
-//   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setSuccess("");
+    setLoading(true);
 
-    if (!title || !caption || !content || !user?.email || !area.length) {
+    if (!title || !caption || !content || !user?.id || !area.length) {
       setError("Preencha todos os campos obrigatórios.");
+      setLoading(false);
       return;
     }
 
-    const postData = {
-      author: user?.email,
-      user_id: user?.id, // Corrigido para o formato esperado pelo serviço
-      title,
-      caption,
-      content,
-      area: Array.isArray(area) ? area[0] : area, // API espera uma string, não um array
-      imageUrl,
-      created_at: postOriginal?.createdAt || new Date().toISOString(),
-      likes: postOriginal?.likes || 0,
-      comments: postOriginal?.comments || [],
-      id: postOriginal?.id,
-    };
-
     try {
+      // Verificando se área é um array e extraindo o primeiro elemento se for
+      const areaValue = Array.isArray(area) ? area[0] : area;
+      
+      const postData = {
+        title,
+        caption,
+        content,
+        area: areaValue,
+        imageUrl,
+        user_id: user.id,
+        created_at: new Date().toISOString(),
+      };
+
+      console.log("Enviando dados do post:", postData);
+
       if (modoEdicao && onSubmitEdicao) {
         await onSubmitEdicao(postData);
         setSuccess("Post editado com sucesso!");
+        showSuccess("Post editado com sucesso!");
       } else {
-        await createPost(postData);
-        setSuccess("Post criado com sucesso!");
-        setTitle("");
-        setCaption("");
-        setContent("");
-        setImageUrl("");
-        setAuthor("");
-        setArea([]);
+        const novoPost = await createPost(postData);
+        console.log("Resposta ao criar post:", novoPost);
+        if (novoPost) {
+          setSuccess("Post criado com sucesso!");
+          showSuccess("Post criado com sucesso!");
+          // Limpar formulário
+          setTitle("");
+          setCaption("");
+          setContent("");
+          setImageUrl("");
+          setAuthor("");
+          setArea([]);
+        }
       }
-    } catch (error) {
-      console.error("Erro ao " + (modoEdicao ? "editar" : "criar") + " post:", error);
-      setError(error.message || "Ocorreu um erro. Tente novamente mais tarde.");
+    } catch (err) {
+      console.error("Erro ao " + (modoEdicao ? "editar" : "criar") + " post:", err);
+      const mensagemErro = err.message || "Ocorreu um erro. Tente novamente mais tarde.";
+      setError(mensagemErro);
+      showError(mensagemErro);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -188,20 +192,17 @@ export const NewPost = ({
               <p style={{ fontSize: 12, color: "#aaa", marginLeft: 8 }}>
                 Selecione até 3 categorias
               </p>
-              {/* <button
-                type="button"
-                onClick={handleCategorize}
-                disabled={loadingCategoria || !content}
-                style={{ marginLeft: 12 }}
-              >
-                {loadingCategoria ? "Analisando..." : "Categorizar com IA (Ainda não está funcionando)"}
-              </button> */}
             </div>
           )}
         </div>
       </div>
-      <button type="submit">
-        {modoEdicao ? "Salvar alterações" : "Publicar"}
+      <button 
+        type="submit" 
+        disabled={loading}
+      >
+        {loading 
+          ? "Processando..." 
+          : (modoEdicao ? "Salvar alterações" : "Publicar")}
       </button>
       {error && <p style={{ color: "red", marginTop: 8 }}>{error}</p>}
       {success && <p style={{ color: "green", marginTop: 8 }}>{success}</p>}
