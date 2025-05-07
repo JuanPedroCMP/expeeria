@@ -25,3 +25,4 @@ dist-ssr
 
 # Arquivos secretos
 tokens.env
+.vercel

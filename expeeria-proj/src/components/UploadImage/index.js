@@ -1,1 +1,1 @@
-export * from "./UploadImage";
+export { UploadImage } from './UploadImage';

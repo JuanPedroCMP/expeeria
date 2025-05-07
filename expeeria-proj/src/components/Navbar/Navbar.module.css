@@ -1,33 +1,178 @@
-.Navbar {
+/* Estilos para o componente Navbar melhorado */
+.navbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  position: fixed;
+  background-color: #fff;
+  padding: 0.8rem 1.5rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  position: sticky;
   top: 0;
-  left: 0;
-  width: 100%;
-
-  background: #010203c9;
-  backdrop-filter: blur(5px);
-
-  min-height: 60px;
-  padding: 5px 2rem;
-
-  border-bottom: 0.1rem solid var(--cinzaAzulado);
+  z-index: 1000;
 }
 
-.profileBtn, .loginBtn {
-  background: linear-gradient(90deg, #0575e6, #00f260);
-  color: #fff;
-  border: none;
-  border-radius: 0.4rem;
-  padding: 0.5rem 1.2rem;
-  font-size: 1rem;
-  cursor: pointer;
+.navbarLeft {
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #023047;
   text-decoration: none;
   margin-left: 1rem;
-  transition: filter 0.2s;
 }
-.profileBtn:hover, .loginBtn:hover {
-  filter: brightness(1.1);
+
+.navbarSearch {
+  flex-grow: 1;
+  max-width: 400px;
+  margin: 0 1.5rem;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 0.6rem 1rem;
+  border: 1px solid #ddd;
+  border-radius: 50px;
+  font-size: 0.9rem;
+  background-color: #f8f9fa;
+  transition: all 0.3s;
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: #8ecae6;
+  background-color: #fff;
+  box-shadow: 0 0 0 2px rgba(142, 202, 230, 0.2);
+}
+
+.navbarRight {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.authButtons {
+  display: flex;
+  gap: 0.8rem;
+}
+
+.loginBtn {
+  padding: 0.5rem 1rem;
+  border: 1px solid #8ecae6;
+  border-radius: 4px;
+  color: #8ecae6;
+  background-color: transparent;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.loginBtn:hover {
+  background-color: #8ecae6;
+  color: #fff;
+}
+
+.signupBtn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  background-color: #8ecae6;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.signupBtn:hover {
+  background-color: #219ebc;
+}
+
+.createPostBtn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  background-color: #fb8500;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.createPostBtn:hover {
+  background-color: #e76f00;
+}
+
+.userContainer {
+  position: relative;
+}
+
+.userProfile {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  padding: 0.4rem 0.8rem;
+  border-radius: 50px;
+  transition: background-color 0.2s;
+}
+
+.userProfile:hover {
+  background-color: #f1f1f1;
+}
+
+.username {
+  font-weight: 500;
+  color: #333;
+}
+
+.userMenu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 0.5rem;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  min-width: 180px;
+  overflow: hidden;
+  z-index: 1001;
+}
+
+.menuItem {
+  display: block;
+  padding: 0.8rem 1rem;
+  color: #333;
+  text-decoration: none;
+  transition: background-color 0.2s;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.menuItem:hover {
+  background-color: #f8f9fa;
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    padding: 0.6rem 1rem;
+  }
+  
+  .navbarSearch {
+    display: none;
+  }
+  
+  .username {
+    display: none;
+  }
+  
+  .createPostBtn {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.9rem;
+  }
 }

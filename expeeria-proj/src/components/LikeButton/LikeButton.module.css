@@ -1,0 +1,46 @@
+/* Estilos para o componente de botão de curtida */
+.likeButton {
+  display: flex;
+  align-items: center;
+  background: none;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #6c757d;
+}
+
+.likeButton:hover {
+  background-color: rgba(230, 57, 70, 0.1);
+}
+
+.likeButton.liked {
+  color: #e63946;
+}
+
+.likeButton.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Tamanhos de botão */
+.sm {
+  font-size: 0.8rem;
+}
+
+.md {
+  font-size: 1rem;
+}
+
+.lg {
+  font-size: 1.2rem;
+}
+
+.icon {
+  margin-right: 4px;
+}
+
+.count {
+  font-weight: 500;
+}

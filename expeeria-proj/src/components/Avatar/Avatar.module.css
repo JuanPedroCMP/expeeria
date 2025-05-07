@@ -1,0 +1,43 @@
+/* Estilos para o componente Avatar */
+.avatar {
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #f1f1f1;
+}
+
+/* Tamanhos predefinidos */
+.xs {
+  width: 24px;
+  height: 24px;
+}
+
+.sm {
+  width: 32px;
+  height: 32px;
+}
+
+.md {
+  width: 48px;
+  height: 48px;
+}
+
+.lg {
+  width: 64px;
+  height: 64px;
+}
+
+.xl {
+  width: 96px;
+  height: 96px;
+}
+
+/* Estilo para avatar clicável */
+.clickable {
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.clickable:hover {
+  transform: scale(1.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}

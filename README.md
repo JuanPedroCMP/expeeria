@@ -1,20 +1,31 @@
 # Expeeria – Conectando pessoas através do conhecimento
 
+<div align="center">
+  <img src="https://i.imgur.com/Dv7S0Z2.png" alt="Logo Expeeria" width="200px">
+  
+  ### 🌟 Compartilhe experiências. Aprenda. Conecte-se.
+  
+  [![Acesse o site](https://img.shields.io/badge/Expeeria-Acessar%20Site-0575e6?style=for-the-badge)](https://expeeria.vercel.app)
+  [![Status](https://img.shields.io/badge/Status-Beta-orange?style=for-the-badge)](https://expeeria.vercel.app)
+</div>
+
 ## 🌐 Acesse o site online
 
 👉 **Acesse agora:** [https://expeeria.vercel.app](https://expeeria.vercel.app)
 
 ### ⚠️ IMPORTANTE ⚠️
 
-  ⚠️  **O sitema de usuario (visualizar perfil, etc.) pode não funcionar corretamente pois ainda não está utilizando um banco de dados, isso será corrigido.**
+  ⚠️  **O sistema de usuário (visualizar perfil, etc.) pode não funcionar corretamente pois ainda não está utilizando um banco de dados permanente, isso será corrigido.**
 
-  ⚠️  **Pode demorar até um minuto para carregar o site pela primeira vez, devido ao modo de suspenção automática do Render**
+  ⚠️  **Pode demorar até um minuto para carregar o site pela primeira vez, devido ao modo de suspensão automática do Render**
 
-  Caso o sistema de usuario não esteja funcionando, para poder testar o sitema de usuario use um usuarío já feito, mas tente criar uma conta primero, se não der usse essa:
+  Caso o sistema de usuário não esteja funcionando, para poder testar a plataforma, tente criar uma conta primeiro. Se não for possível, utilize uma conta de demonstração:
 
-      email: "carol@eco.com"
-      password: "carol123"
-      name: "Carol Verde"
+  ```
+  📧 Email: "carol@eco.com"
+  🔑 Senha: "carol123"
+  👤 Nome: "Carol Verde"
+  ```
 
 ---
 
@@ -37,7 +48,18 @@
 
 ## 1. Visão Geral
 
-O **Expeeria** é uma plataforma web colaborativa para compartilhar experiências, dicas e aprendizados em diversas áreas, como tecnologia, arte, sustentabilidade, saúde, viagens e mais. Usuários podem criar posts, comentar, seguir outros usuários, personalizar seus perfis e receber recomendações personalizadas.
+<div align="center">
+  <img src="https://i.imgur.com/7GXN530.png" alt="Expeeria Conceito" width="500px">
+</div>
+
+O **Expeeria** é uma plataforma colaborativa que conecta pessoas através da troca de conhecimentos e experiências. Nossa missão é criar um ambiente onde:
+
+- 🌱 **Experiências são valorizadas** como formas legítimas de ensino e aprendizado
+- 🤝 **Conexões significativas** são estabelecidas entre pessoas com interesses complementares
+- 📚 **Conhecimento é compartilhado** de forma direta, prática e acessível
+- 🚀 **Comunidades crescem** através da colaboração mútua
+
+Desenvolvido para atender diversas áreas como tecnologia, arte, sustentabilidade, saúde, viagens e mais, o Expeeria permite que usuários criem conteúdo, interajam, personalizem seus perfis e descubram novos conhecimentos através de recomendações personalizadas.
 
 ---
 
@@ -64,12 +86,32 @@ O **Expeeria** é uma plataforma web colaborativa para compartilhar experiência
 
 ## 3. Tecnologias Utilizadas
 
-- **Frontend:** React.js, React Router, CSS Modules
-- **Backend:** JSON Server (API REST fake)
-- **Gerenciamento de estado:** Context API
-- **Upload de imagens:** Cloudinary
-- **Markdown:** react-markdown
-- **Outros:** Vite, Axios
+<div align="center">
+  <table>
+    <tr>
+      <td align="center"><b>Frontend</b></td>
+      <td align="center"><b>Backend</b></td>
+      <td align="center"><b>Ferramentas</b></td>
+    </tr>
+    <tr>
+      <td>
+        <img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React" /><br/>
+        <img src="https://img.shields.io/badge/React_Router-CA4245?style=for-the-badge&logo=react-router&logoColor=white" alt="React Router" /><br/>
+        <img src="https://img.shields.io/badge/CSS_Modules-000000?style=for-the-badge&logo=css3&logoColor=1572B6" alt="CSS Modules" />
+      </td>
+      <td>
+        <img src="https://img.shields.io/badge/JSON_Server-000000?style=for-the-badge&logo=json&logoColor=white" alt="JSON Server" /><br/>
+        <img src="https://img.shields.io/badge/REST_API-005571?style=for-the-badge&logo=fastapi&logoColor=white" alt="REST API" /><br/>
+        <img src="https://img.shields.io/badge/Context_API-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="Context API" />
+      </td>
+      <td>
+        <img src="https://img.shields.io/badge/Vite-B73BFE?style=for-the-badge&logo=vite&logoColor=FFD62E" alt="Vite" /><br/>
+        <img src="https://img.shields.io/badge/Cloudinary-3448C5?style=for-the-badge&logo=cloudinary&logoColor=white" alt="Cloudinary" /><br/>
+        <img src="https://img.shields.io/badge/Axios-5A29E4?style=for-the-badge&logo=axios&logoColor=white" alt="Axios" />
+      </td>
+    </tr>
+  </table>
+</div>
 
 ---
 
@@ -193,40 +235,78 @@ expeeria-proj/
 
 ## 9. Padrões de Código e Boas Práticas
 
-- **Componentização:** Componentes reutilizáveis, separados por responsabilidade.
-- **CSS Modules:** Estilos isolados por componente.
-- **Context API:** Para autenticação e gerenciamento de posts.
-- **Validação de formulários:** Todos os campos obrigatórios são validados.
-- **Acessibilidade:** Botões com `aria-label`, navegação por teclado, contraste de cores.
-- **Responsividade:** Layout adaptado para desktop e mobile.
-- **Feedback visual:** Mensagens de sucesso/erro, loading em uploads, botões desabilitados durante ações.
+Implementamos diversas práticas de desenvolvimento moderno para garantir a qualidade e manutenibilidade do código:
+
+| 💡 Prática | 📝 Descrição |
+|------------|-------------|
+| **🧩 Componentização** | Arquitetura modular com componentes reutilizáveis, facilitando manutenção e expansão do projeto |
+| **🎨 CSS Modules** | Estilos isolados por componente, evitando conflitos e tornando o código mais legível |
+| **🔄 Context API** | Sistema eficiente para gerenciamento global de estado, utilizado para autenticação e gerenciamento de posts |
+| **✅ Validação** | Todos os formulários possuem validação de dados, garantindo a consistência das informações |
+| **♿ Acessibilidade** | Interface projetada com atributos `aria-label`, navegação por teclado e contraste adequado de cores |
+| **📱 Responsividade** | Design adaptativo para qualquer dispositivo, de smartphones a desktops |
+| **🔔 Feedback visual** | Sistema completo de notificações, incluindo mensagens de sucesso/erro e indicadores de carregamento |
+| **🔐 Segurança** | Proteção de rotas privadas e validação de permissões no frontend |
 
 ---
 
 ## 10. Integrantes do Grupo
 
-- **Juan Pedro** (2°DS)
-- **Rafael Sales** (2°DS)
-- **Ricardo Costa** (2°DS)
+<div align="center">
+  <table>
+    <tr>
+      <td align="center">
+        <b>Juan Pedro</b><br />
+        <small>2º DS</small><br />
+      </td>
+      <td align="center">
+        <b>Rafael Sales</b><br />
+        <small>2º DS</small><br />
+      </td>
+      <td align="center">
+        <b>Ricardo Costa</b><br />
+        <small>2º DS</small><br />
+      </td>
+    </tr>
+  </table>
+</div>
 
 ---
 
 ## 11. Planos Futuros
 
-- **Integrar a um banco de dados real** (ex: MongoDB, PostgreSQL, Supabase) para persistência dos dados dos usuários e posts.
-- **Aprimorar a segurança e autenticação**: adicionar autenticação JWT, redefinição de senha, verificação de e-mail e permissões avançadas.
-- **Melhorar o sistema de usuários**: perfis públicos/privados, badges, níveis de experiência, notificações e sistema de mensagens diretas.
-- **Aprimorar posts**: adicionar ferramentas de formatação avançada (editor WYSIWYG, suporte a vídeos, enquetes, anexos, etc).
-- **Integração com GitHub e outras plataformas**: login social, compartilhamento de posts, integração com LinkedIn, Google e Discord.
-- **Construir uma plataforma de cursos gratuitos**: área de cursos, trilhas de aprendizado, quizzes, certificados e gamificação.
-- **Sistema de comentários em tempo real** e notificações instantâneas.
-- **Feed personalizado com IA**: recomendações baseadas em interesses, histórico e engajamento.
-- **Aplicativo mobile (React Native)** para ampliar o acesso.
-- **Dashboard administrativo**: moderação de conteúdo, analytics e relatórios.
-- **Sistema de eventos e webinars**: calendário, inscrições e transmissão ao vivo.
-- **Marketplace de serviços e mentorias**.
-- **API pública para desenvolvedores**.
-- **Acessibilidade e internacionalização**: suporte a múltiplos idiomas e recursos para PCD.
+<div align="center">
+  <h3>🚀 Roadmap do Expeeria</h3>
+</div>
+
+### Fase 1: Infraestrutura Robusta
+- 🔐 **Banco de dados permanente**: Migração para MongoDB, PostgreSQL ou Supabase
+- 🛡️ **Segurança avançada**: Implementação de JWT, redefinição de senha e verificação de email
+- 📱 **Responsividade completa**: Otimização para todos os dispositivos
+
+### Fase 2: Experiência de Usuário Aprimorada
+- 🧩 **Sistema de perfis expandido**: Badges, níveis de experiência e perfis personalizáveis
+- 💬 **Sistema de mensagens diretas**: Comunicação privada entre usuários
+- 🔍 **Busca avançada**: Filtros complexos e sugestões inteligentes
+- 📝 **Editor avançado**: WYSIWYG, suporte a vídeos, enquetes e anexos
+
+### Fase 3: Integrações e Expansão
+- 🔄 **Login social**: Integração com GitHub, Google, LinkedIn e Discord
+- 📚 **Plataforma de cursos gratuitos**: Trilhas de aprendizado, quizzes e certificados
+- 🎮 **Gamificação**: Sistema de pontos, conquistas e rankings
+- 📲 **Aplicativo mobile**: Versão React Native para iOS e Android
+
+### Fase 4: Inovação e Crescimento
+- 🤖 **Feed personalizado com IA**: Recomendações baseadas em interesses e comportamento
+- 📊 **Dashboard administrativo**: Moderação de conteúdo, analytics e relatórios
+- 📅 **Sistema de eventos**: Webinars, calendário e transmissões ao vivo
+- 🏆 **Marketplace de mentorias**: Conexão entre mentores e aprendizes
+
+### Fase 5: Consolidação e Expansão Global
+- 🌐 **Suporte multilíngue**: Internacionalização completa da plataforma
+- ♿ **Acessibilidade total**: Recursos avançados para PCD
+- 🧰 **API pública**: Ferramentas para desenvolvedores externos
+- 🌱 **Expansão de comunidades**: Suporte para grupos locais e temas especializados
 
 ---
 

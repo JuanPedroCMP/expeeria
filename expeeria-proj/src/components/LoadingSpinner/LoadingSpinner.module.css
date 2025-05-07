@@ -1,0 +1,106 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-md);
+}
+
+.fullPage {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(22, 33, 62, 0.8); /* Versão semitransparente do --background-principal */
+  z-index: 1000;
+}
+
+/* Estilos para o componente de spinner de carregamento */
+.spinnerContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+}
+
+.fullPageContainer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.7);
+  z-index: 9999;
+}
+
+.spinner {
+  border-radius: 50%;
+  border-style: solid;
+  border-color: transparent;
+  animation: spin 1s linear infinite;
+}
+
+/* Tamanhos */
+.xs {
+  width: 16px;
+  height: 16px;
+  border-width: 2px;
+}
+
+.sm {
+  width: 24px;
+  height: 24px;
+  border-width: 3px;
+}
+
+.md {
+  width: 36px;
+  height: 36px;
+  border-width: 4px;
+}
+
+.lg {
+  width: 48px;
+  height: 48px;
+  border-width: 5px;
+}
+
+.xl {
+  width: 64px;
+  height: 64px;
+  border-width: 6px;
+}
+
+/* Cores */
+.primary {
+  border-top-color: #8ecae6;
+}
+
+.secondary {
+  border-top-color: #023047;
+}
+
+.success {
+  border-top-color: #00b894;
+}
+
+.danger {
+  border-top-color: #e63946;
+}
+
+.warning {
+  border-top-color: #fb8500;
+}
+
+.text {
+  margin-top: var(--space-md);
+  color: var(--texto-principal);
+  font-family: var(--fonte-subtitulos);
+  font-weight: 400;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

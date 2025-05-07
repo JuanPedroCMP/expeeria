@@ -1,44 +1,92 @@
+import React, { useState } from 'react';
+import { Link, useNavigate } from "react-router-dom";
 import { MenuRecolhivel } from "./MenuRecolhivel/MenuRecolhivel";
-import style from "./Navbar.module.css";
-import { Link } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
+import { Avatar } from "../Avatar/Avatar";
+import styles from "./Navbar.module.css";
 
-const Navbar = () => {
-  const { user } = useAuth();
+/**
+ * Componente de Navbar melhorado com componentização e melhor organização
+ */
+export const Navbar = () => {
+  const { user, logout } = useAuth();
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    if (window.confirm('Deseja realmente sair da conta?')) {
+      logout();
+      navigate('/login');
+    }
+  };
 
   return (
-    <>
-      <nav className={style.Navbar}>
+    <nav className={styles.navbar}>
+      <div className={styles.navbarLeft}>
         <MenuRecolhivel />
-        <h6>Expeeria</h6>
-        <div>
-          {user ? (
-            <>
-              <Link to="/perfil" className={style.profileBtn}>
-                Meu Perfil
-              </Link>
-              <button
-                className={style.loginBtn}
-                style={{ marginLeft: 8 }}
-                onClick={() => {
-                  if (window.confirm('Deseja realmente sair da conta?')) {
-                    window.localStorage.removeItem('user');
-                    window.location.href = '/login';
-                  }
-                }}
+        <Link to="/" className={styles.logo}>
+          Expeeria
+        </Link>
+      </div>
+      
+      <div className={styles.navbarSearch}>
+        <input 
+          type="text" 
+          placeholder="Pesquisar..."
+          className={styles.searchInput}
+        />
+      </div>
+      
+      <div className={styles.navbarRight}>
+        {user ? (
+          <>
+            <Link to="/criar_post" className={styles.createPostBtn}>
+              Novo Post
+            </Link>
+            
+            <div className={styles.userContainer}>
+              <div 
+                className={styles.userProfile} 
+                onClick={() => setShowUserMenu(!showUserMenu)}
               >
-                Sair
-              </button>
-            </>
-          ) : (
-            <Link to="/login" className={style.loginBtn}>
+                <Avatar 
+                  src={user.avatar_url} 
+                  username={user.username}
+                  size="sm"
+                  clickable
+                />
+                <span className={styles.username}>{user.username}</span>
+              </div>
+              
+              {showUserMenu && (
+                <div className={styles.userMenu}>
+                  <Link to="/perfil" className={styles.menuItem}>
+                    Meu Perfil
+                  </Link>
+                  <Link to="/explorar" className={styles.menuItem}>
+                    Explorar
+                  </Link>
+                  <button 
+                    onClick={handleLogout} 
+                    className={styles.menuItem}
+                  >
+                    Sair
+                  </button>
+                </div>
+              )}
+            </div>
+          </>
+        ) : (
+          <div className={styles.authButtons}>
+            <Link to="/login" className={styles.loginBtn}>
               Entrar
             </Link>
-          )}
-        </div>
-      </nav>
-    </>
+            <Link to="/signup" className={styles.signupBtn}>
+              Cadastrar
+            </Link>
+          </div>
+        )}
+      </div>
+    </nav>
   );
 };
-
-export { Navbar };

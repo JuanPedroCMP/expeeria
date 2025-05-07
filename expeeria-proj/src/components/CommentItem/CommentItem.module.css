@@ -1,0 +1,137 @@
+/* Estilos para o componente de comentários */
+.commentItem {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 15px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.commentHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.userInfo {
+  display: flex;
+  align-items: center;
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  margin-right: 10px;
+  object-fit: cover;
+}
+
+.username {
+  font-weight: 600;
+  color: #023047;
+}
+
+.date {
+  font-size: 0.8rem;
+  color: #6c757d;
+}
+
+.commentContent {
+  margin-bottom: 12px;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.commentActions {
+  display: flex;
+  gap: 15px;
+  margin-top: 10px;
+}
+
+.actionBtn {
+  background: none;
+  border: none;
+  color: #6c757d;
+  font-size: 0.9rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+}
+
+.actionBtn:hover {
+  background-color: #e9ecef;
+}
+
+.actionBtn.liked {
+  color: #e63946;
+}
+
+.editForm, .replyForm {
+  margin-top: 10px;
+}
+
+.editTextarea, .replyTextarea {
+  width: 100%;
+  min-height: 80px;
+  padding: 10px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  resize: vertical;
+}
+
+.editActions, .replyActions {
+  display: flex;
+  gap: 10px;
+}
+
+.saveBtn, .replyBtn {
+  background-color: #8ecae6;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.saveBtn:hover, .replyBtn:hover {
+  background-color: #219ebc;
+}
+
+.cancelBtn {
+  background-color: #f8f9fa;
+  border: 1px solid #ced4da;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.cancelBtn:hover {
+  background-color: #e9ecef;
+}
+
+.replies {
+  margin-left: 30px;
+  margin-top: 15px;
+  border-left: 2px solid #dee2e6;
+  padding-left: 15px;
+}
+
+@media (max-width: 576px) {
+  .commentHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .date {
+    margin-top: 5px;
+    margin-left: 42px; /* alinha com o username */
+  }
+  
+  .commentActions {
+    flex-wrap: wrap;
+  }
+}
