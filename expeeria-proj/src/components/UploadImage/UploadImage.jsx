@@ -3,30 +3,40 @@ import { useNotification } from '../../hooks/useNotification';
 import { Button } from '../Button';
 import styles from './UploadImage.module.css';
 import { isValidImage, errorMessages } from '../../utils/validation';
+import { uploadService } from '../../services/api';
 
 /**
  * Componente para upload de imagens com funcionalidades avançadas
  * @param {Object} props - Propriedades do componente
  * @param {Function} props.onImageUpload - Função chamada quando a imagem é carregada
+ * @param {Function} props.onUpload - Alternativa para onImageUpload (compatibilidade)
  * @param {string} [props.initialImage] - URL da imagem inicial (se existir)
  * @param {number} [props.maxSizeMB=5] - Tamanho máximo da imagem em MB
  * @param {string} [props.aspectRatio] - Proporção esperada da imagem ('1:1', '16:9', '4:3')
  * @param {boolean} [props.preview=true] - Se deve mostrar pré-visualização
  * @param {string} [props.label] - Texto de rótulo para o upload
+ * @param {string} [props.preset] - Preset do Cloudinary
+ * @param {Object} [props.previewStyle] - Estilos adicionais para a pré-visualização
  */
 export const UploadImage = ({
   onImageUpload,
+  onUpload,
   initialImage = '',
   maxSizeMB = 5,
   aspectRatio,
   preview = true,
   label = 'Carregue uma imagem',
+  preset = 'expeeria_cloud',
+  previewStyle = {},
 }) => {
   const [image, setImage] = useState(initialImage);
   const [isLoading, setIsLoading] = useState(false);
   const [dragActive, setDragActive] = useState(false);
   const fileInputRef = useRef(null);
   const { showError } = useNotification();
+  
+  // Usar onUpload como fallback para onImageUpload
+  const handleImageUpload = onImageUpload || onUpload;
 
   // Determinar a classe para o contêiner de acordo com o aspectRatio
   const getContainerClass = () => {
@@ -58,12 +68,26 @@ export const UploadImage = ({
       }
       
       // Criar URL temporária para pré-visualização
-      const imageUrl = URL.createObjectURL(file);
-      setImage(imageUrl);
+      const localImageUrl = URL.createObjectURL(file);
+      setImage(localImageUrl);
       
-      // Passar o arquivo para o componente pai
-      if (onImageUpload) {
-        onImageUpload(file, imageUrl);
+      // Fazer upload da imagem para o Cloudinary
+      try {
+        const uploadResult = await uploadService.uploadImage(file, preset);
+        console.log('Imagem enviada para o Cloudinary:', uploadResult);
+        
+        // Passar a URL da imagem remota para o componente pai
+        if (handleImageUpload) {
+          handleImageUpload(uploadResult.secure_url);
+        }
+      } catch (uploadError) {
+        console.error('Erro ao fazer upload da imagem:', uploadError);
+        showError('Falha ao enviar a imagem para o servidor. Tente novamente.');
+        
+        // Mesmo com erro no upload para o Cloudinary, manter a pré-visualização local
+        if (handleImageUpload) {
+          handleImageUpload(localImageUrl);
+        }
       }
     } catch (error) {
       console.error('Erro ao processar imagem:', error);
@@ -121,8 +145,8 @@ export const UploadImage = ({
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
-    if (onImageUpload) {
-      onImageUpload(null);
+    if (handleImageUpload) {
+      handleImageUpload(null);
     }
   };
 
@@ -153,6 +177,7 @@ export const UploadImage = ({
               src={image}
               alt="Pré-visualização"
               className={styles.previewImage}
+              style={previewStyle}
             />
             <div className={styles.overlay}>
               <Button

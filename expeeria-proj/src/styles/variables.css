@@ -1,0 +1,45 @@
+/* Arquivo de variáveis CSS centralizadas para toda a aplicação Expeeria
+   Definições globais que são usadas em múltiplos componentes
+*/
+
+:root {
+  /* Espaçamentos */
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  
+  /* Cores alinhadas com index.css */
+  --texto-principal: var(--texto-principal);
+  --texto-secundario: var(--texto-secundario);
+  --fundo-principal: var(--background-principal);
+  --elementos-secundarios: var(--elementos-secundarios);
+  --destaque-primario: var(--destaque-primario);
+  --destaque-secundario: var(--destaque-secundario);
+  --alerta-erro: var(--alerta-erro);
+  --acento: var(--acento);
+  --cor-hover: rgba(255, 255, 255, 0.05);
+  --borda-padrao: rgba(255, 255, 255, 0.1);
+  
+  /* Bordas */
+  --borda-sm: var(--borda-sm);
+  --borda-md: var(--borda-md);
+  --borda-lg: var(--borda-lg);
+  --borda-xl: var(--borda-xl);
+  
+  /* Sombras */
+  --sombra-suave: var(--sombra-suave);
+  --sombra-media: var(--sombra-media);
+  --sombra-forte: var(--sombra-forte);
+  --sombra-md: var(--sombra-media);
+  
+  /* Fontes */
+  --fonte-titulos: var(--fonte-titulos);
+  --fonte-subtitulos: var(--fonte-subtitulos);
+  --fonte-corpo: var(--fonte-corpo);
+  
+  /* Transições */
+  --transicao-rapida: 0.2s ease;
+  --transicao-media: 0.3s ease;
+}

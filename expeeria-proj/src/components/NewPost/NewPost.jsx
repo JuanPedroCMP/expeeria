@@ -53,14 +53,12 @@ export const NewPost = ({
     }
 
     try {
-      // Verificando se área é um array e extraindo o primeiro elemento se for
-      const areaValue = Array.isArray(area) ? area[0] : area;
-      
+      // Usar o array completo de áreas em vez de extrair apenas o primeiro elemento
       const postData = {
         title,
         caption,
         content,
-        area: areaValue,
+        area: area, // Enviando o array completo de categorias
         imageUrl,
         user_id: user.id,
         created_at: new Date().toISOString(),
