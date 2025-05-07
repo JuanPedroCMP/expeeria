@@ -1,7 +1,6 @@
 # Expeeria – Conectando pessoas através do conhecimento
 
 <div align="center">
-  <img src="https://i.imgur.com/Dv7S0Z2.png" alt="Logo Expeeria" width="200px">
   
   ### 🌟 Compartilhe experiências. Aprenda. Conecte-se.
   
@@ -15,7 +14,6 @@
 
 ### ⚠️ IMPORTANTE ⚠️
 
-<<<<<<< HEAD
   ⚠️  **O sistema de usuário (visualizar perfil, etc.) pode não funcionar corretamente pois ainda não está utilizando um banco de dados permanente, isso será corrigido.**
 =======
   ⚠️  **O sitema de usuario (editar perfil, visualizar perfil, etc.) pode não funcionar corretamente pois ainda não está utilizando um banco de dados, isso será corrigido.**
@@ -51,10 +49,6 @@
 ---
 
 ## 1. Visão Geral
-
-<div align="center">
-  <img src="https://i.imgur.com/7GXN530.png" alt="Expeeria Conceito" width="500px">
-</div>
 
 O **Expeeria** é uma plataforma colaborativa que conecta pessoas através da troca de conhecimentos e experiências. Nossa missão é criar um ambiente onde:
 
