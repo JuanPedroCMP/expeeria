@@ -13,7 +13,7 @@ export const NewPost = ({
   postOriginal = null,
   onSubmitEdicao,
 }) => {
-  const { addPost } = usePost();
+  const { createPost } = usePost();
   const { user } = useAuth();
   const [title, setTitle] = useState(postOriginal?.title || "");
   const [caption, setCaption] = useState(postOriginal?.caption || "");
@@ -61,30 +61,35 @@ export const NewPost = ({
 
     const postData = {
       author: user?.email,
-      userId: user?.id,
+      user_id: user?.id, // Corrigido para o formato esperado pelo serviço
       title,
       caption,
       content,
-      area,
+      area: Array.isArray(area) ? area[0] : area, // API espera uma string, não um array
       imageUrl,
-      createdAt: postOriginal?.createdAt || new Date().toISOString(),
+      created_at: postOriginal?.createdAt || new Date().toISOString(),
       likes: postOriginal?.likes || 0,
       comments: postOriginal?.comments || [],
       id: postOriginal?.id,
     };
 
-    if (modoEdicao && onSubmitEdicao) {
-      await onSubmitEdicao(postData);
-      setSuccess("Post editado com sucesso!");
-    } else {
-      await addPost(postData);
-      setSuccess("Post criado com sucesso!");
-      setTitle("");
-      setCaption("");
-      setContent("");
-      setImageUrl("");
-      setAuthor("");
-      setArea([]);
+    try {
+      if (modoEdicao && onSubmitEdicao) {
+        await onSubmitEdicao(postData);
+        setSuccess("Post editado com sucesso!");
+      } else {
+        await createPost(postData);
+        setSuccess("Post criado com sucesso!");
+        setTitle("");
+        setCaption("");
+        setContent("");
+        setImageUrl("");
+        setAuthor("");
+        setArea([]);
+      }
+    } catch (error) {
+      console.error("Erro ao " + (modoEdicao ? "editar" : "criar") + " post:", error);
+      setError(error.message || "Ocorreu um erro. Tente novamente mais tarde.");
     }
   };
 

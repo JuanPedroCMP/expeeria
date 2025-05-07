@@ -4,6 +4,41 @@
 
 // Validação de email
 export const isValidEmail = (email) => {
+  if (!email) return false;
+  
+  // Limpar espaços extras
+  email = email.trim();
+  
+  // Regex melhorada para validação de email que suporta subdomínios múltiplos (.sp.gov, .co.uk, etc)
+  const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+  
+  // Verificação básica com regex
+  if (!emailRegex.test(email)) return false;
+  
+  // Verificações adicionais
+  const parts = email.split('@');
+  if (parts.length !== 2) return false;
+  
+  // Verificar parte local (antes do @)
+  const localPart = parts[0];
+  if (localPart.length === 0 || localPart.length > 64) return false;
+  
+  // Verificar domínio (após o @)
+  const domainPart = parts[1];
+  if (domainPart.length === 0 || domainPart.length > 255 || !domainPart.includes('.')) return false;
+  
+  // Verificar se o TLD tem pelo menos 2 caracteres
+  const tld = domainPart.split('.').pop();
+  if (tld.length < 2) return false;
+  
+  return true;
+};
+
+/**
+ * Valida um e-mail de maneira simplificada (para uso em tempo real durante digitação)
+ * É menos rigorosa que a validação completa, mas útil para feedback imediato
+ */
+export const isValidEmailBasic = (email) => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(email);
 };

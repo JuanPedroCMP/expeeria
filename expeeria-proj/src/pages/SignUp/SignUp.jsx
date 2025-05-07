@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useAuth } from "../../hooks/useAuth";
 import { Link, useNavigate } from "react-router-dom";
 import { LoadingSpinner } from "../../components/LoadingSpinner";
+import { isValidEmail, isStrongPassword, isValidUsername } from "../../utils/validation";
 import styles from "./SignUp.module.css";
 
 export function SignUp() {
@@ -38,32 +39,6 @@ export function SignUp() {
     }
   };
 
-  // Função para validar o formato do e-mail
-  const isValidEmail = (email) => {
-    if (!email) return false;
-    
-    // Limpar espaços extras
-    email = email.trim();
-    
-    // Verificações básicas
-    const parts = email.split('@');
-    if (parts.length !== 2) return false;
-    
-    const [localPart, domainPart] = parts;
-    
-    // Verificar parte local (antes do @)
-    if (localPart.length === 0 || localPart.length > 64) return false;
-    
-    // Verificar domínio (após o @)
-    if (domainPart.length === 0 || domainPart.length > 255 || !domainPart.includes('.')) return false;
-    
-    // Verificar TLD (parte final do domínio)
-    const tld = domainPart.split('.').pop();
-    if (tld.length < 2) return false;
-    
-    return true;
-  };
-
   const validateForm = () => {
     // Validar e-mail
     if (!formData.email) {
@@ -88,8 +63,8 @@ export function SignUp() {
       return false;
     }
 
-    if (formData.username.length < 3) {
-      setError("O nome de usuário deve ter pelo menos 3 caracteres");
+    if (!isValidUsername(formData.username)) {
+      setError("O nome de usuário deve ter entre 3 e 20 caracteres e conter apenas letras, números, underline e hífen");
       return false;
     }
 
@@ -99,9 +74,15 @@ export function SignUp() {
       return false;
     }
 
+    // Validação básica de senha - mínimo 6 caracteres
     if (formData.password.length < 6) {
       setError("A senha deve ter pelo menos 6 caracteres");
       return false;
+    }
+
+    // Recomendar senha forte mas não obrigar
+    if (!isStrongPassword(formData.password)) {
+      console.warn("Senha fraca. Recomendado: pelo menos 8 caracteres com letras maiúsculas, minúsculas e números");
     }
 
     if (formData.password !== formData.confirmPassword) {

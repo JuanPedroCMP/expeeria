@@ -173,13 +173,18 @@ export function PostProvider({ children }) {
     setError(null);
     
     try {
-      // Adicionar dados do autor
+      // Garantir que os dados estejam no formato esperado
       const newPostData = {
         ...postData,
-        author_id: user.id,
-        like_count: 0,
-        comment_count: 0
+        user_id: postData.user_id || user.id,
+        like_count: postData.like_count || 0,
+        comment_count: postData.comment_count || 0
       };
+      
+      // Remover campos que possam causar conflitos
+      if (newPostData.author_id && newPostData.author_id !== newPostData.user_id) {
+        delete newPostData.author_id;
+      }
       
       const newPost = await postService.createPost(newPostData);
       
