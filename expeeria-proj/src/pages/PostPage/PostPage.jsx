@@ -3,8 +3,9 @@ import { useParams } from "react-router-dom";
 import { usePost } from "../../hooks/usePost";
 import ReactMarkdown from "react-markdown";
 import style from "./PostPage.module.css";
-import { Button } from "../../components";
+import { Button, CommentItem, Pagination } from "../../components";
 import { useAuth } from "../../hooks/useAuth";
+import { useComment } from "../../hooks/useComment";
 
 export const PostPage = () => {
   const { id } = useParams();
@@ -12,6 +13,11 @@ export const PostPage = () => {
   const [comment, setComment] = useState("");
   const [userInput, setUserInput] = useState("");
   const { user } = useAuth();
+  const { addComment: addNewComment, deleteComment } = useComment();
+  
+  // Estados para paginação de comentários
+  const [currentPage, setCurrentPage] = useState(1);
+  const commentsPerPage = 5; // Quantidade de comentários por página
 
   const handleDelete = (e) => {
     e.preventDefault();
@@ -34,13 +40,34 @@ export const PostPage = () => {
   const handleComment = (e) => {
     e.preventDefault();
     if (!(user || userInput) || !comment) return;
-    addComment(post.id, {
+
+    const newComment = {
       id: `${Date.now()}-${Math.random()}`,
       user: user ? user.name || user.email : userInput,
+      userId: user ? user.id : null,
       text: comment,
-    });
+      postId: post.id,
+      createdAt: new Date().toISOString(),
+      likes: 0,
+      likedBy: []
+    };
+
+    addComment(post.id, newComment);
+    addNewComment(newComment);
     setComment("");
     if (!user) setUserInput("");
+    // Após adicionar um comentário, voltar para a primeira página
+    setCurrentPage(1);
+  };
+
+  // Função para mudar de página
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    // Scroll para cima da seção de comentários
+    const commentsSection = document.querySelector(`.${style.commentsTitle}`);
+    if (commentsSection) {
+      commentsSection.scrollIntoView({ behavior: "smooth" });
+    }
   };
 
   return (
@@ -138,17 +165,38 @@ export const PostPage = () => {
           />
           <button type="submit">Comentar</button>
         </form>
-        <ul className={style.commentsList}>
+
+        <div className={style.commentsContainer}>
           {Array.isArray(post.comments) && post.comments.length > 0 ? (
-            post.comments.map((c) => (
-              <li key={c.id || `${c.user}-${c.text}-${Math.random()}`}>
-                <b>{c.user}:</b> {c.text}
-              </li>
-            ))
+            <>
+              {post.comments
+                .slice((currentPage - 1) * commentsPerPage, currentPage * commentsPerPage)
+                .map((c) => (
+                  <CommentItem 
+                    key={c.id || `${c.user}-${c.text}-${Math.random()}`}
+                    comment={c}
+                    postId={post.id}
+                    currentUser={user}
+                    onDelete={() => {
+                      deletePost(post.id, c.id);
+                      deleteComment(c.id);
+                    }}
+                  />
+                ))}
+              <div className={style.paginationWrapper}>
+                <Pagination 
+                  currentPage={currentPage}
+                  totalPages={Math.ceil(post.comments.length / commentsPerPage)}
+                  onPageChange={handlePageChange}
+                  siblingCount={1}
+                  size="sm"
+                />
+              </div>
+            </>
           ) : (
-            <li style={{ color: "#aaa" }}>Nenhum comentário ainda.</li>
+            <p style={{ color: "#aaa" }}>Nenhum comentário ainda.</p>
           )}
-        </ul>
+        </div>
       </div>
     </>
   );

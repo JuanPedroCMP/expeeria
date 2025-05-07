@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect, useCallback } from 'react';
-import { userService } from '../services/api';
+import { authService } from '../services/authService';
+import supabase from '../services/supabase';
 
 // Criando o contexto de autenticação
 export const AuthContext = createContext({});
@@ -9,22 +10,29 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Verificar token ao iniciar
+  // Verificar sessão ao iniciar
   useEffect(() => {
     const initAuth = async () => {
       setLoading(true);
       try {
-        // Tenta recuperar o usuário do localStorage
-        const storedUser = userService.getCurrentUser();
+        // Verificar se há uma sessão ativa no Supabase
+        const { data: session } = await authService.getSession();
         
-        if (storedUser) {
-          // Verificar se o token ainda é válido fazendo uma chamada de teste
-          try {
-            const refreshedUser = await userService.getUserProfile(storedUser.id);
-            setUser(refreshedUser);
-          } catch (error) {
-            console.warn('Sessão expirada ou inválida, usuário será deslogado');
-            userService.logout();
+        if (session?.session) {
+          // Buscar dados do usuário
+          const userData = await authService.getCurrentUser();
+          if (userData) {
+            // Buscar perfil do usuário para dados adicionais
+            const { data: profile } = await supabase
+              .from('profiles')
+              .select('*')
+              .eq('id', userData.id)
+              .single();
+            
+            setUser({
+              ...userData,
+              ...profile
+            });
           }
         }
       } catch (error) {
@@ -44,13 +52,30 @@ export function AuthProvider({ children }) {
     setError(null);
     
     try {
-      const data = await userService.login(email, password);
-      setUser(data.user);
+      const data = await authService.signIn({ email, password });
+      
+      // Buscar perfil do usuário
+      if (data.user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', data.user.id)
+          .single();
+        
+        setUser({
+          ...data.user,
+          ...profile
+        });
+        return {
+          ...data.user,
+          ...profile
+        };
+      }
       return data.user;
     } catch (error) {
       console.error('Erro no login:', error);
       setError(
-        error.response?.data?.message || 
+        error.message || 
         'Falha ao fazer login. Verifique suas credenciais.'
       );
       throw error;
@@ -60,9 +85,13 @@ export function AuthProvider({ children }) {
   }, []);
 
   // Função de logout
-  const logout = useCallback(() => {
-    userService.logout();
-    setUser(null);
+  const logout = useCallback(async () => {
+    try {
+      await authService.signOut();
+      setUser(null);
+    } catch (error) {
+      console.error('Erro ao fazer logout:', error);
+    }
   }, []);
 
   // Função de registro
@@ -71,12 +100,12 @@ export function AuthProvider({ children }) {
     setError(null);
     
     try {
-      const data = await userService.register(userData);
+      const data = await authService.signUp(userData);
       return data;
     } catch (error) {
       console.error('Erro no registro:', error);
       setError(
-        error.response?.data?.message || 
+        error.message || 
         'Falha ao registrar. Por favor, tente novamente.'
       );
       throw error;
@@ -93,16 +122,27 @@ export function AuthProvider({ children }) {
     setError(null);
     
     try {
-      const updatedUser = await userService.updateUserProfile(user.id, profileData);
+      // Atualizar apenas os dados do perfil
+      const { data: updatedProfile, error: profileError } = await supabase
+        .from('profiles')
+        .update(profileData)
+        .eq('id', user.id)
+        .select()
+        .single();
+      
+      if (profileError) throw profileError;
+      
+      // Atualizar o usuário local
       setUser((currentUser) => ({
         ...currentUser,
-        ...updatedUser,
+        ...updatedProfile,
       }));
-      return updatedUser;
+      
+      return updatedProfile;
     } catch (error) {
       console.error('Erro ao atualizar perfil:', error);
       setError(
-        error.response?.data?.message || 
+        error.message || 
         'Falha ao atualizar perfil. Por favor, tente novamente.'
       );
       throw error;
@@ -116,9 +156,18 @@ export function AuthProvider({ children }) {
     if (!user) throw new Error('Usuário não autenticado');
     
     try {
-      const result = await userService.followUser(userId);
+      // Atualizar a relação de seguidor
+      const { error } = await supabase
+        .from('follows')
+        .insert({
+          follower_id: user.id,
+          following_id: userId,
+          created_at: new Date().toISOString()
+        });
       
-      // Atualizar o usuário local se necessário
+      if (error) throw error;
+      
+      // Atualizar o usuário local
       setUser((currentUser) => {
         if (!currentUser) return currentUser;
         
@@ -128,7 +177,7 @@ export function AuthProvider({ children }) {
         };
       });
       
-      return result;
+      return true;
     } catch (error) {
       console.error('Erro ao seguir usuário:', error);
       throw error;
@@ -140,9 +189,18 @@ export function AuthProvider({ children }) {
     if (!user) throw new Error('Usuário não autenticado');
     
     try {
-      const result = await userService.unfollowUser(userId);
+      // Remover a relação de seguidor
+      const { error } = await supabase
+        .from('follows')
+        .delete()
+        .match({
+          follower_id: user.id,
+          following_id: userId
+        });
       
-      // Atualizar o usuário local se necessário
+      if (error) throw error;
+      
+      // Atualizar o usuário local
       setUser((currentUser) => {
         if (!currentUser) return currentUser;
         
@@ -152,7 +210,7 @@ export function AuthProvider({ children }) {
         };
       });
       
-      return result;
+      return true;
     } catch (error) {
       console.error('Erro ao deixar de seguir usuário:', error);
       throw error;
@@ -160,14 +218,32 @@ export function AuthProvider({ children }) {
   }, [user]);
 
   // Função para verificar se o usuário está seguindo outro
-  const isFollowing = useCallback((userId) => {
+  const isFollowing = useCallback(async (userId) => {
     if (!user) return false;
-    return user.following?.includes(userId) || false;
+    
+    try {
+      const { data, error } = await supabase
+        .from('follows')
+        .select()
+        .match({
+          follower_id: user.id,
+          following_id: userId
+        })
+        .single();
+      
+      if (error && error.code !== 'PGRST116') return false; // PGRST116 é o código para 'no rows returned'
+      
+      return !!data;
+    } catch (error) {
+      console.error('Erro ao verificar seguidor:', error);
+      return false;
+    }
   }, [user]);
 
   // Verifica se o usuário é administrador
   const isAdmin = useCallback(() => {
-    return user?.role === 'admin';
+    if (!user) return false;
+    return user.role === 'admin';
   }, [user]);
 
   // Verifica se o usuário é dono de um recurso

@@ -14,6 +14,7 @@ export { PrivateRoute } from './PrivateRoute';
 export { Pagination } from './Pagination';
 export { Notifications } from './Notifications';
 export { Recomendacoes } from './Recomendacoes';
+export { ThemeToggle } from './ThemeToggle';
 export { UploadImage } from './UploadImage';
 
 // Exportar constantes úteis

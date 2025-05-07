@@ -1,7 +1,8 @@
 import { Navbar } from "../../components/Navbar/Navbar";
 import { Outlet } from "react-router-dom";
 import style from "./LayoutPadrao.module.css";
-import { PostProvider } from "../../contexts/PostContext"; // <-- Adicione esta linha
+import { PostProvider } from "../../contexts/PostContext";
+import { ThemeToggle } from "../../components/ThemeToggle";
 
 
 const LayoutPadrao = () => {
@@ -11,6 +12,7 @@ const LayoutPadrao = () => {
       <div className={style.LayoutPadrao}>
         <Outlet />
       </div>
+      <ThemeToggle fixed={true} />
     </PostProvider>
   );
 };

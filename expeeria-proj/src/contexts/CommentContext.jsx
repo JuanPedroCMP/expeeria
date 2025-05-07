@@ -1,5 +1,5 @@
 import React, { createContext, useState, useCallback, useContext } from 'react';
-import { commentService } from '../services/api';
+import { commentService } from '../services/commentService';
 import { AuthContext } from './AuthContext';
 
 // Criando o contexto de comentários
@@ -12,19 +12,19 @@ export function CommentProvider({ children }) {
   const [error, setError] = useState(null);
 
   // Carregar comentários de um post específico
-  const loadComments = useCallback(async (postId) => {
+  const loadComments = useCallback(async (postId, options = {}) => {
     setLoading(true);
     setError(null);
     
     try {
-      const data = await commentService.getPostComments(postId);
+      const result = await commentService.getCommentsByPost(postId, options);
       
       setComments(prev => ({
         ...prev,
-        [postId]: data
+        [postId]: result.comments
       }));
       
-      return data;
+      return result;
     } catch (error) {
       console.error('Erro ao carregar comentários:', error);
       setError('Falha ao carregar os comentários. Tente novamente mais tarde.');
@@ -35,26 +35,31 @@ export function CommentProvider({ children }) {
   }, []);
 
   // Adicionar um comentário
-  const addComment = useCallback(async (postId, content) => {
+  const addComment = useCallback(async (postId, content, parentId = null) => {
     if (!user) throw new Error('Usuário não autenticado');
     
     setLoading(true);
     setError(null);
     
     try {
-      const newComment = await commentService.addComment(postId, {
+      const newComment = await commentService.createComment({
+        post_id: postId,
+        user_id: user.id,
         content,
-        userId: user.id
+        parent_id: parentId
       });
       
-      // Adicionar o comentário ao estado local
-      setComments(prev => {
-        const postComments = prev[postId] || [];
-        return {
-          ...prev,
-          [postId]: [newComment, ...postComments]
-        };
-      });
+      // Se for uma resposta a outro comentário, não adiciona à lista principal
+      if (!parentId) {
+        // Adicionar o comentário ao estado local
+        setComments(prev => {
+          const postComments = prev[postId] || [];
+          return {
+            ...prev,
+            [postId]: [newComment, ...postComments]
+          };
+        });
+      }
       
       return newComment;
     } catch (error) {
@@ -82,7 +87,7 @@ export function CommentProvider({ children }) {
         return {
           ...prev,
           [postId]: postComments.map(comment => 
-            comment.id === commentId ? updatedComment : comment
+            comment.id === commentId ? { ...comment, ...updatedComment } : comment
           )
         };
       });
@@ -105,16 +110,18 @@ export function CommentProvider({ children }) {
     setError(null);
     
     try {
-      await commentService.deleteComment(commentId);
+      const result = await commentService.deleteComment(commentId);
       
-      // Remover o comentário do estado local
-      setComments(prev => {
-        const postComments = prev[postId] || [];
-        return {
-          ...prev,
-          [postId]: postComments.filter(comment => comment.id !== commentId)
-        };
-      });
+      // Remover o comentário do estado local apenas se for uma exclusão bem-sucedida
+      if (result) {
+        setComments(prev => {
+          const postComments = prev[postId] || [];
+          return {
+            ...prev,
+            [postId]: postComments.filter(comment => comment.id !== commentId)
+          };
+        });
+      }
       
       return { success: true };
     } catch (error) {
@@ -126,23 +133,26 @@ export function CommentProvider({ children }) {
     }
   }, [user]);
 
-  // Curtir um comentário
-  const likeComment = useCallback(async (commentId, postId) => {
+  // Curtir ou descurtir um comentário
+  const toggleLikeComment = useCallback(async (commentId, postId) => {
     if (!user) throw new Error('Usuário não autenticado');
     
     try {
-      await commentService.likeComment(commentId);
+      const { liked } = await commentService.toggleLike(commentId, user.id);
       
-      // Atualizar o comentário no estado local
+      // Atualizar o estado local para refletir a mudança na curtida
       setComments(prev => {
         const postComments = prev[postId] || [];
         return {
           ...prev,
           [postId]: postComments.map(comment => {
             if (comment.id === commentId) {
+              const currentLikesCount = comment.likes || 0;
               return {
                 ...comment,
-                likes: [...(comment.likes || []), user.id]
+                // Se curtiu, incrementa o contador, senão decrementa
+                likes: liked ? currentLikesCount + 1 : Math.max(0, currentLikesCount - 1),
+                liked
               };
             }
             return comment;
@@ -150,53 +160,50 @@ export function CommentProvider({ children }) {
         };
       });
       
-      return { success: true };
+      return { liked };
     } catch (error) {
-      console.error('Erro ao curtir comentário:', error);
-      throw error;
-    }
-  }, [user]);
-
-  // Remover curtida de um comentário
-  const unlikeComment = useCallback(async (commentId, postId) => {
-    if (!user) throw new Error('Usuário não autenticado');
-    
-    try {
-      await commentService.unlikeComment(commentId);
-      
-      // Atualizar o comentário no estado local
-      setComments(prev => {
-        const postComments = prev[postId] || [];
-        return {
-          ...prev,
-          [postId]: postComments.map(comment => {
-            if (comment.id === commentId) {
-              return {
-                ...comment,
-                likes: (comment.likes || []).filter(id => id !== user.id)
-              };
-            }
-            return comment;
-          })
-        };
-      });
-      
-      return { success: true };
-    } catch (error) {
-      console.error('Erro ao remover curtida do comentário:', error);
+      console.error('Erro ao interagir com comentário:', error);
       throw error;
     }
   }, [user]);
 
   // Verificar se o usuário curtiu um comentário
-  const hasLikedComment = useCallback((commentId, postId) => {
-    if (!user) return false;
+  const checkCommentLiked = useCallback(async (commentId) => {
+    if (!user) return { liked: false };
     
-    const postComments = comments[postId] || [];
-    const comment = postComments.find(c => c.id === commentId);
+    try {
+      return await commentService.checkLiked(commentId, user.id);
+    } catch (error) {
+      console.error('Erro ao verificar curtida:', error);
+      return { liked: false };
+    }
+  }, [user]);
+
+  // Obter respostas a um comentário
+  const loadReplies = useCallback(async (commentId) => {
+    setLoading(true);
+    try {
+      const replies = await commentService.getReplies(commentId);
+      return replies;
+    } catch (error) {
+      console.error('Erro ao carregar respostas:', error);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // Reportar um comentário
+  const reportComment = useCallback(async (commentId, reason) => {
+    if (!user) throw new Error('Usuário não autenticado');
     
-    return comment?.likes?.includes(user.id) || false;
-  }, [user, comments]);
+    try {
+      return await commentService.reportComment(commentId, user.id, reason);
+    } catch (error) {
+      console.error('Erro ao reportar comentário:', error);
+      throw error;
+    }
+  }, [user]);
 
   // Obter os comentários de um post específico
   const getPostComments = useCallback((postId) => {
@@ -213,9 +220,10 @@ export function CommentProvider({ children }) {
         addComment,
         updateComment,
         deleteComment,
-        likeComment,
-        unlikeComment,
-        hasLikedComment,
+        toggleLikeComment,
+        checkCommentLiked,
+        loadReplies,
+        reportComment,
         getPostComments
       }}
     >

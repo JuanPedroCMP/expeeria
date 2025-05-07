@@ -1,196 +1,288 @@
+/* Estilos para o componente Button - Tema Escuro Moderno */
+
+/* Estilos dos botões principais */
 .Button[tipo="primario"] {
-    color: var(--preto);
-    font-family: var(--fonte-titulos);
-    background-color: var(--brancoSuave);
-    cursor: pointer;
-    padding: 1rem 2rem;
-    border: 1px solid;
-    border-radius: 0.8rem;
-    margin-block-end: 1rem;
-    z-index: 1;
-    transition: background-color 0.3s ease-in-out;
-    flex-direction: column;
+  color: var(--texto-principal);
+  font-family: var(--fonte-titulos);
+  background: var(--gradiente-botoes);
+  cursor: pointer;
+  padding: 0.8rem 1.8rem;
+  border: none;
+  border-radius: var(--borda-md);
+  margin-block-end: 1rem;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--sombra-suave);
+  transition: all var(--transicao-rapida);
 }
 
-.Button:hover[tipo="primario"] {
-    background-color: var(--azulEletrico)
+.Button[tipo="primario"]::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.7s ease;
 }
 
+.Button[tipo="primario"]:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--sombra-media), var(--sombra-destaque);
+}
 
-/* TODO Resolver o problema do botão destaque com o menu */
+.Button[tipo="primario"]:hover::before {
+  left: 100%;
+}
 
+.Button[tipo="primario"]:active {
+  transform: translateY(1px);
+  box-shadow: var(--sombra-suave);
+}
 
 .Button[tipo="destaque"] {
-    position: relative;
-    overflow: hidden;
-    color: var(--brancoSuave);
-    font-family: var(--fonte-titulos);
-    background-color: var(--cinzaEscuro);
-    cursor: pointer;
-    padding: 1rem 2rem;
-    border: 1px solid;
-    border-radius: 0.8rem;
-    margin: 1rem;
-    z-index: 10;
-    transition: color 0.3s ease-in-out;
+  position: relative;
+  overflow: hidden;
+  color: var(--texto-principal);
+  font-family: var(--fonte-titulos);
+  background-color: transparent;
+  cursor: pointer;
+  padding: 0.8rem 1.8rem;
+  border: 1px solid var(--destaque-secundario);
+  border-radius: var(--borda-md);
+  margin: 1rem;
+  z-index: 10;
+  transition: all var(--transicao-media);
 }
 
 .Button[tipo="destaque"]::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: -150%;
-    width: 300%;
-    height: 100%;
-    background: linear-gradient(120deg, #00f260, #0575e6, #ff0080, #ff8c00);
-    background-size: 200% 200%;
-    z-index: -1;
-    transition: transform 0.3s ease-in-out;
-    transform: translateX(-100%);
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 200%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    var(--destaque-primario),
+    var(--destaque-secundario),
+    var(--destaque-terciario),
+    var(--acento));
+  background-size: 200% 100%;
+  z-index: -1;
+  transition: transform var(--transicao-media);
+  transform: translateX(-100%);
 }
 
 .Button[tipo="destaque"]:hover::before {
-    transform: translateX(0);
-    animation: gradienteMovimentacao 3s infinite linear;
+  transform: translateX(0);
+  animation: gradienteMovimentacao 3s infinite linear;
 }
 
 .Button[tipo="destaque"]:hover {
-    color: var(--preto);
+  color: var(--texto-principal);
+  border-color: transparent;
+  transform: translateY(-2px);
+  box-shadow: var(--sombra-media);
+}
+
+.Button[tipo="destaque"]:active {
+  transform: translateY(1px);
+  box-shadow: var(--sombra-suave);
 }
 
 @keyframes gradienteMovimentacao {
-    0% {
-        background-position: 0% 50%;
-    }
-    50% {
-        background-position: 100% 50%;
-    }
-    100% {
-        background-position: 0% 50%;
-    }
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
-@keyframes respirar {
-    from {
-        padding: 0.5rem;
-    }
-
-    to {
-        padding: 0.7rem;
-    }
-}
-
-/* Estilos para o componente Button */
+/* Sistema de botões modular */
 .button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-family: inherit;
+  font-family: var(--fonte-titulos);
   font-weight: 500;
   text-align: center;
   text-decoration: none;
   cursor: pointer;
-  border-radius: 6px;
-  transition: all 0.2s ease;
+  border-radius: var(--borda-md);
+  transition: all var(--transicao-rapida);
   outline: none;
   border: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transition: left 0.7s ease;
+}
+
+.button:hover::before {
+  left: 100%;
 }
 
 /* Variantes */
 .primary {
-  background-color: #8ecae6;
-  color: white;
+  background: var(--gradiente-botoes);
+  color: var(--texto-principal);
+  box-shadow: var(--sombra-suave);
 }
 
 .primary:hover:not(.disabled) {
-  background-color: #219ebc;
+  transform: translateY(-2px);
+  box-shadow: var(--sombra-media), var(--sombra-destaque);
+}
+
+.primary:active:not(.disabled) {
+  transform: translateY(1px);
+  box-shadow: var(--sombra-suave);
 }
 
 .secondary {
-  background-color: #f8f9fa;
-  color: #343a40;
-  border: 1px solid #ced4da;
+  background-color: var(--elementos-secundarios);
+  color: var(--texto-principal);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .secondary:hover:not(.disabled) {
-  background-color: #e9ecef;
+  background-color: var(--elementos-primarios);
+  transform: translateY(-1px);
+  box-shadow: var(--sombra-suave);
+}
+
+.secondary:active:not(.disabled) {
+  transform: translateY(0);
 }
 
 .outline {
   background-color: transparent;
-  color: #8ecae6;
-  border: 1px solid #8ecae6;
+  color: var(--destaque-secundario);
+  border: 1px solid var(--destaque-secundario);
 }
 
 .outline:hover:not(.disabled) {
-  background-color: rgba(142, 202, 230, 0.1);
+  background-color: rgba(14, 165, 233, 0.1);
+  border-color: var(--destaque-primario);
+  color: var(--destaque-primario);
+  transform: translateY(-1px);
+}
+
+.outline:active:not(.disabled) {
+  transform: translateY(0);
 }
 
 .danger {
-  background-color: #e63946;
-  color: white;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: var(--texto-principal);
+  box-shadow: var(--sombra-suave);
 }
 
 .danger:hover:not(.disabled) {
-  background-color: #d62828;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
 }
 
 .success {
-  background-color: #00b894;
-  color: white;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: var(--texto-principal);
+  box-shadow: var(--sombra-suave);
 }
 
 .success:hover:not(.disabled) {
-  background-color: #00a387;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
 }
 
 .warning {
-  background-color: #fb8500;
-  color: white;
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: var(--texto-principal);
+  box-shadow: var(--sombra-suave);
 }
 
 .warning:hover:not(.disabled) {
-  background-color: #e76f00;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
 }
 
 .ghost {
   background-color: transparent;
-  color: #023047;
+  color: var(--texto-secundario);
 }
 
 .ghost:hover:not(.disabled) {
-  background-color: rgba(142, 202, 230, 0.1);
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--texto-principal);
+}
+
+.ghost:active:not(.disabled) {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.link {
+  background-color: transparent;
+  color: var(--destaque-secundario);
+  padding: 0;
+  border-radius: 0;
+  overflow: visible;
+}
+
+.link::before {
+  display: none;
+}
+
+.link:hover:not(.disabled) {
+  color: var(--destaque-primario);
+  text-decoration: underline;
+}
+
+.link:active:not(.disabled) {
+  color: var(--destaque-primario);
 }
 
 /* Tamanhos */
 .xs {
   font-size: 0.75rem;
   padding: 0.25rem 0.5rem;
-  height: 1.5rem;
+  height: 1.75rem;
 }
 
 .sm {
   font-size: 0.875rem;
   padding: 0.375rem 0.75rem;
-  height: 2rem;
+  height: 2.25rem;
 }
 
 .md {
   font-size: 1rem;
-  padding: 0.5rem 1rem;
-  height: 2.5rem;
+  padding: 0.5rem 1.25rem;
+  height: 2.75rem;
 }
 
 .lg {
   font-size: 1.125rem;
-  padding: 0.625rem 1.25rem;
-  height: 3rem;
+  padding: 0.625rem 1.5rem;
+  height: 3.25rem;
 }
 
 .xl {
   font-size: 1.25rem;
-  padding: 0.75rem 1.5rem;
-  height: 3.5rem;
+  padding: 0.75rem 1.75rem;
+  height: 3.75rem;
 }
 
 /* Variações de estilo */
@@ -204,131 +296,11 @@
   pointer-events: none;
 }
 
-/* Focus e active states */
-.button:focus {
-  box-shadow: 0 0 0 3px rgba(142, 202, 230, 0.4);
+.disabled::before {
+  display: none;
 }
 
-.button:active:not(.disabled) {
-  transform: translateY(1px);
-}
-
-.button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--borda-md);
-  font-family: var(--fonte-subtitulos);
-  font-weight: 500;
-  cursor: pointer;
-  transition: all var(--transicao-rapida);
-  border: 1px solid transparent;
-  gap: var(--space-xs);
-  white-space: nowrap;
-}
-
-.button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  pointer-events: none;
-}
-
-/* Variantes de botão */
-.primary {
-  background-color: var(--destaque-secundario);
-  color: var(--texto-primario-light);
-}
-
-.primary:hover:not(:disabled) {
-  background-color: var(--destaque-primario);
-  transform: translateY(-1px);
-}
-
-.primary:active:not(:disabled) {
-  transform: translateY(0);
-}
-
-.secondary {
-  background-color: var(--acento);
-  color: var(--texto-primario-light);
-}
-
-.secondary:hover:not(:disabled) {
-  background-color: var(--acento-hover);
-  transform: translateY(-1px);
-}
-
-.secondary:active:not(:disabled) {
-  transform: translateY(0);
-}
-
-.outline {
-  background-color: transparent;
-  border: 1px solid var(--destaque-secundario);
-  color: var(--destaque-secundario);
-}
-
-.outline:hover:not(:disabled) {
-  background-color: rgba(28, 119, 195, 0.1);
-  transform: translateY(-1px);
-}
-
-.outline:active:not(:disabled) {
-  transform: translateY(0);
-}
-
-.ghost {
-  background-color: transparent;
-  color: var(--texto-principal);
-}
-
-.ghost:hover:not(:disabled) {
-  background-color: rgba(255, 255, 255, 0.1);
-}
-
-.danger {
-  background-color: var(--alerta-erro);
-  color: white;
-}
-
-.danger:hover:not(:disabled) {
-  background-color: var(--alerta-erro-hover);
-  transform: translateY(-1px);
-}
-
-.danger:active:not(:disabled) {
-  transform: translateY(0);
-}
-
-.success {
-  background-color: var(--destaque-primario);
-  color: white;
-}
-
-.success:hover:not(:disabled) {
-  background-color: #27bb76;
-  transform: translateY(-1px);
-}
-
-.success:active:not(:disabled) {
-  transform: translateY(0);
-}
-
-.link {
-  background-color: transparent;
-  color: var(--destaque-secundario);
-  padding: 0;
-  border-radius: 0;
-  border: none;
-  font-weight: 400;
-  text-decoration: none;
-}
-
-.link:hover:not(:disabled) {
-  text-decoration: underline;
-  color: var(--destaque-primario);
-}
-
+/* Botões de ícone */
 .icon {
   border-radius: 50%;
   padding: 0;
@@ -338,92 +310,430 @@
   justify-content: center;
 }
 
-/* Tamanhos de botão */
-.xs {
-  font-size: 0.75rem;
-  padding: 0.25rem 0.5rem;
-  min-height: 24px;
-}
-
-.sm {
+.icon.xs {
+  width: 1.75rem;
+  height: 1.75rem;
   font-size: 0.875rem;
-  padding: 0.375rem 0.75rem;
-  min-height: 32px;
 }
 
-.md {
+.icon.sm {
+  width: 2.25rem;
+  height: 2.25rem;
   font-size: 1rem;
-  padding: 0.5rem 1rem;
-  min-height: 40px;
 }
 
-.lg {
-  font-size: 1.125rem;
-  padding: 0.625rem 1.25rem;
-  min-height: 48px;
-}
-
-.xl {
+.icon.md {
+  width: 2.75rem;
+  height: 2.75rem;
   font-size: 1.25rem;
-  padding: 0.75rem 1.5rem;
-  min-height: 56px;
 }
 
-/* Opções adicionais */
-.fullWidth {
-  width: 100%;
+.icon.lg {
+  width: 3.25rem;
+  height: 3.25rem;
+  font-size: 1.5rem;
 }
 
-/* Ícones */
+.icon.xl {
+  width: 3.75rem;
+  height: 3.75rem;
+  font-size: 1.75rem;
+}
+
+/* Combinações de ícones com texto */
 .iconLeft {
-  display: flex;
-  margin-right: var(--space-xxs);
+  margin-right: 0.5rem;
+  font-size: 1.1em;
+  display: inline-flex;
+  align-items: center;
 }
 
 .iconRight {
-  display: flex;
-  margin-left: var(--space-xxs);
+  margin-left: 0.5rem;
+  font-size: 1.1em;
+  display: inline-flex;
+  align-items: center;
 }
 
-/* Container de carregamento */
-.loadingContainer {
-  display: flex;
+/* Efeito de carregamento */
+.loading {
+  position: relative;
+  color: transparent !important;
+}
+
+.loading::after {
+  content: "";
+  position: absolute;
+  width: 1em;
+  height: 1em;
+  border: 2px solid;
+  border-radius: 50%;
+  border-color: var(--texto-principal) transparent var(--texto-principal) transparent;
+  animation: rotation 0.8s linear infinite;
+}
+
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Botão com animação de destaque */
+.pulse {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(14, 165, 233, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(14, 165, 233, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(14, 165, 233, 0);
+  }
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .Button[tipo="primario"],
+  .Button[tipo="destaque"] {
+    padding: 0.6rem 1.4rem;
+  }
+  
+  .md {
+    padding: 0.4rem 1rem;
+    height: 2.5rem;
+  }
+  
+  .lg {
+    padding: 0.5rem 1.25rem;
+    height: 3rem;
+  }
+  
+  .xl {
+    padding: 0.6rem 1.5rem;
+    height: 3.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .Button[tipo="primario"],
+  .Button[tipo="destaque"] {
+    padding: 0.5rem 1.2rem;
+    font-size: 0.95rem;
+  }
+  
+  .button {
+    font-size: 0.95rem;
+  }
+  
+  .lg, .xl {
+    font-size: 1.1rem;
+  }
+}
+
+/* Estilos aprimorados para botões */
+.buttonBase {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  font-family: var(--fonte-subtitulos);
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+  border: none;
+  border-radius: var(--borda-md);
+  transition: all var(--transicao-media);
+  position: relative;
+  overflow: hidden;
+  padding: var(--space-sm) var(--space-lg);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  user-select: none;
+}
+
+/* Efeito hover avançado */
+.buttonBase::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateX(-100%) rotate(45deg);
+  transition: transform var(--transicao-lenta);
+}
+
+.buttonBase:hover::before {
+  transform: translateX(100%) rotate(45deg);
+}
+
+/* Efeito de clique/ativo */
+.buttonBase:active {
+  transform: translateY(2px);
+  transition-duration: 0.1s;
+}
+
+/* Variantes primárias */
+.primary {
+  background: var(--gradiente-botoes);
+  color: white;
+  box-shadow: 0 4px 12px rgba(14, 165, 233, 0.25);
+}
+
+.primary:hover {
+  box-shadow: 0 6px 15px rgba(14, 165, 233, 0.35);
+  filter: brightness(1.1);
+}
+
+.primary:focus {
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.25), 0 4px 12px rgba(14, 165, 233, 0.25);
+}
+
+/* Variantes secundárias */
+.secondary {
+  background-color: var(--elementos-secundarios);
+  color: var(--texto-principal);
+  border: 1px solid rgba(203, 213, 225, 0.15);
+}
+
+.secondary:hover {
+  background-color: var(--elementos-primarios);
+  border-color: rgba(203, 213, 225, 0.3);
+}
+
+.secondary:focus {
+  box-shadow: 0 0 0 3px rgba(203, 213, 225, 0.15);
+}
+
+/* Variante com destaque */
+.accent {
+  background: var(--acento);
+  color: var(--background-principal);
+  font-weight: 700;
+}
+
+.accent:hover {
+  filter: brightness(1.1);
+  box-shadow: 0 6px 15px rgba(245, 158, 11, 0.3);
+}
+
+.accent:focus {
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.25);
+}
+
+/* Variante fantasma */
+.ghost {
+  background-color: transparent;
+  color: var(--destaque-secundario);
+  border: 1px solid var(--destaque-secundario);
+}
+
+.ghost:hover {
+  background-color: rgba(14, 165, 233, 0.1);
+}
+
+.ghost:focus {
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.15);
+}
+
+/* Variante de texto */
+.text {
+  background-color: transparent;
+  color: var(--destaque-secundario);
+  padding: var(--space-xs) var(--space-sm);
+}
+
+.text:hover {
+  background-color: rgba(14, 165, 233, 0.08);
+  color: var(--destaque-primario);
+}
+
+.text:focus {
+  box-shadow: none;
+}
+
+/* Variantes de tamanho */
+.small {
+  padding: var(--space-xs) var(--space-md);
+  font-size: 0.85rem;
+}
+
+.large {
+  padding: var(--space-md) var(--space-xl);
+  font-size: 1.1rem;
+}
+
+/* Estados do botão */
+.loading {
+  cursor: wait;
+  opacity: 0.8;
+}
+
+.loading .buttonContent {
+  visibility: hidden;
+}
+
+.loadingSpinner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 1.25em;
+  height: 1.25em;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+.disabled,
+.buttonBase:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Variante com ícone */
+.withIcon {
+  display: inline-flex;
   align-items: center;
   gap: var(--space-sm);
 }
 
-/* Tamanhos específicos para botão de ícone */
-.icon.xs {
-  width: 24px;
-  height: 24px;
-  font-size: 0.875rem;
-  padding: 0;
+.iconOnly {
+  padding: var(--space-sm);
+  border-radius: var(--borda-md);
+  aspect-ratio: 1;
 }
 
-.icon.sm {
-  width: 32px;
-  height: 32px;
-  font-size: 1rem;
-  padding: 0;
+.iconLeft svg, .iconRight svg {
+  flex-shrink: 0;
+  width: 1.25em;
+  height: 1.25em;
 }
 
-.icon.md {
-  width: 40px;
-  height: 40px;
-  font-size: 1.25rem;
-  padding: 0;
+.iconLeft {
+  padding-left: var(--space-md);
 }
 
-.icon.lg {
-  width: 48px;
-  height: 48px;
-  font-size: 1.5rem;
-  padding: 0;
+.iconRight {
+  padding-right: var(--space-md);
 }
 
-.icon.xl {
-  width: 56px;
-  height: 56px;
-  font-size: 1.75rem;
-  padding: 0;
+/* Variante de grupo de botões */
+.buttonGroup {
+  display: inline-flex;
+}
+
+.buttonGroup .buttonBase:not(:first-child) {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.buttonGroup .buttonBase:not(:last-child) {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Efeito de ondulação */
+.ripple {
+  position: relative;
+  overflow: hidden;
+}
+
+.ripple::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.5);
+  opacity: 0;
+  border-radius: 100%;
+  transform: scale(1, 1) translate(-50%, -50%);
+  transform-origin: 50% 50%;
+}
+
+.ripple:focus:not(:active)::after {
+  animation: ripple 0.8s ease-out;
+}
+
+@keyframes ripple {
+  0% {
+    transform: scale(0, 0);
+    opacity: 0.5;
+  }
+  20% {
+    transform: scale(25, 25);
+    opacity: 0.3;
+  }
+  100% {
+    transform: scale(50, 50);
+    opacity: 0;
+  }
+}
+
+/* Botão com gradiente */
+.gradientButton {
+  background-size: 200% auto;
+  transition: background-position var(--transicao-media) ease, transform var(--transicao-rapida) ease;
+}
+
+.gradientButton:hover {
+  background-position: right center;
+}
+
+.success {
+  background-image: linear-gradient(135deg, var(--alerta-sucesso), #06d6a0);
+  color: white;
+}
+
+.warning {
+  background-image: linear-gradient(135deg, var(--alerta-aviso), #ffba08);
+  color: var(--background-principal);
+}
+
+.danger {
+  background-image: linear-gradient(135deg, var(--alerta-erro), #e5383b);
+  color: white;
+}
+
+.info {
+  background-image: linear-gradient(135deg, var(--alerta-info), #00b4d8);
+  color: white;
+}
+
+.fullWidth {
+  width: 100%;
+}
+
+/* Animação sutil */
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(14, 165, 233, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(14, 165, 233, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(14, 165, 233, 0);
+  }
+}
+
+.pulseAnimation:focus {
+  animation: pulse 1.5s infinite;
 }

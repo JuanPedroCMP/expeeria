@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { MenuRecolhivel } from "./MenuRecolhivel/MenuRecolhivel";
 import { useAuth } from "../../hooks/useAuth";
 import { Avatar } from "../Avatar/Avatar";
+import { ThemeToggle } from "../ThemeToggle";
 import styles from "./Navbar.module.css";
 
 /**
@@ -38,6 +39,8 @@ export const Navbar = () => {
       </div>
       
       <div className={styles.navbarRight}>
+        <ThemeToggle className={styles.themeToggleNav} />
+        
         {user ? (
           <>
             <Link to="/criar_post" className={styles.createPostBtn}>

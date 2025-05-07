@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { categoriasPadrao } from "../../utils/categoriasPadrao";
 import styles from "./FeedFilters.module.css";
 

@@ -1,6 +1,8 @@
 import React, { createContext, useState, useEffect, useCallback, useContext } from 'react';
-import { postService, commentService } from '../services/api';
+import { postService } from '../services/postService';
+import { commentService } from '../services/commentService';
 import { AuthContext } from './AuthContext';
+import supabase from '../services/supabase';
 
 // Criando o contexto de posts
 export const PostContext = createContext({});
@@ -21,7 +23,7 @@ export function PostProvider({ children }) {
     setError(null);
     
     try {
-      const data = await postService.getAllPosts(params);
+      const data = await postService.getPosts(params);
       setPosts(data);
       return data;
     } catch (error) {
@@ -41,7 +43,28 @@ export function PostProvider({ children }) {
     setError(null);
     
     try {
-      const data = await postService.getFeed(page, limit);
+      // Buscar IDs de usuários que o usuário atual segue
+      const { data: followingData } = await supabase
+        .from('follows')
+        .select('following_id')
+        .eq('follower_id', user.id);
+      
+      if (!followingData || followingData.length === 0) {
+        setFeedPosts([]);
+        return [];
+      }
+      
+      const followingIds = followingData.map(item => item.following_id);
+      
+      // Buscar posts dos usuários seguidos
+      const { data, error: postsError } = await supabase
+        .from('posts')
+        .select('*, author:profiles(*)')
+        .in('author_id', followingIds)
+        .order('created_at', { ascending: false })
+        .range((page - 1) * limit, page * limit - 1);
+      
+      if (postsError) throw postsError;
       
       if (page === 1) {
         setFeedPosts(data);
@@ -65,7 +88,29 @@ export function PostProvider({ children }) {
     setError(null);
     
     try {
-      const data = await postService.getExplore(filters);
+      // Montar a query com base nos filtros
+      let query = supabase
+        .from('posts')
+        .select('*, author:profiles(*)')
+        .order('created_at', { ascending: false });
+      
+      // Aplicar filtros
+      if (filters.category) {
+        query = query.eq('category', filters.category);
+      }
+      
+      if (filters.trending) {
+        query = query.order('like_count', { ascending: false });
+      }
+      
+      if (filters.limit) {
+        query = query.limit(filters.limit);
+      }
+      
+      const { data, error: postsError } = await query;
+      
+      if (postsError) throw postsError;
+      
       setExplorePosts(data);
       return data;
     } catch (error) {
@@ -83,7 +128,14 @@ export function PostProvider({ children }) {
     setError(null);
     
     try {
-      const data = await postService.getUserPosts(userId);
+      const { data, error: postsError } = await supabase
+        .from('posts')
+        .select('*, author:profiles(*)')
+        .eq('author_id', userId)
+        .order('created_at', { ascending: false });
+      
+      if (postsError) throw postsError;
+      
       setUserPosts(data);
       return data;
     } catch (error) {
@@ -101,9 +153,9 @@ export function PostProvider({ children }) {
     setError(null);
     
     try {
-      const data = await postService.getPostById(postId);
-      setCurrentPost(data);
-      return data;
+      const post = await postService.getPostById(postId);
+      setCurrentPost(post);
+      return post;
     } catch (error) {
       console.error('Erro ao carregar post:', error);
       setError('Falha ao carregar o post. O conteúdo pode ter sido removido.');
@@ -121,10 +173,15 @@ export function PostProvider({ children }) {
     setError(null);
     
     try {
-      const newPost = await postService.createPost({
+      // Adicionar dados do autor
+      const newPostData = {
         ...postData,
-        authorId: user.id
-      });
+        author_id: user.id,
+        like_count: 0,
+        comment_count: 0
+      };
+      
+      const newPost = await postService.createPost(newPostData);
       
       // Atualizar os arrays locais com o novo post
       setPosts(current => [newPost, ...current]);
@@ -210,7 +267,32 @@ export function PostProvider({ children }) {
     if (!user) throw new Error('Usuário não autenticado');
     
     try {
-      await postService.likePost(postId);
+      // Verificar se o usuário já curtiu o post
+      const { data: existingLike } = await supabase
+        .from('likes')
+        .select()
+        .match({ post_id: postId, user_id: user.id })
+        .single();
+      
+      if (existingLike) {
+        return { success: true }; // Já curtiu, não fazer nada
+      }
+      
+      // Registrar curtida
+      const { error: likeError } = await supabase
+        .from('likes')
+        .insert({ 
+          post_id: postId, 
+          user_id: user.id,
+          created_at: new Date().toISOString()
+        });
+      
+      if (likeError) throw likeError;
+      
+      // Incrementar contador de curtidas no post
+      const { error: updateError } = await supabase.rpc('increment_likes', { post_id_param: postId });
+      
+      if (updateError) throw updateError;
       
       // Atualizar os arrays locais para refletir o like
       const updateArrayWithLike = (array) => 
@@ -218,7 +300,7 @@ export function PostProvider({ children }) {
           if (post.id === postId) {
             return {
               ...post,
-              likeCount: (post.likeCount || 0) + 1,
+              like_count: (post.like_count || 0) + 1,
               likes: [...(post.likes || []), user.id]
             };
           }
@@ -233,7 +315,7 @@ export function PostProvider({ children }) {
       if (currentPost?.id === postId) {
         setCurrentPost(prev => ({
           ...prev,
-          likeCount: (prev.likeCount || 0) + 1,
+          like_count: (prev.like_count || 0) + 1,
           likes: [...(prev.likes || []), user.id]
         }));
       }
@@ -250,7 +332,18 @@ export function PostProvider({ children }) {
     if (!user) throw new Error('Usuário não autenticado');
     
     try {
-      await postService.unlikePost(postId);
+      // Remover curtida
+      const { error: unlikeError } = await supabase
+        .from('likes')
+        .delete()
+        .match({ post_id: postId, user_id: user.id });
+      
+      if (unlikeError) throw unlikeError;
+      
+      // Decrementar contador de curtidas no post
+      const { error: updateError } = await supabase.rpc('decrement_likes', { post_id_param: postId });
+      
+      if (updateError) throw updateError;
       
       // Atualizar os arrays locais para refletir o unlike
       const updateArrayWithUnlike = (array) => 
@@ -258,7 +351,7 @@ export function PostProvider({ children }) {
           if (post.id === postId) {
             return {
               ...post,
-              likeCount: Math.max((post.likeCount || 0) - 1, 0),
+              like_count: Math.max((post.like_count || 0) - 1, 0),
               likes: (post.likes || []).filter(id => id !== user.id)
             };
           }
@@ -273,7 +366,7 @@ export function PostProvider({ children }) {
       if (currentPost?.id === postId) {
         setCurrentPost(prev => ({
           ...prev,
-          likeCount: Math.max((prev.likeCount || 0) - 1, 0),
+          like_count: Math.max((prev.like_count || 0) - 1, 0),
           likes: (prev.likes || []).filter(id => id !== user.id)
         }));
       }
@@ -286,30 +379,47 @@ export function PostProvider({ children }) {
   }, [user, currentPost]);
 
   // Verificar se o usuário curtiu um post específico
-  const hasLiked = useCallback((postId) => {
+  const hasLiked = useCallback(async (postId) => {
     if (!user) return false;
     
-    const post = posts.find(p => p.id === postId) || 
-                 currentPost?.id === postId ? currentPost : null;
-    
-    return post?.likes?.includes(user.id) || false;
-  }, [user, posts, currentPost]);
+    try {
+      const { data, error } = await supabase
+        .from('likes')
+        .select()
+        .match({ post_id: postId, user_id: user.id })
+        .single();
+      
+      if (error && error.code !== 'PGRST116') return false; // PGRST116 é o código para 'no rows returned'
+      
+      return !!data;
+    } catch (error) {
+      console.error('Erro ao verificar curtida:', error);
+      return false;
+    }
+  }, [user]);
 
   // Adicionar um comentário a um post
   const addComment = useCallback(async (postId, commentText) => {
     if (!user) throw new Error('Usuário não autenticado');
     
     try {
-      const newComment = await commentService.addComment(postId, {
+      const commentData = {
+        post_id: postId,
+        user_id: user.id,
         content: commentText,
-        userId: user.id
-      });
+        created_at: new Date().toISOString()
+      };
+      
+      const newComment = await commentService.createComment(commentData);
+      
+      // Incrementar contador de comentários no post
+      await supabase.rpc('increment_comments', { post_id_param: postId });
       
       // Atualizar o post atual com o novo comentário
       if (currentPost?.id === postId) {
         setCurrentPost(prev => ({
           ...prev,
-          commentCount: (prev.commentCount || 0) + 1
+          comment_count: (prev.comment_count || 0) + 1
         }));
       }
       
@@ -319,7 +429,7 @@ export function PostProvider({ children }) {
           if (post.id === postId) {
             return {
               ...post,
-              commentCount: (post.commentCount || 0) + 1
+              comment_count: (post.comment_count || 0) + 1
             };
           }
           return post;
@@ -344,11 +454,14 @@ export function PostProvider({ children }) {
     try {
       await commentService.deleteComment(commentId);
       
+      // Decrementar contador de comentários no post
+      await supabase.rpc('decrement_comments', { post_id_param: postId });
+      
       // Atualizar o post atual com o comentário removido
       if (currentPost?.id === postId) {
         setCurrentPost(prev => ({
           ...prev,
-          commentCount: Math.max((prev.commentCount || 0) - 1, 0)
+          comment_count: Math.max((prev.comment_count || 0) - 1, 0)
         }));
       }
       
@@ -358,7 +471,7 @@ export function PostProvider({ children }) {
           if (post.id === postId) {
             return {
               ...post,
-              commentCount: Math.max((post.commentCount || 0) - 1, 0)
+              comment_count: Math.max((post.comment_count || 0) - 1, 0)
             };
           }
           return post;
@@ -382,8 +495,17 @@ export function PostProvider({ children }) {
     setError(null);
     
     try {
-      const results = await postService.searchPosts(query);
-      return results;
+      // Usar pesquisa textual do Supabase
+      const { data, error: searchError } = await supabase
+        .from('posts')
+        .select('*, author:profiles(*)')
+        .textSearch('content', query, {
+          config: 'portuguese'
+        });
+      
+      if (searchError) throw searchError;
+      
+      return data;
     } catch (error) {
       console.error('Erro na pesquisa de posts:', error);
       setError('Falha ao pesquisar. Por favor, tente novamente.');
