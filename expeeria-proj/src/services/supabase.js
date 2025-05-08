@@ -3,17 +3,25 @@ import { createClient } from '@supabase/supabase-js';
 // Configuração para obter variáveis de ambiente independente do ambiente (Vite ou Node.js)
 let supabaseUrl, supabaseAnonKey;
 
-// Verificação se estamos em ambiente Node.js ou browser
+// Verificação se estamos em ambiente Vite/browser ou Node.js
 if (typeof import.meta !== 'undefined' && import.meta.env) {
   // Ambiente Vite/browser
   supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
   supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+  
+  // Registro para depuração durante o desenvolvimento
+  if (import.meta.env.DEV) {
+    console.log('Configuração do Supabase (DEV):', {
+      url: supabaseUrl ? 'Definida' : 'Não definida',
+      key: supabaseAnonKey ? 'Definida' : 'Não definida'
+    });
+  }
 } else {
-  // Ambiente Node.js - usando dotenv diretamente
+  // Ambiente Node.js - usando variáveis de ambiente do sistema
   try {
-    // Para execução direta via Node.js, definimos URLs fixas para teste
-    supabaseUrl = 'https://bqjsyidyxnhungvniyij.supabase.co';
-    supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJxanN5aWR5eG5odW5ndm5peWlqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY2MzI5MDcsImV4cCI6MjA2MjIwODkwN30.dU4qcCV1D7zEI26Sxi2Hu8PKdJADpxf3l-tlXrqrWLw';
+    // Verificar as variáveis de ambiente do Node.js
+    supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
+    supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY;
   } catch (error) {
     console.error('Erro ao carregar variáveis de ambiente:', error);
   }
@@ -21,15 +29,29 @@ if (typeof import.meta !== 'undefined' && import.meta.env) {
 
 // Validação das variáveis de ambiente
 if (!supabaseUrl || !supabaseAnonKey) {
-  console.error('Variáveis de ambiente do Supabase não encontradas');
+  console.error('⚠️ ERRO CRÍTICO: Variáveis de ambiente do Supabase não encontradas');
+  console.error('Por favor, verifique se o arquivo .env.local contém VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY');
+  
+  // Em ambiente de desenvolvimento, fornecer instruções úteis
+  if (typeof window !== 'undefined') {
+    // Em ambiente browser
+    alert('Configuração do Supabase incompleta. Verifique o console para mais informações.');
+  }
 }
 
-// Criação do cliente Supabase
+// Criação do cliente Supabase com configurações adicionais para evitar problemas de CORS
 const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     persistSession: true,
     autoRefreshToken: true,
+    // Configurações para contornar problemas de CORS
+    detectSessionInUrl: false,
+    flowType: 'implicit',
   },
+  // Configurações globais para fetch
+  global: {
+    fetch: (...args) => fetch(...args)
+  }
 });
 
 // Adicionar as URLs para facilitar o debug

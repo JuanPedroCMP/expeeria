@@ -3,43 +3,98 @@
 */
 
 :root {
+  /* Paleta de cores principal - Blues */
+  --primary-50: #f0f9ff;
+  --primary-100: #e0f2fe;
+  --primary-200: #bae6fd;
+  --primary-300: #7dd3fc;
+  --primary-400: #38bdf8;
+  --primary-500: #0ea5e9;
+  --primary-600: #0284c7;
+  --primary-700: #0369a1;
+  --primary-800: #075985;
+  --primary-900: #0c4a6e;
+  --primary-950: #082f49;
+  
+  /* Paleta neutra - Slates */
+  --slate-50: #f8fafc;
+  --slate-100: #f1f5f9;
+  --slate-200: #e2e8f0;
+  --slate-300: #cbd5e1;
+  --slate-400: #94a3b8;
+  --slate-500: #64748b;
+  --slate-600: #475569;
+  --slate-700: #334155;
+  --slate-800: #1e293b;
+  --slate-900: #0f172a;
+  --slate-950: #020617;
+  
+  /* Cores de feedback */
+  --success: #10b981;
+  --success-light: #a7f3d0;
+  --warning: #f59e0b;
+  --warning-light: #fde68a;
+  --error: #ef4444;
+  --error-light: #fecaca;
+  --info: #3b82f6;
+  --info-light: #bfdbfe;
+  
+  /* Cores funcionais para a aplicação */
+  --texto-principal: var(--slate-100);
+  --texto-secundario: var(--slate-300);
+  --texto-terciario: var(--slate-400);
+  --fundo-principal: var(--slate-950);
+  --fundo-secundario: var(--slate-900);
+  --fundo-terciario: var(--slate-800);
+  --fundo-card: rgba(30, 41, 59, 0.8);
+  --fundo-input: rgba(15, 23, 42, 0.6);
+  
+  /* Destaque, acentos e outros */
+  --destaque-primario: var(--primary-500);
+  --destaque-secundario: var(--primary-400);
+  --destaque-terciario: var(--primary-300);
+  --cor-hover: rgba(255, 255, 255, 0.1);
+  --cor-active: rgba(255, 255, 255, 0.15);
+  --borda-padrao: rgba(255, 255, 255, 0.1);
+  --borda-forte: rgba(255, 255, 255, 0.15);
+  --overlay: rgba(0, 0, 0, 0.5);
+  
+  /* Aliases para compatibilidade */
+  --alerta-erro: var(--error);
+  --acento: var(--primary-500);
+  --azulEletrico: var(--primary-500);
+  --background-principal: var(--fundo-principal);
+  --elementos-secundarios: var(--fundo-secundario);
+  
   /* Espaçamentos */
   --space-xs: 0.25rem;
   --space-sm: 0.5rem;
   --space-md: 1rem;
   --space-lg: 1.5rem;
   --space-xl: 2rem;
-  
-  /* Cores alinhadas com index.css */
-  --texto-principal: var(--texto-principal);
-  --texto-secundario: var(--texto-secundario);
-  --fundo-principal: var(--background-principal);
-  --elementos-secundarios: var(--elementos-secundarios);
-  --destaque-primario: var(--destaque-primario);
-  --destaque-secundario: var(--destaque-secundario);
-  --alerta-erro: var(--alerta-erro);
-  --acento: var(--acento);
-  --cor-hover: rgba(255, 255, 255, 0.05);
-  --borda-padrao: rgba(255, 255, 255, 0.1);
+  --space-2xl: 3rem;
   
   /* Bordas */
-  --borda-sm: var(--borda-sm);
-  --borda-md: var(--borda-md);
-  --borda-lg: var(--borda-lg);
-  --borda-xl: var(--borda-xl);
+  --borda-sm: 0.125rem;
+  --borda-md: 0.25rem;
+  --borda-lg: 0.5rem;
+  --borda-xl: 0.75rem;
+  --borda-2xl: 1rem;
   
   /* Sombras */
-  --sombra-suave: var(--sombra-suave);
-  --sombra-media: var(--sombra-media);
-  --sombra-forte: var(--sombra-forte);
-  --sombra-md: var(--sombra-media);
+  --sombra-suave: 0 2px 5px rgba(0, 0, 0, 0.1);
+  --sombra-media: 0 4px 12px rgba(0, 0, 0, 0.15);
+  --sombra-forte: 0 10px 25px rgba(0, 0, 0, 0.2);
+  --sombra-interna: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
   
   /* Fontes */
-  --fonte-titulos: var(--fonte-titulos);
-  --fonte-subtitulos: var(--fonte-subtitulos);
-  --fonte-corpo: var(--fonte-corpo);
+  --fonte-titulos: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --fonte-subtitulos: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --fonte-corpo: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   
   /* Transições */
   --transicao-rapida: 0.2s ease;
   --transicao-media: 0.3s ease;
+  --transicao-lenta: 0.5s ease;
+  --transicao-bounce: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }

@@ -72,25 +72,30 @@
   border-width: 6px;
 }
 
-/* Cores */
+/* Cores refinadas alinhadas com o novo sistema */
 .primary {
-  border-top-color: #8ecae6;
+  border-top-color: var(--primary-900, rgba(14, 165, 233, 1));
+  box-shadow: 0 0 10px rgba(14, 165, 233, 0.3);
 }
 
 .secondary {
-  border-top-color: #023047;
+  border-top-color: rgba(71, 85, 105, 1);
+  box-shadow: 0 0 10px rgba(71, 85, 105, 0.3);
 }
 
 .success {
-  border-top-color: #00b894;
+  border-top-color: rgba(34, 197, 94, 1);
+  box-shadow: 0 0 10px rgba(34, 197, 94, 0.3);
 }
 
 .danger {
-  border-top-color: #e63946;
+  border-top-color: rgba(239, 68, 68, 1);
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
 }
 
 .warning {
-  border-top-color: #fb8500;
+  border-top-color: rgba(245, 158, 11, 1);
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
 }
 
 .text {

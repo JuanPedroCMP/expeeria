@@ -103,7 +103,7 @@ export const postService = {
         throw new Error('O post que você está procurando não existe ou foi removido.');
       }
       
-      throw new Error('Não foi possível carregar o post. Tente novamente mais tarde.');
+      throw new Error('Não foi possível carregar o post. Tente novamente.');
     }
   },
 
@@ -114,42 +114,85 @@ export const postService = {
    */
   async createPost(postData) {
     try {
-      if (!postData.title) throw new Error('O título do post é obrigatório');
-      if (!postData.user_id) throw new Error('Usuário não autenticado');
+      // Validação de campos obrigatórios
+      if (!postData.title || postData.title.trim() === '') {
+        throw new Error('O título do post é obrigatório');
+      }
+      
+      if (!postData.user_id) {
+        throw new Error('Usuário não autenticado. Faça login para criar um post.');
+      }
+      
+      // Verificar se o usuário existe
+      const { data: userExists, error: userError } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('id', postData.user_id)
+        .single();
+        
+      if (userError || !userExists) {
+        console.error('Erro ao verificar usuário:', userError);
+        throw new Error('Usuário não encontrado ou sem permissão para criar posts');
+      }
+      
+      // Validação e configuração de tamanho máximo para conteúdo
+      const content = postData.content || '';
+      if (content.length > 50000) {
+        throw new Error('O conteúdo do post é muito grande. Limite de 50.000 caracteres.');
+      }
       
       // Garantir que os campos obrigatórios estejam presentes e formatados corretamente
       const newPostData = {
         title: postData.title.trim(),
-        caption: postData.caption.trim(),
-        content: postData.content,
-        area: postData.area,
+        caption: (postData.caption || '').trim(),
+        content: content,
+        area: postData.area || 'geral',  // Valor padrão se não for fornecido
         user_id: postData.user_id,
         imageUrl: postData.imageUrl || null,
-        created_at: postData.created_at || new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        like_count: 0,  // Iniciar com zero curtidas
+        comment_count: 0  // Iniciar com zero comentários
       };
       
-      console.log('Dados do post formatados para o Supabase:', newPostData);
+      // Registro para depuração
+      console.log('Criando novo post:', newPostData);
       
-      // Criando o post no Supabase
+      // Criar post com transação
       const { data, error } = await supabase
         .from('posts')
         .insert(newPostData)
-        .select();
+        .select(`
+          *,
+          profiles:user_id (
+            id,
+            username,
+            full_name,
+            avatar_url
+          )
+        `);
         
       if (error) {
         console.error('Erro detalhado do Supabase ao criar post:', error);
-        throw new Error(`Erro ao criar post: ${error.message}`);
+        
+        // Mensagens de erro mais específicas com base no erro do Supabase
+        if (error.code === '23505') {
+          throw new Error('Já existe um post com este título. Use um título diferente.');
+        } else if (error.code === '23503') {
+          throw new Error('Erro de referência: verifique se todos os campos estão corretos.');
+        } else {
+          throw new Error('Não foi possível criar o post. Por favor, tente novamente.');
+        }
       }
       
       if (!data || data.length === 0) {
-        throw new Error('Erro ao criar post: nenhum dado retornado');
+        throw new Error('Post criado, mas não foi possível recuperar os dados. Recarregue a página.');
       }
       
-      console.log('Post criado com sucesso, resposta do Supabase:', data[0]);
       return data[0];
     } catch (error) {
       console.error('Erro ao criar post:', error);
+      throw error;
       
       if (error.message === 'Usuário não autenticado') {
         throw new Error('Você precisa estar logado para criar um post.');

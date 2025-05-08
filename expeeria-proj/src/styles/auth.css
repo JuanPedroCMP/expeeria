@@ -1,0 +1,242 @@
+/* Estilos para Login e Cadastro - Expeeria */
+
+/* ===== FORMULu00c1RIOS DE AUTENTICAu00c7u00c3O ===== */
+.auth-form {
+  padding: 2.5rem 2rem;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  color: var(--text-primary, #f1f5f9);
+}
+
+.auth-form h2 {
+  font-size: 1.875rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 1rem;
+  color: var(--primary-400, #38bdf8);
+  letter-spacing: -0.025em;
+}
+
+/* ===== GRUPOS DE FORMULu00c1RIO AVANu00c7ADOS ===== */
+.auth-form .form-group {
+  margin-bottom: 1.25rem;
+}
+
+.auth-form .floating-label {
+  position: relative;
+}
+
+.auth-form .floating-label input {
+  height: 3.5rem;
+  padding: 1.25rem 1rem 0.5rem;
+  font-size: 1rem;
+  border-radius: 0.5rem;
+  background-color: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  color: white;
+  width: 100%;
+  transition: all 0.2s ease;
+}
+
+.auth-form .floating-label input:focus {
+  border-color: var(--primary-400, #38bdf8);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.25);
+}
+
+.auth-form .floating-label label {
+  position: absolute;
+  left: 1rem;
+  top: 1.15rem;
+  font-size: 1rem;
+  color: rgba(148, 163, 184, 0.8);
+  pointer-events: none;
+  transition: all 0.2s ease;
+}
+
+.auth-form .floating-label input:focus ~ label,
+.auth-form .floating-label input:not(:placeholder-shown) ~ label {
+  top: 0.5rem;
+  left: 1rem;
+  font-size: 0.75rem;
+  color: var(--primary-400, #38bdf8);
+}
+
+/* ===== BOTu00d5ES DE AUTENTICAu00c7u00c3O ===== */
+.auth-form .btn-primary {
+  height: 3.25rem;
+  background: linear-gradient(135deg, var(--primary-600, #0284c7), var(--primary-500, #0ea5e9));
+  color: white;
+  font-weight: 600;
+  font-size: 1rem;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25);
+}
+
+.auth-form .btn-primary:hover {
+  background: linear-gradient(135deg, var(--primary-700, #0369a1), var(--primary-600, #0284c7));
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(2, 132, 199, 0.35);
+}
+
+.auth-form .btn-primary:active {
+  transform: translateY(1px);
+}
+
+.auth-form .btn-outline {
+  background: transparent;
+  border: 1px solid rgba(56, 189, 248, 0.5);
+  color: var(--primary-400, #38bdf8);
+  height: 3.25rem;
+  font-weight: 500;
+  font-size: 1rem;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.auth-form .btn-outline:hover {
+  background: rgba(56, 189, 248, 0.1);
+  border-color: var(--primary-400, #38bdf8);
+}
+
+/* ===== ALERTAS E FEEDBACK ===== */
+.auth-form .alert {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.auth-form .alert svg {
+  flex-shrink: 0;
+}
+
+.auth-form .alert-success {
+  background-color: rgba(34, 197, 94, 0.1);
+  color: #4ade80;
+  border-left: 3px solid #22c55e;
+}
+
+.auth-form .alert-error {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #fca5a5;
+  border-left: 3px solid #ef4444;
+}
+
+/* ===== UTILS ===== */
+.auth-form .text-center {
+  text-align: center;
+}
+
+.auth-form .text-right {
+  text-align: right;
+}
+
+.auth-form .mt-sm {
+  margin-top: 0.5rem;
+}
+
+.auth-form .mt-md {
+  margin-top: 1rem;
+}
+
+.auth-form .mt-lg {
+  margin-top: 1.5rem;
+}
+
+.auth-form .mb-sm {
+  margin-bottom: 0.5rem;
+}
+
+.auth-form .mb-md {
+  margin-bottom: 1rem;
+}
+
+.auth-form .mb-lg {
+  margin-bottom: 1.5rem;
+}
+
+.auth-form .link-enhanced {
+  color: var(--primary-400, #38bdf8);
+  text-decoration: none;
+  font-size: 0.875rem;
+  transition: color 0.2s ease;
+}
+
+.auth-form .link-enhanced:hover {
+  color: var(--primary-300, #7dd3fc);
+  text-decoration: underline;
+}
+
+/* Estilos para links de alternativa (Cadastro/Login) */
+.auth-form .auth-alt-link {
+  margin-top: 2rem;
+  text-align: center;
+  font-size: 0.95rem;
+}
+
+.auth-form .auth-alt-link p {
+  color: rgba(148, 163, 184, 0.8);
+  margin-bottom: 0.75rem;
+}
+
+/* ===== RESPONSIVIDADE ===== */
+@media (max-width: 480px) {
+  .auth-form {
+    padding: 2rem 1.5rem;
+  }
+  
+  .auth-form h2 {
+    font-size: 1.5rem;
+  }
+  
+  .auth-form .btn-primary,
+  .auth-form .btn-outline {
+    font-size: 0.95rem;
+    height: 3rem;
+  }
+}
+
+/* ===== ANIMAu00c7u00d5ES ===== */
+.auth-container .slide-up {
+  animation: slide-up 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slide-up {
+  from {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.auth-container .fade-in {
+  animation: fade-in 0.5s ease;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

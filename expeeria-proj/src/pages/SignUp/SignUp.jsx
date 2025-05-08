@@ -118,99 +118,116 @@ export function SignUp() {
   };
 
   return (
-    <div className={styles.signupContainer}>
-      <form onSubmit={handleSubmit} className={styles.authForm}>
-        <h2>Criar Conta</h2>
-        
-        <div className={styles.formGroup}>
-          <label htmlFor="fullName">Nome Completo</label>
-          <input
-            id="fullName"
-            name="fullName"
-            type="text"
-            value={formData.fullName}
-            onChange={handleChange}
-            required
+    <div className={`${styles.signupContainer} auth-container slide-up fade-in`}>
+      <div className="auth-card">
+        <form onSubmit={handleSubmit} className={`${styles.authForm} form-enhanced`}>
+          <h2 className="text-center mb-lg">Crie sua conta</h2>
+          <p className="text-center text-secondary mb-lg">Faça parte da comunidade Expeeria</p>
+          
+          <div className={`${styles.formGroup} form-group floating-label`}>
+            <input
+              id="fullName"
+              name="fullName"
+              type="text"
+              className="input-enhanced"
+              placeholder=" "
+              value={formData.fullName}
+              onChange={handleChange}
+              required
+              disabled={loading}
+            />
+            <label htmlFor="fullName">Nome Completo</label>
+          </div>
+          
+          <div className={`${styles.formGroup} form-group floating-label`}>
+            <input
+              id="username"
+              name="username"
+              type="text"
+              className="input-enhanced"
+              placeholder=" "
+              value={formData.username}
+              onChange={handleChange}
+              required
+              disabled={loading}
+            />
+            <label htmlFor="username">Nome de Usuário</label>
+            <small className="form-hint">Seu identificador único na plataforma</small>
+          </div>
+          
+          <div className={`${styles.formGroup} form-group floating-label`}>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              className="input-enhanced"
+              placeholder=" "
+              value={formData.email}
+              onChange={handleChange}
+              required
+              disabled={loading}
+              title="Digite um e-mail válido como exemplo@dominio.com ou nome@etec.sp.gov.br"
+            />
+            <label htmlFor="email">E-mail</label>
+          </div>
+          
+          <div className={`${styles.formGroup} form-group floating-label`}>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              className="input-enhanced"
+              placeholder=" "
+              value={formData.password}
+              onChange={handleChange}
+              required
+              minLength={6}
+              disabled={loading}
+            />
+            <label htmlFor="password">Senha</label>
+            <small className="form-hint">Mínimo de 6 caracteres</small>
+          </div>
+          
+          <div className={`${styles.formGroup} form-group floating-label`}>
+            <input
+              id="confirmPassword"
+              name="confirmPassword"
+              type="password"
+              className="input-enhanced"
+              placeholder=" "
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              required
+              disabled={loading}
+            />
+            <label htmlFor="confirmPassword">Confirmar Senha</label>
+          </div>
+          
+          <button 
+            type="submit" 
+            className="btn btn-primary btn-block btn-lg ripple-effect mt-lg"
             disabled={loading}
-          />
-        </div>
-        
-        <div className={styles.formGroup}>
-          <label htmlFor="username">Nome de Usuário</label>
-          <input
-            id="username"
-            name="username"
-            type="text"
-            value={formData.username}
-            onChange={handleChange}
-            required
-            disabled={loading}
-            placeholder="Seu identificador único"
-          />
-        </div>
-        
-        <div className={styles.formGroup}>
-          <label htmlFor="email">E-mail</label>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            value={formData.email}
-            onChange={handleChange}
-            required
-            disabled={loading}
-            placeholder="exemplo@dominio.com"
-            pattern="[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*"
-            title="Digite um e-mail válido como exemplo@dominio.com ou nome@etec.sp.gov.br"
-          />
-        </div>
-        
-        <div className={styles.formGroup}>
-          <label htmlFor="password">Senha</label>
-          <input
-            id="password"
-            name="password"
-            type="password"
-            value={formData.password}
-            onChange={handleChange}
-            required
-            minLength={6}
-            disabled={loading}
-            placeholder="Mínimo 6 caracteres"
-          />
-        </div>
-        
-        <div className={styles.formGroup}>
-          <label htmlFor="confirmPassword">Confirmar Senha</label>
-          <input
-            id="confirmPassword"
-            name="confirmPassword"
-            type="password"
-            value={formData.confirmPassword}
-            onChange={handleChange}
-            required
-            disabled={loading}
-          />
-        </div>
-        
-        <button 
-          type="submit" 
-          className={styles.signupButton}
-          disabled={loading}
-        >
-          {loading ? <LoadingSpinner size="sm" /> : "Cadastrar"}
-        </button>
-        
-        {(error || authError) && (
-          <p className={styles.errorMessage}>
-            {error || authError}
-          </p>
-        )}
-        
-        <div className={styles.loginLink}>
-          Já tem uma conta? <Link to="/login">Entrar</Link>
-        </div>
-      </form>
+          >
+            {loading ? <LoadingSpinner size="sm" /> : "Criar minha conta"}
+          </button>
+          
+          {(error || authError) && (
+            <div className="alert alert-error mt-md">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+              {error || authError}
+            </div>
+          )}
+          
+          <div className={`${styles.loginLink} text-center mt-lg`}>
+            <p>Já tem uma conta?</p>
+            <Link to="/login" className="btn btn-outline mt-sm ripple-effect">Fazer login</Link>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

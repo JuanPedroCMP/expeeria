@@ -1,78 +1,168 @@
-/* Estilo atualizado para recriar o menu inspirado no GitHub */
+/* Menu recolhível redesenhado - mais moderno e elegante */
 .menuRecolhivel {
   position: relative;
+  margin-right: 8px;
 }
 
 .dropdownButton {
-  background-color: #0936962a;
-  color: var(--brancoSuave);
-  padding: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  color: var(--text-primary, #f8fafc);
+  width: 38px;
+  height: 38px;
   border: none;
+  border-radius: 50%;
   cursor: pointer;
-  border-radius: 3px;
-  font-size: 1rem;
-  z-index: 1001; /* Mantém o botão acima do conteúdo até o menu abrir */
+  font-size: 1.25rem;
+  z-index: 1001;
+  transition: all 0.2s ease;
 }
 
-/* Corrigi o estilo para garantir que o blur funcione corretamente */
+.dropdownButton:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  transform: scale(1.05);
+}
+
+.dropdownButton:active {
+  transform: scale(0.95);
+}
+
+/* Menu lateral com design moderno */
 .menu {
   position: fixed;
   top: 0;
   left: 0;
-  width: 300px;
+  width: 320px;
   height: 100vh;
-  background-color: var(--cinzaEscuro); /* Fundo cinza com transparência */
-  backdrop-filter: blur(10px); /* Efeito de desfoque */
-  -webkit-backdrop-filter: blur(10px); /* Suporte para navegadores baseados em WebKit */
-  border-right: 1px solid var(--cinzaAzulado);
-  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+  background-color: var(--background-card, #1e293b);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-right: 1px solid rgba(148, 163, 184, 0.1);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.25);
   z-index: 1000;
   display: flex;
   flex-direction: column;
   transform: translateX(-100%);
-  transition: transform 0.4s ease-in-out; 
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow-y: auto;
 }
 
 .menu.open {
-  transform: translateX(0); 
+  transform: translateX(0);
 }
 
 .menuHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px;
-  background-color: var(--azulEletrico);
-  color: var(--brancoSuave);
-  font-weight: bold;
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.menuHeader h4 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--primary-400, #38bdf8);
+  margin: 0;
+  letter-spacing: -0.02em;
 }
 
 .closeButton {
-  background: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(239, 68, 68, 0.1);
+  color: rgba(239, 68, 68, 0.8);
   border: none;
-  color: #8a0b0b;
-  font-size: 1.2rem;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  font-size: 1rem;
   cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.closeButton:hover {
+  background: rgba(239, 68, 68, 0.2);
+  color: rgba(239, 68, 68, 1);
 }
 
 .menuLink {
-  display: block;
-  padding: 10px 15px;
-  color: var(--brancoSuave);
+  display: flex;
+  align-items: center;
+  padding: 14px 20px;
+  color: var(--text-primary, #f1f5f9);
   text-decoration: none;
-  font-family: var(--fonte-subtitulos);
+  font-weight: 500;
+  font-size: 1rem;
+  border-radius: 6px;
+  margin: 4px 8px;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.menuLink::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 4px;
+  background: var(--primary-500, #0ea5e9);
+  transform: scaleY(0);
+  transition: transform 0.2s ease;
+  transform-origin: bottom;
+  opacity: 0;
 }
 
 .menuLink:hover {
-  background-color: var(--azulEletrico);
-  color: var(--preto);
+  background-color: rgba(56, 189, 248, 0.1);
+  color: var(--text-primary, #f1f5f9);
+}
+
+.menuLink:hover::before {
+  transform: scaleY(1);
+  opacity: 1;
+}
+
+.menuLink:active {
+  background-color: rgba(56, 189, 248, 0.2);
+}
+
+/* Efeito ripple nos links */
+.menuLink span {
+  position: relative;
+  z-index: 1;
+}
+
+/* Separações de categorias no menu */
+.menuCategory {
+  padding: 8px 20px;
+  margin-top: 16px;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary, #94a3b8);
+  font-weight: 600;
 }
 
 .menuOverlay {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.35);
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   z-index: 999;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: all 0.3s ease;
+  opacity: 0;
+  animation: fadeIn 0.3s ease forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }

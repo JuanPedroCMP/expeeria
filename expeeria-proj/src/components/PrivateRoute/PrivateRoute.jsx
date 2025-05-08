@@ -9,13 +9,14 @@ export function PrivateRoute({ children }) {
   // Mostra spinner de carregamento enquanto verifica a sessão
   if (loading || !sessionChecked) {
     return (
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center',
-        height: '100vh'
-      }}>
-        <LoadingSpinner />
+      <div className="auth-container fade-in">
+        <div className="auth-card" style={{ maxWidth: '400px', textAlign: 'center', padding: '2rem' }}>
+          <h3 className="mb-lg">Verificando autenticação...</h3>
+          <div className="flex justify-center mb-lg">
+            <LoadingSpinner size="lg" />
+          </div>
+          <p className="text-secondary">Aguarde enquanto verificamos sua sessão.</p>
+        </div>
       </div>
     );
   }

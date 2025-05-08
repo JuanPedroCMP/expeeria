@@ -8,6 +8,32 @@
 
 ## 1. Variáveis de Ambiente
 
+### Configuração do Projeto
+
+Copie o arquivo `.env.example` para criar um novo arquivo `.env.local` na raiz do projeto:
+
+```bash
+cp .env.example .env.local
+```
+
+Edite o arquivo `.env.local` com suas configurações:
+
+```env
+# Configurações do Supabase
+VITE_SUPABASE_URL=https://seu-projeto.supabase.co
+VITE_SUPABASE_ANON_KEY=sua-chave-anon-key
+
+# Configurações do Cloudinary
+VITE_CLOUDINARY_CLOUD_NAME=seu-cloud-name
+VITE_CLOUDINARY_API_KEY=sua-api-key
+VITE_CLOUDINARY_API_SECRET=seu-api-secret
+
+# Configurações de API (opcional, se usar um backend separado)
+VITE_API_URL=http://localhost:5000
+```
+
+> **IMPORTANTE**: Nunca suba arquivos de ambiente para o repositório.
+
 - **tokens.env**: Armazene segredos e tokens (ex: Cloudinary, APIs externas).
   
   Exemplo:

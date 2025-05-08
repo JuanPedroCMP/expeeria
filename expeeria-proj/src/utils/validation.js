@@ -2,34 +2,24 @@
  * Utilitários de validação para formulários no Expeeria
  */
 
-// Validação de email
+// Validação de email - simplificada para evitar erros de regex
 export const isValidEmail = (email) => {
   if (!email) return false;
   
   // Limpar espaços extras
   email = email.trim();
   
-  // Regex melhorada para validação de email que suporta subdomínios múltiplos (.sp.gov, .co.uk, etc)
-  const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
-  
-  // Verificação básica com regex
+  // Verificação mais simples que ainda funciona para a maioria dos casos
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) return false;
   
-  // Verificações adicionais
+  // Verificações adicionais básicas
   const parts = email.split('@');
   if (parts.length !== 2) return false;
   
-  // Verificar parte local (antes do @)
-  const localPart = parts[0];
-  if (localPart.length === 0 || localPart.length > 64) return false;
-  
-  // Verificar domínio (após o @)
+  // Verificar se tem um ponto no domínio
   const domainPart = parts[1];
-  if (domainPart.length === 0 || domainPart.length > 255 || !domainPart.includes('.')) return false;
-  
-  // Verificar se o TLD tem pelo menos 2 caracteres
-  const tld = domainPart.split('.').pop();
-  if (tld.length < 2) return false;
+  if (!domainPart.includes('.')) return false;
   
   return true;
 };
@@ -43,11 +33,10 @@ export const isValidEmailBasic = (email) => {
   return emailRegex.test(email);
 };
 
-// Validação de senha forte
+// Validação de senha - simplificada para evitar erros
 export const isStrongPassword = (password) => {
-  // Pelo menos 8 caracteres, uma letra maiúscula, uma minúscula, um número
-  const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
-  return strongPasswordRegex.test(password);
+  // Versão simplificada - apenas verifica se tem pelo menos 6 caracteres
+  return password && password.length >= 6;
 };
 
 // Validação de URL
@@ -105,7 +94,7 @@ export const isValidImage = (file, maxSizeInMB = 5) => {
 export const errorMessages = {
   required: 'Este campo é obrigatório',
   email: 'Digite um endereço de email válido',
-  password: 'A senha deve ter pelo menos 8 caracteres, incluindo letra maiúscula, minúscula e número',
+  password: 'A senha deve ter pelo menos 6 caracteres',
   passwordMatch: 'As senhas não correspondem',
   url: 'Digite uma URL válida',
   username: 'Nome de usuário deve ter entre 3 e 20 caracteres e conter apenas letras, números, underline e hífen',

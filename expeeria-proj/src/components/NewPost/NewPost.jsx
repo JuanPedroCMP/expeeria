@@ -9,6 +9,9 @@ import { useAuth } from "../../hooks/useAuth";
 import { UploadImage } from "../UploadImage/UploadImage";
 import { useNotification } from "../../hooks/useNotification";
 
+// Import de funções de log para debugging
+const DEBUG = true; // Ative para modo de desenvolvimento, desative para produção
+
 export const NewPost = ({
   modoEdicao = false,
   postOriginal = null,
@@ -48,6 +51,14 @@ export const NewPost = ({
 
     if (!title || !caption || !content || !user?.id || !area.length) {
       setError("Preencha todos os campos obrigatórios.");
+      setLoading(false);
+      return;
+    }
+    
+    // Verificar se a função createPost está disponível
+    if (!createPost && DEBUG) {
+      console.error("Erro: função createPost não está disponível no hook usePost");
+      setError("Erro interno: função de criação não está disponível. Contate o suporte.");
       setLoading(false);
       return;
     }

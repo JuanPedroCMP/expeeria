@@ -40,64 +40,78 @@ export function Login() {
   };
 
   return (
-    <div className={styles.loginContainer}>
-      <form onSubmit={handleSubmit} className={styles.authForm}>
-        <h2>Entrar</h2>
-        
-        {successMessage && (
-          <p className={styles.successMessage}>
-            {successMessage}
-          </p>
-        )}
-        
-        <div className={styles.formGroup}>
-          <label htmlFor="email">E-mail</label>
-          <input
-            id="email"
-            type="email"
-            placeholder="Seu e-mail"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
+    <div className={`${styles.loginContainer} auth-container slide-up fade-in`}>
+      <div className="auth-card">
+        <form onSubmit={handleSubmit} className={`${styles.authForm} form-enhanced`}>
+          <h2 className="text-center mb-lg">Boas-vindas à Expeeria</h2>
+          
+          {successMessage && (
+            <div className="alert alert-success mb-md">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+              </svg>
+              {successMessage}
+            </div>
+          )}
+          
+          <div className={`${styles.formGroup} form-group floating-label`}>
+            <input
+              id="email"
+              type="email"
+              className="input-enhanced"
+              placeholder=" "
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              disabled={loading}
+            />
+            <label htmlFor="email">E-mail</label>
+          </div>
+          
+          <div className={`${styles.formGroup} form-group floating-label`}>
+            <input
+              id="password"
+              type="password"
+              className="input-enhanced"
+              placeholder=" "
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              disabled={loading}
+            />
+            <label htmlFor="password">Senha</label>
+          </div>
+          
+          <div className={`${styles.forgotPassword} text-right mb-md`}>
+            <Link to="/recuperar-senha" className="link-enhanced">Esqueceu sua senha?</Link>
+          </div>
+          
+          <button 
+            type="submit" 
+            className="btn btn-primary btn-block btn-lg ripple-effect"
             disabled={loading}
-          />
-        </div>
-        
-        <div className={styles.formGroup}>
-          <label htmlFor="password">Senha</label>
-          <input
-            id="password"
-            type="password"
-            placeholder="Sua senha"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            disabled={loading}
-          />
-        </div>
-        
-        <div className={styles.forgotPassword}>
-          <Link to="/recuperar-senha">Esqueceu sua senha?</Link>
-        </div>
-        
-        <button 
-          type="submit" 
-          className={styles.loginButton}
-          disabled={loading}
-        >
-          {loading ? <LoadingSpinner size="sm" /> : "Entrar"}
-        </button>
-        
-        {(error || authError) && (
-          <p className={styles.errorMessage}>
-            {error || authError}
-          </p>
-        )}
-        
-        <div className={styles.registerLink}>
-          Não tem conta ainda? <Link to="/signup">Cadastre-se</Link>
-        </div>
-      </form>
+          >
+            {loading ? <LoadingSpinner size="sm" /> : "Entrar"}
+          </button>
+          
+          {(error || authError) && (
+            <div className="alert alert-error mt-md">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+              {error || authError}
+            </div>
+          )}
+          
+          <div className={`${styles.registerLink} text-center mt-lg`}>
+            <p>Não tem conta ainda?</p>
+            <Link to="/signup" className="btn btn-outline mt-sm ripple-effect">Criar conta</Link>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

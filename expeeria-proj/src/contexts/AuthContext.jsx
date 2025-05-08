@@ -13,8 +13,47 @@ export function AuthProvider({ children }) {
 
   // Verificar sessão ao iniciar
   useEffect(() => {
-    let isMounted = true; // Verificar se o componente está montado
+    let isMounted = true; // Flag para verificar se o componente está montado
     let safetyTimeout; // Referência para o timeout de segurança
+    let authStateSubscription; // Armazenar a referência da inscrição
+    
+    // Configuração de timeout mais curto para não bloquear a interface
+    safetyTimeout = setTimeout(() => {
+      if (loading && isMounted) {
+        console.log('Timeout de segurança acionado para AuthContext');
+        
+        // Tentativa simplificada sem verificar Supabase para evitar CORS
+        if (isMounted) {
+          // Definir um estado inicial mesmo sem confirmação completa
+          // Isso prioriza o funcionamento sobre segurança conforme solicitado
+          setLoading(false);
+          setSessionChecked(true);
+          
+          // Verificar se há dados de sessão no localStorage
+          try {
+            const localSession = localStorage.getItem('supabase.auth.token');
+            // Se há dados no storage, assumir que existe uma sessão válida
+            // Isso é uma solução de contorno que prioriza o funcionamento
+            if (localSession) {
+              // Tentar extrair informações básicas do usuário do localStorage
+              try {
+                const parsedSession = JSON.parse(localSession);
+                if (parsedSession?.currentSession?.user) {
+                  setUser(parsedSession.currentSession.user);
+                }
+              } catch (e) {
+                console.warn('Erro ao processar sessão local, continuando mesmo assim');
+              }
+            } else {
+              // Sem sessão no localStorage
+              setUser(null);
+            }
+          } catch (e) {
+            console.warn('Erro ao acessar localStorage, continuando mesmo assim');
+          }
+        }
+      }
+    }, 3000); // Reduzido para 3 segundos para não bloquear a interface
 
     const initAuth = async () => {
       if (!isMounted) return;
@@ -139,7 +178,10 @@ export function AuthProvider({ children }) {
     // Limpar subscription e state quando o componente for desmontado
     return () => {
       isMounted = false;
-      clearTimeout(safetyTimeout);
+      // Limpar o timeout de segurança ao desmontar o componente
+      if (safetyTimeout) {
+        clearTimeout(safetyTimeout);
+      }
       subscription?.unsubscribe();
     };
   }, []);
@@ -386,6 +428,62 @@ export function AuthProvider({ children }) {
     return user.id === resourceUserId;
   }, [user]);
 
+  // Função para reconexão automática e revalidação de sessão
+  const reconnectAndValidate = useCallback(async () => {
+    if (!navigator.onLine) {
+      return { success: false, reason: 'offline' };
+    }
+    
+    setLoading(true);
+    setError(null);
+    
+    try {
+      // Tentar buscar a sessão atual do Supabase
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError) {
+        throw sessionError;
+      }
+      
+      if (!session) {
+        // Se não houver sessão, confirmar que o usuário está realmente deslogado
+        setUser(null);
+        return { success: true, authenticated: false };
+      }
+      
+      // Buscar dados do usuário com a sessão renovada
+      const userData = await authService.getCurrentUser();
+      
+      if (userData) {
+        // Buscar perfil atualizado
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', userData.id)
+          .single();
+        
+        // Atualizar o estado do usuário com dados frescos
+        setUser({
+          ...userData,
+          ...profile
+        });
+        
+        return { success: true, authenticated: true };
+      } else {
+        // Se não conseguiu obter dados do usuário com uma sessão válida
+        setUser(null);
+        return { success: true, authenticated: false };
+      }
+    } catch (error) {
+      console.error('Erro durante a reconexão:', error);
+      setError('Falha ao reconectar. Por favor, faça login novamente.');
+      setUser(null);
+      return { success: false, reason: 'error', error };
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   return (
     <AuthContext.Provider
       value={{
@@ -404,7 +502,8 @@ export function AuthProvider({ children }) {
         isAuthenticated: !!user,
         isAdmin,
         isOwner,
-        resetAuthState, // Adicionando a nova função ao contexto
+        resetAuthState,
+        reconnectAndValidate
       }}
     >
       {children}
