@@ -98,16 +98,26 @@ export const authService = {
       }
 
       try {
-        // Criar o perfil do usuário
+        // Criar o perfil do usuário na tabela users
         const { error: profileError } = await supabase
-          .from('profiles')
+          .from('users')
           .insert({
             id: authData.user.id,
+            email,
+            password: '#hash_gerenciado_pelo_supabase_auth',  // O Supabase Auth gerencia as senhas
             username,
-            full_name: fullName,
-            avatar_url: null,
+            name: fullName,
             bio: '',
+            avatar: null,
             created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            role: 'user',
+            status: 'active',
+            metadata: JSON.stringify({
+              lastLogin: new Date().toISOString(),
+              loginCount: 1,
+              preferences: {}
+            })
           });
 
         if (profileError) {

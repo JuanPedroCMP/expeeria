@@ -45,8 +45,8 @@ export function PostProvider({ children }) {
     try {
       // Buscar IDs de usuários que o usuário atual segue
       const { data: followingData } = await supabase
-        .from('follows')
-        .select('following_id')
+        .from('user_followers')
+        .select('user_id')
         .eq('follower_id', user.id);
       
       if (!followingData || followingData.length === 0) {
@@ -54,12 +54,12 @@ export function PostProvider({ children }) {
         return [];
       }
       
-      const followingIds = followingData.map(item => item.following_id);
+      const followingIds = followingData.map(item => item.user_id);
       
       // Buscar posts dos usuários seguidos
       const { data, error: postsError } = await supabase
         .from('posts')
-        .select('*, author:profiles(*)')
+        .select('*, users!author_id(*)')
         .in('author_id', followingIds)
         .order('created_at', { ascending: false })
         .range((page - 1) * limit, page * limit - 1);
@@ -276,7 +276,7 @@ export function PostProvider({ children }) {
     try {
       // Verificar se o usuário já curtiu o post
       const { data: existingLike } = await supabase
-        .from('likes')
+        .from('post_likes')
         .select()
         .match({ post_id: postId, user_id: user.id })
         .single();
@@ -287,7 +287,7 @@ export function PostProvider({ children }) {
       
       // Registrar curtida
       const { error: likeError } = await supabase
-        .from('likes')
+        .from('post_likes')
         .insert({ 
           post_id: postId, 
           user_id: user.id,
@@ -296,10 +296,8 @@ export function PostProvider({ children }) {
       
       if (likeError) throw likeError;
       
-      // Incrementar contador de curtidas no post
-      const { error: updateError } = await supabase.rpc('increment_likes', { post_id_param: postId });
-      
-      if (updateError) throw updateError;
+      // Nota: Não precisamos atualizar o contador manualmente
+      // O trigger update_post_like_count criado no SQL faz isso automaticamente
       
       // Atualizar os arrays locais para refletir o like
       const updateArrayWithLike = (array) => 
@@ -341,16 +339,14 @@ export function PostProvider({ children }) {
     try {
       // Remover curtida
       const { error: unlikeError } = await supabase
-        .from('likes')
+        .from('post_likes')
         .delete()
         .match({ post_id: postId, user_id: user.id });
       
       if (unlikeError) throw unlikeError;
       
-      // Decrementar contador de curtidas no post
-      const { error: updateError } = await supabase.rpc('decrement_likes', { post_id_param: postId });
-      
-      if (updateError) throw updateError;
+      // Nota: Nu00e3o precisamos atualizar o contador manualmente
+      // O trigger update_post_like_count criado no SQL faz isso automaticamente
       
       // Atualizar os arrays locais para refletir o unlike
       const updateArrayWithUnlike = (array) => 
@@ -391,7 +387,7 @@ export function PostProvider({ children }) {
     
     try {
       const { data, error } = await supabase
-        .from('likes')
+        .from('post_likes')
         .select()
         .match({ post_id: postId, user_id: user.id })
         .single();

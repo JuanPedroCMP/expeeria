@@ -1,9 +1,49 @@
 // Script para testar conexão com o Supabase (usando CommonJS para evitar problemas com Node.js)
 const { createClient } = require('@supabase/supabase-js');
+const fs = require('fs');
+const path = require('path');
+const dotenv = require('dotenv');
 
-// Credenciais do Supabase diretamente no script (apenas para teste)
-const supabaseUrl = 'https://bqjsyidyxnhungvniyij.supabase.co';
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJxanN5aWR5eG5odW5ndm5peWlqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY2MzI5MDcsImV4cCI6MjA2MjIwODkwN30.dU4qcCV1D7zEI26Sxi2Hu8PKdJADpxf3l-tlXrqrWLw';
+// Carrega variáveis de ambiente do arquivo .env.local se existir
+let supabaseUrl, supabaseAnonKey;
+
+// Tenta carregar variáveis de ambiente de diferentes locais
+const envFiles = ['.env.local', '.env'];
+let envLoaded = false;
+
+for (const file of envFiles) {
+  const envPath = path.resolve(process.cwd(), file);
+  if (fs.existsSync(envPath)) {
+    console.log(`Carregando variáveis de ambiente de ${file}`);
+    const envConfig = dotenv.parse(fs.readFileSync(envPath));
+    
+    // Primeiro tenta encontrar variáveis VITE_ (para compatibilidade com Vite)
+    supabaseUrl = envConfig.VITE_SUPABASE_URL;
+    supabaseAnonKey = envConfig.VITE_SUPABASE_ANON_KEY;
+    
+    // Se não encontrar, tenta sem o prefixo VITE_
+    if (!supabaseUrl) supabaseUrl = envConfig.SUPABASE_URL;
+    if (!supabaseAnonKey) supabaseAnonKey = envConfig.SUPABASE_ANON_KEY;
+    
+    if (supabaseUrl && supabaseAnonKey) {
+      envLoaded = true;
+      break;
+    }
+  }
+}
+
+// Se não conseguir carregar do arquivo .env, usa valores padrão apenas para teste
+if (!envLoaded) {
+  console.log('\n\x1b[33mVariáveis de ambiente não encontradas! Usando valores padrão.\x1b[0m');
+  console.log('Para configurar corretamente, crie um arquivo .env.local com:');
+  console.log('VITE_SUPABASE_URL=sua_url_supabase');
+  console.log('VITE_SUPABASE_ANON_KEY=sua_chave_anon\n');
+  
+  // Solicite ao usuário inserir as credenciais
+  console.log('\x1b[36mPor favor insira suas credenciais do Supabase:');
+  supabaseUrl = process.env.SUPABASE_URL || process.argv[2] || '';
+  supabaseAnonKey = process.env.SUPABASE_ANON_KEY || process.argv[3] || '';
+}
 
 // Função principal para testar conexão
 async function testarConexaoSupabase() {
@@ -14,9 +54,9 @@ async function testarConexaoSupabase() {
   const supabase = createClient(supabaseUrl, supabaseAnonKey);
   
   try {
-    // Testar a conexão tentando acessar algumas tabelas
+    // Testar a conexão tentando acessar as tabelas do novo esquema
     console.log('\n--- Testando tabelas ---');
-    const tabelas = ['profiles', 'posts', 'comments', 'likes', 'followers'];
+    const tabelas = ['users', 'posts', 'comments', 'user_interests', 'user_followers', 'post_categories', 'post_tags', 'post_likes', 'comment_likes', 'notifications'];
     
     let algumaTabelaExiste = false;
     

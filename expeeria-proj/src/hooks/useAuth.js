@@ -83,8 +83,16 @@ export const useAuth = () => {
   const getDisplayName = useCallback(() => {
     if (!user) return '';
     
+    // Verifica se há dados do perfil extra
+    if (user.profile) {
+      return user.profile.name || user.profile.username || (user.email?.split('@')[0] || 'Usuário');
+    }
+    
+    // Fallback para metadata do Supabase Auth ou dados do usuário
     return user.user_metadata?.full_name || 
            user.user_metadata?.username || 
+           user.name || 
+           user.username || 
            user.email?.split('@')[0] || 
            'Usuário';
   }, [user]);

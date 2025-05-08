@@ -69,7 +69,7 @@ export function AuthProvider({ children }) {
           if (userData && isMounted) {
             // Buscar perfil do usuário para dados adicionais
             const { data: profile } = await supabase
-              .from('profiles')
+              .from('users')
               .select('*')
               .eq('id', userData.id)
               .single();
@@ -116,7 +116,7 @@ export function AuthProvider({ children }) {
             if (userData && isMounted) {
               // Buscar perfil do usuário
               const { data: profile } = await supabase
-                .from('profiles')
+                .from('users')
                 .select('*')
                 .eq('id', userData.id)
                 .single();
@@ -209,7 +209,7 @@ export function AuthProvider({ children }) {
       // Buscar perfil do usuário
       if (data.user) {
         const { data: profile } = await supabase
-          .from('profiles')
+          .from('users')
           .select('*')
           .eq('id', data.user.id)
           .single();
@@ -280,7 +280,7 @@ export function AuthProvider({ children }) {
     try {
       // Atualizar apenas os dados do perfil
       const { data: updatedProfile, error: profileError } = await supabase
-        .from('profiles')
+        .from('users')
         .update(profileData)
         .eq('id', user.id)
         .select()
@@ -334,10 +334,10 @@ export function AuthProvider({ children }) {
     try {
       // Atualizar a relação de seguidor
       const { error } = await supabase
-        .from('follows')
+        .from('user_followers')
         .insert({
-          follower_id: user.id,
-          following_id: userId,
+          user_id: userId,  // O usuário que está sendo seguido
+          follower_id: user.id,  // O usuário que está seguindo
           created_at: new Date().toISOString()
         });
       
@@ -367,11 +367,11 @@ export function AuthProvider({ children }) {
     try {
       // Remover a relação de seguidor
       const { error } = await supabase
-        .from('follows')
+        .from('user_followers')
         .delete()
         .match({
-          follower_id: user.id,
-          following_id: userId
+          user_id: userId,  // O usuário que estava sendo seguido
+          follower_id: user.id  // O usuário que estava seguindo
         });
       
       if (error) throw error;
@@ -399,11 +399,11 @@ export function AuthProvider({ children }) {
     
     try {
       const { data, error } = await supabase
-        .from('follows')
+        .from('user_followers')
         .select()
         .match({
-          follower_id: user.id,
-          following_id: userId
+          user_id: userId,
+          follower_id: user.id
         })
         .single();
       
