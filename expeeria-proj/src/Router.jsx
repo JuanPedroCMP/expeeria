@@ -9,10 +9,12 @@ import { SignUp } from "./pages/SignUp/SignUp";
 import { PrivateRoute } from "./components/PrivateRoute";
 import { Profile } from "./pages/Profile/Profile";
 import { Explore } from "./pages/Explore/Explore";
+import { Presentation } from "./pages/Presentation/Presentation";
 
 const Router = () => {
   return (
     <Routes>
+      <Route path="/apresentacao" element={<Presentation />} />
       <Route path="/" element={<LayoutPadrao />}>
         <Route index element={<Inicial />} />
         <Route path="/explorar" element={<Explore />} />

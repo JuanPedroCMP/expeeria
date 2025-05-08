@@ -1,33 +1,41 @@
-# Expeeria – Conectando pessoas através do conhecimento
+# Expeeria – Plataforma Educacional Colaborativa
 
 <div align="center">
+  <img src="https://i.ibb.co/vDmDnXk/expeeria-logo.png" alt="Expeeria Logo" width="300px" />
   
   ### 🌟 Compartilhe experiências. Aprenda. Conecte-se.
   
   [![Acesse o site](https://img.shields.io/badge/Expeeria-Acessar%20Site-0575e6?style=for-the-badge)](https://expeeria.vercel.app)
-  [![Status](https://img.shields.io/badge/Status-Beta-orange?style=for-the-badge)](https://expeeria.vercel.app)
+  [![Status](https://img.shields.io/badge/Status-Em%20Desenvolvimento-orange?style=for-the-badge)](https://expeeria.vercel.app)
 </div>
 
-## 🌐 Acesse o site online
+## ⚠️ AVISO IMPORTANTE ⚠️
 
-👉 **Acesse agora:** [https://expeeria.vercel.app](https://expeeria.vercel.app)
+**Atualmente existe um problema de conexão com o banco de dados Supabase** que não foi possível resolver a tempo. Por essa razão:  
 
-### ⚠️ IMPORTANTE ⚠️
+- **O sistema de usuários não está funcionando** (registro, login, perfis)  
+- **A criação e visualização de posts está comprometida**  
+- **A página de apresentação** (/presentation) **está funcionando com dados de exemplo** incorporados diretamente no componente  
 
-  ⚠️  **O sistema de usuário (visualizar perfil, etc.) pode não funcionar corretamente pois ainda não está utilizando um banco de dados permanente, isso será corrigido.**
-=======
-  ⚠️  **O sitema de usuario (editar perfil, visualizar perfil, etc.) pode não funcionar corretamente pois ainda não está utilizando um banco de dados, isso será corrigido.**
->>>>>>> 56591ee15f601b35fdd781c14ffc843ad06f54a3
+A interface e navegação entre páginas estão disponíveis para demonstração do design e layout do projeto.
 
-  ⚠️  **Pode demorar até um minuto para carregar o site pela primeira vez, devido ao modo de suspensão automática do Render**
+## 🌐 Acesse a Demonstração
 
-  Caso o sistema de usuário não esteja funcionando, para poder testar a plataforma, tente criar uma conta primeiro. Se não for possível, utilize uma conta de demonstração:
+👉 **Acesse agora:** [https://expeeria.vercel.app/presentation](https://expeeria.vercel.app/presentation)
 
-  ```
-  📧 Email: "carol@eco.com"
-  🔑 Senha: "carol123"
-  👤 Nome: "Carol Verde"
-  ```
+> Recomendamos acessar diretamente a página de apresentação (/presentation) que foi especialmente preparada para funcionar sem dependência do banco de dados.
+
+## 🔍 Página de Apresentação
+
+A página de apresentação (/presentation) foi desenvolvida como uma solução para os problemas de conexão com o banco de dados. Ela apresenta:
+
+- **Posts de exemplo incorporados** diretamente no componente React
+- **Design completo e moderno** com animações e gradientes
+- **Interface responsiva** adaptada para todos os tamanhos de tela
+- **Cards de conteúdo** exibindo posts educacionais em várias categorias
+- **Seções informativas** sobre o projeto e seus objetivos
+
+As informações exibidas nesta página foram estruturadas para demonstrar a proposta do Expeeria, mesmo sem a funcionalidade completa do banco de dados.
 
 ---
 
@@ -37,14 +45,14 @@
 2. [Funcionalidades](#2-funcionalidades)
 3. [Tecnologias Utilizadas](#3-tecnologias-utilizadas)
 4. [Como Rodar o Projeto](#4-como-rodar-o-projeto)
-5. [Estrutura de Pastas](#5-estrutura-de-pastas)
-6. [Principais Componentes e Páginas](#6-principais-componentes-e-páginas)
-7. [Fluxo de Usuário](#7-fluxo-de-usuário)
-8. [Permissões e Papéis](#8-permissões-e-papéis)
-9. [Padrões de Código e Boas Práticas](#9-padrões-de-código-e-boas-práticas)
+5. [Principais Componentes e Páginas](#6-principais-componentes-e-páginas)
+6. [Fluxo de Usuário](#7-fluxo-de-usuário)
+7. [Permissões e Papéis](#8-permissões-e-papéis)
+8. [Soluções Técnicas Implementadas](#9-soluções-técnicas-implementadas)
+9. [Padrões de Código e Boas Práticas](#10-padrões-de-código-e-boas-práticas)
 10. [Integrantes do Grupo](#10-integrantes-do-grupo)
 11. [Planos Futuros](#11-planos-futuros)
-11. [Ideia da startup](#12-sobre-a-ideia-da-startup)
+12. [Ideia da Startup](#12-sobre-a-ideia-da-startup)
 
 ---
 
@@ -131,52 +139,6 @@ npm run dev
 
 ---
 
-## 5. Estrutura de Pastas
-
-```
-expeeria-proj/
-├── public/
-│   └── vite.svg
-├── server/
-│   └── db.json
-├── src/
-│   ├── assets/
-│   ├── components/
-│   │   ├── Button/
-│   │   ├── Card/
-│   │   ├── CardBox/
-│   │   ├── EditPost/
-│   │   ├── Feed/
-│   │   ├── HeadInfoUsuario/
-│   │   ├── Navbar/
-│   │   │   └── MenuRecolhivel/
-│   │   ├── NewPost/
-│   │   ├── PrivateRoute/
-│   │   ├── Recomendacoes/
-│   │   └── UploadImage/
-│   ├── contexts/
-│   ├── hooks/
-│   ├── layouts/
-│   │   └── LayoutPadrao/
-│   ├── pages/
-│   │   ├── CreatePost/
-│   │   ├── Explore/
-│   │   ├── Home/
-│   │   ├── Login/
-│   │   ├── NotFound/
-│   │   ├── PostPage/
-│   │   ├── Profile/
-│   │   └── SignUp/
-│   ├── services/
-│   └── utils/
-├── package.json
-├── vite.config.js
-├── README.md
-└── ...
-```
-
----
-
 ## 6. Principais Componentes e Páginas
 
 ### Navbar/MenuRecolhivel
@@ -231,7 +193,25 @@ expeeria-proj/
 
 ---
 
-## 9. Padrões de Código e Boas Práticas
+## 9. Soluções Técnicas Implementadas
+
+### Posts de Exemplo
+
+Para contornar o problema de conexão com o banco de dados, implementamos as seguintes soluções:
+
+- **Hook `useExamplePosts`**: Desenvolvido para simular a interação com o backend, fornecendo dados de exemplo estruturados
+- **Dados Incorporados**: Posts educacionais com estrutura completa (título, descrição, categoria, autor) diretamente no componente
+- **Renderização Condicional**: Sistema de tratamento para garantir que a interface seja mostrada mesmo sem dados reais
+- **CSS Modular**: Estilos dedicados para a página de apresentação sem depender de componentes externos
+
+### Problemas Conhecidos
+
+- **Autenticação**: O hook `useAuth.js` não retorna corretamente a propriedade 'sessionChecked' utilizada pelo componente PrivateRoute
+- **Conexão com Supabase**: Há um erro na configuração ou conexão com o banco de dados que impede o funcionamento adequado das funcionalidades principais
+
+---
+
+## 10. Padrões de Código e Boas Práticas
 
 Implementamos diversas práticas de desenvolvimento moderno para garantir a qualidade e manutenibilidade do código:
 
@@ -353,6 +333,4 @@ O **Expeeria** é uma plataforma digital onde pessoas compartilham, trocam e adq
 > “Você ensina. Você aprende. Você cresce.”
 >
 > “Transforme o que você sabe em uma ponte para o que quer aprender.”
-
----
 

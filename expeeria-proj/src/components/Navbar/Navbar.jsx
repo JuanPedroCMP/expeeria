@@ -35,14 +35,11 @@ export const Navbar = () => {
           Expeeria
         </Link>
       </div>
-      
-      <div className={styles.navbarSearch}>
-        <SearchBar onSearch={handleSearch} />
-      </div>
-      
+
       <div className={styles.navbarRight}>
-        <ThemeToggle className={styles.themeToggleNav} />
-        
+        <Link to="/apresentacao" className={styles.navLink}>
+          Sobre Expeeria
+        </Link>
         {user ? (
           <>
             <Link to="/criar_post" className={styles.createPostBtn}>

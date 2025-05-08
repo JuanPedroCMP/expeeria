@@ -11,8 +11,7 @@ const LayoutPadrao = () => {
       <Navbar />
       <div className={style.LayoutPadrao}>
         <Outlet />
-      </div>
-      <ThemeToggle fixed={true} />
+      </div>  
     </PostProvider>
   );
 };

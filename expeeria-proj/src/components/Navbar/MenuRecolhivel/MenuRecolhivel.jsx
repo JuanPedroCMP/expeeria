@@ -42,7 +42,7 @@ const MenuRecolhivel = () => {
         className={style.dropdownButton}
         aria-label="Abrir menu"
       >
-     
+        ☰
       </button>
       
       {isOpen && (
@@ -64,7 +64,7 @@ const MenuRecolhivel = () => {
                 className={style.closeButton}
                 aria-label="Fechar menu"
               >
-                X
+                ⨉
               </button>
             </div>
             
