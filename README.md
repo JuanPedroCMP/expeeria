@@ -1,14 +1,5 @@
 # Expeeria – Plataforma Educacional Colaborativa
 
-<div align="center">
-  <img src="https://i.ibb.co/vDmDnXk/expeeria-logo.png" alt="Expeeria Logo" width="300px" />
-  
-  ### 🌟 Compartilhe experiências. Aprenda. Conecte-se.
-  
-  [![Acesse o site](https://img.shields.io/badge/Expeeria-Acessar%20Site-0575e6?style=for-the-badge)](https://expeeria.vercel.app)
-  [![Status](https://img.shields.io/badge/Status-Em%20Desenvolvimento-orange?style=for-the-badge)](https://expeeria.vercel.app)
-</div>
-
 ## ⚠️ AVISO IMPORTANTE ⚠️
 
 **Atualmente existe um problema de conexão com o banco de dados Supabase** que não foi possível resolver a tempo. Por essa razão:  
@@ -21,7 +12,7 @@ A interface e navegação entre páginas estão disponíveis para demonstração
 
 ## 🌐 Acesse a Demonstração
 
-👉 **Acesse agora:** [https://expeeria.vercel.app/presentation](https://expeeria.vercel.app/presentation)
+👉 **Acesse agora:** [https://expeeria.vercel.app/presentation](https://expeeria.vercel.app/apresentacao)
 
 > Recomendamos acessar diretamente a página de apresentação (/presentation) que foi especialmente preparada para funcionar sem dependência do banco de dados.
 
