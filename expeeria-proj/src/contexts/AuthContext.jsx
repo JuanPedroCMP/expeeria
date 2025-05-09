@@ -204,32 +204,54 @@ export function AuthProvider({ children }) {
     setError(null);
     
     try {
-      const data = await authService.signIn({ email, password });
+      console.log('Iniciando processo de login para:', email);
+      const result = await authService.signIn({ email, password });
+      console.log('Resultado do login:', result);
+      
+      // Verificar se temos dados do usuário
+      if (!result || !result.user) {
+        throw new Error('Dados de usuário ausentes na resposta de autenticação');
+      }
+      
+      const userData = result.user;
+      console.log('Dados do usuário obtidos:', userData.id);
       
       // Buscar perfil do usuário
-      if (data.user) {
-        const { data: profile } = await supabase
+      try {
+        const { data: profile, error: profileError } = await supabase
           .from('users')
           .select('*')
-          .eq('id', data.user.id)
+          .eq('id', userData.id)
           .single();
+          
+        if (profileError) {
+          console.warn('Erro ao buscar perfil, continuando com dados básicos:', profileError);
+        }
         
-        setUser({
-          ...data.user,
-          ...profile
-        });
-        return {
-          ...data.user,
-          ...profile
+        // Mesmo com erro ao buscar perfil, definimos o usuário com os dados básicos
+        const completeUser = {
+          ...userData,
+          ...(profile || {})  // Usar perfil se disponível, ou objeto vazio
         };
+        
+        console.log('Definindo usuário completo no contexto');
+        setUser(completeUser);
+        setSessionChecked(true);
+        return completeUser;
+      } catch (profileError) {
+        // Se houver erro ao buscar perfil, ainda definimos o usuário com dados básicos
+        console.warn('Erro ao buscar perfil, continuando com dados básicos:', profileError);
+        setUser(userData);
+        setSessionChecked(true);
+        return userData;
       }
-      return data.user;
     } catch (error) {
       console.error('Erro no login:', error);
       setError(
         error.message || 
         'Falha ao fazer login. Verifique suas credenciais.'
       );
+      setSessionChecked(true); // Garante que sessionChecked seja definido mesmo em caso de erro
       throw error;
     } finally {
       setLoading(false);

@@ -173,35 +173,53 @@ export const authService = {
    * @returns {Promise} - Resultado da operação
    */
   async signIn(credentials) {
-    if (!credentials) {
-      throw new Error("Credenciais não fornecidas");
-    }
-    
-    const { email, password } = credentials;
-    
     try {
+      if (!credentials) {
+        throw new Error("Credenciais não fornecidas");
+      }
+      
+      const { email, password } = credentials;
+      
       // Validar email antes de enviar para o Supabase
       if (!this.isValidEmail(email)) {
         throw new Error("Endereço de email inválido");
       }
-
+      
+      // Validar senha
       if (!password) {
-        throw new Error("A senha é obrigatória");
+        throw new Error("Senha obrigatória");
       }
-
+      
+      console.log("Tentando login com:", { email });
+      
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
-
+      
       if (error) throw error;
+      
+      console.log("Login bem-sucedido, dados de retorno:", data);
+      
+      // Garantir que o objeto retornado tenha o formato esperado pelo AuthContext
+      // O AuthContext espera um objeto com uma propriedade 'user'
+      if (data && data.session && data.user) {
+        return {
+          user: data.user, // Isso é o que o AuthContext espera
+          session: data.session
+        };
+      }
+      
+      // Retornar dados da sessão e usuário em um formato adequado
       return data;
     } catch (error) {
-      console.error("Erro no login:", error);
+      console.error("Erro ao fazer login:", error);
       
-      // Traduzir mensagens de erro comuns para português
-      if (error && error.message) {
-        if (this.safeIncludes(error.message, "Invalid login credentials")) {
+      // Tratar erros específicos para mensagens mais amigáveis
+      if (error.message) {
+        if (this.safeIncludes(error.message, "Invalid login") || 
+            this.safeIncludes(error.message, "Invalid email") || 
+            this.safeIncludes(error.message, "Invalid password")) {
           throw new Error("Email ou senha incorretos");
         } else if (this.safeIncludes(error.message, "Email not confirmed")) {
           throw new Error("Email não confirmado. Verifique sua caixa de entrada");
