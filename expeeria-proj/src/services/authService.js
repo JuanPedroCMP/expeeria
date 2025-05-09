@@ -228,12 +228,44 @@ export const authService = {
       
       console.log("Tentando login com:", { email });
       
+      // Verificar se o email existe no sistema
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('email')
+        .eq('email', email)
+        .maybeSingle();
+        
+      if (!userData) {
+        console.warn("Tentativa de login com email não encontrado no banco de dados:", email);
+      }
+      
+      // Tentar fazer login
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
       
-      if (error) throw error;
+      // Log de erro mais detalhado para ajudar na depuração
+      if (error) {
+        console.error("Erro detalhado na autenticação:", {
+          mensagem: error.message,
+          código: error.code,
+          status: error.status,
+          detalhes: error.details
+        });
+        
+        // Verificar se é um erro de email não confirmado específico do Supabase
+        if (error.message && (
+            error.message.includes("Email not confirmed") || 
+            error.message.includes("não confirmado") ||
+            error.status === 401 ||
+            error.code === "auth/email-not-verified"
+        )) {
+          throw new Error("O email desta conta ainda não foi confirmado. Por favor, verifique sua caixa de entrada e confirme seu email antes de fazer login.");
+        }
+        
+        throw error;
+      }
       
       console.log("Login bem-sucedido, verificando perfil do usuário");
       
