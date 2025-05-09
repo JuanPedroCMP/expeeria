@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { usePost } from "../../hooks/usePost";
 import ReactMarkdown from "react-markdown";
 import style from "./NewPost.module.css";
 import { Button } from "../Button";
@@ -18,7 +17,6 @@ export const NewPost = ({
   postOriginal = null,
   onSubmitEdicao,
 }) => {
-  const { createPost } = usePost();
   const { user } = useAuth();
   const { showSuccess, showError } = useNotification();
   const [title, setTitle] = useState(postOriginal?.title || "");
@@ -146,7 +144,6 @@ export const NewPost = ({
   return (
     <form onSubmit={handleSubmit} className={style.formNewPost}>
       <h2>{modoEdicao ? "Editar Post" : "Novo Post"}</h2>
-      <Button destino="/" texto="Voltar para a página inicial" />
       <input
         type="text"
         placeholder="Título do post"

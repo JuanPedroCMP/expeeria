@@ -418,8 +418,6 @@ export const PostPage = () => {
             </button>
           </>
         )}
-
-        <Button destino="/" texto="Voltar para a página inicial" />
         {post.imageUrl && (
           <div className={style.bannerBox}>
             <img
