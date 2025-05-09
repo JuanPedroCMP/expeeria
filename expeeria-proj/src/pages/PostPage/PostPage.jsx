@@ -21,67 +21,121 @@ export const PostPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const commentsPerPage = 5; // Quantidade de comentários por página
   
-  // Buscar post e comentários do Supabase
+  // Buscar post e comentários do Supabase usando abordagem simplificada
   useEffect(() => {
     const fetchPostAndComments = async () => {
       try {
+        console.log('Iniciando busca de post ID:', id);
         setLoading(true);
+        setError(null); // Limpar erros anteriores
         
-        // Buscar o post com suas informações relacionadas
+        // PASSO 1: Buscar dados básicos do post (consulta simplificada)
         const { data: postData, error: postError } = await supabase
           .from('posts')
-          .select(`
-            *,
-            users!author_id (id, username, name, avatar),
-            post_likes!post_id (count),
-            post_categories!post_id (category)
-          `)
+          .select('*')  // Consulta simples, sem joins
           .eq('id', id)
           .single();
           
-        if (postError) throw postError;
+        console.log('Resultado da consulta de post:', { postData, postError });
+          
+        if (postError) {
+          console.error('Erro ao buscar post:', postError);
+          setError('Não foi possível carregar o post: ' + postError.message);
+          setLoading(false);
+          return;
+        }
         
         if (!postData) {
+          console.log('Post não encontrado');
           setError('Post não encontrado');
           setLoading(false);
           return;
         }
         
-        // Buscar comentários do post
-        const { data: commentsData, error: commentsError } = await supabase
+        // PASSO 2: Buscar o autor do post
+        const { data: authorData, error: authorError } = await supabase
+          .from('profiles')
+          .select('id, username, name, avatar')
+          .eq('id', postData.author_id)
+          .single();
+          
+        console.log('Resultado da consulta de autor:', { authorData, authorError });
+          
+        // PASSO 3: Buscar contagem de likes
+        const { count: likeCount, error: likeError } = await supabase
+          .from('post_likes')
+          .select('id', { count: 'exact', head: true })
+          .eq('post_id', id);
+          
+        console.log('Resultado da contagem de likes:', { likeCount, likeError });
+          
+        // PASSO 4: Buscar categorias do post
+        const { data: categoriesData, error: categoriesError } = await supabase
+          .from('post_categories')
+          .select('category')
+          .eq('post_id', id);
+          
+        console.log('Resultado da busca de categorias:', { categoriesData, categoriesError });
+        
+        // PASSO 5: Buscar comentários do post (consulta simplificada)
+        const { data: commentsRawData, error: commentsError } = await supabase
           .from('comments')
-          .select(`
-            *,
-            users!author_id (id, username, name, avatar)
-          `)
+          .select('*')  // Sem joins complexos
           .eq('post_id', id)
           .order('created_at', { ascending: false });
           
-        if (commentsError) throw commentsError;
+        console.log('Resultado da busca de comentários:', { commentsRawData, commentsError });
         
-        // Processar dados do post
+        if (commentsError) {
+          console.warn('Erro ao buscar comentários:', commentsError);
+          // Não interrompe o fluxo, apenas mostra post sem comentários
+        }
+        
+        // PASSO 6: Se tivermos comentários, buscar autores desses comentários
+        let commentAuthors = {};
+        if (commentsRawData && commentsRawData.length > 0) {
+          const authorIds = [...new Set(commentsRawData.map(comment => comment.author_id))];
+          const { data: commentAuthorsData } = await supabase
+            .from('profiles')
+            .select('id, username, name, avatar')
+            .in('id', authorIds);
+            
+          if (commentAuthorsData) {
+            commentAuthorsData.forEach(author => {
+              commentAuthors[author.id] = author;
+            });
+          }
+        }
+        
+        // Processar dados do post combinando informações de todas as consultas
         const processedPost = {
           id: postData.id,
           title: postData.title,
           caption: postData.caption,
           content: postData.content,
           imageUrl: postData.image_url,
-          author: postData.users?.name || postData.users?.username || 'Usuário',
+          author: authorData ? (authorData.name || authorData.username) : 'Usuário',
           authorId: postData.author_id,
           createdAt: postData.created_at,
-          likeCount: postData.post_likes[0]?.count || 0,
-          categories: postData.post_categories.map(cat => cat.category)
+          likeCount: likeCount || 0,
+          categories: categoriesData ? categoriesData.map(cat => cat.category) : []
         };
         
-        // Processar comentários
-        const processedComments = commentsData.map(comment => ({
-          id: comment.id,
-          text: comment.content,
-          user: comment.users?.name || comment.users?.username || 'Usuário',
-          userId: comment.author_id,
-          createdAt: comment.created_at,
-          likeCount: comment.like_count || 0
-        }));
+        // Processar comentários com autores resolvidos
+        const processedComments = commentsRawData ? commentsRawData.map(comment => {
+          const commentAuthor = commentAuthors[comment.author_id] || {};
+          return {
+            id: comment.id,
+            text: comment.content,
+            user: commentAuthor.name || commentAuthor.username || 'Usuário',
+            userId: comment.author_id,
+            createdAt: comment.created_at,
+            likeCount: 0  // Simplificado, podemos adicionar isso depois
+          };
+        }) : [];
+        
+        console.log('Post processado:', processedPost);
+        console.log('Comentários processados:', processedComments);
         
         setPost(processedPost);
         setComments(processedComments);
