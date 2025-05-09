@@ -1,13 +1,44 @@
+import React, { useState, useEffect } from "react";
 import { useAuth } from "../../hooks/useAuth";
 import { Navigate, useLocation } from "react-router-dom";
 import { LoadingSpinner } from "../LoadingSpinner";
 
 export function PrivateRoute({ children }) {
+  // Obter dados de autenticação
   const { user, loading, sessionChecked } = useAuth();
   const location = useLocation();
-
-  // Mostra spinner de carregamento enquanto verifica a sessão
-  if (loading || !sessionChecked) {
+  
+  // Anti-bloqueio: usar um timeout para evitar a tela de carregamento interminável
+  const [timeoutReached, setTimeoutReached] = useState(false);
+  
+  // Configurar timeout de segurança (3 segundos)
+  useEffect(() => {
+    // Se estiver carregando, iniciar timeout
+    if (loading) {
+      const timer = setTimeout(() => {
+        console.log('Timeout de segurança do PrivateRoute acionado!');
+        setTimeoutReached(true);
+      }, 3000);
+      
+      // Limpar timeout se o carregamento terminar
+      return () => clearTimeout(timer);
+    }
+  }, [loading]);
+  
+  // Verificação para possível bloqueio
+  const possibleBlockage = loading && !sessionChecked && !timeoutReached;
+  
+  // Log para depuração
+  console.log('PrivateRoute - Estado atual:', { 
+    temUsuario: !!user, 
+    loading, 
+    sessionChecked, 
+    timeoutReached, 
+    possibleBlockage
+  });
+  
+  // Mostra spinner de carregamento somente por um tempo limitado
+  if (possibleBlockage) {
     return (
       <div className="auth-container fade-in">
         <div className="auth-card" style={{ maxWidth: '400px', textAlign: 'center', padding: '2rem' }}>

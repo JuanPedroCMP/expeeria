@@ -21,23 +21,25 @@ const Inicial = () => {
     const fetchPosts = async () => {
       try {
         setLoading(true);
-        console.log('Iniciando busca de posts...');
+        setError(null); // Limpar erros anteriores
+        console.log('Iniciando busca simplificada de posts...');
         
-        // Buscar posts com contagens de likes e informações do autor
+        // Consulta simplificada para reduzir chances de erro
+        // Apenas informações básicas dos posts, sem junções complexas
         const { data: postsData, error: postsError } = await supabase
           .from('posts')
-          .select(`
-            *,
-            users!author_id (id, username, name, avatar),
-            post_likes!post_id (count),
-            post_categories!post_id (category)
-          `)
+          .select('*')  // Consulta simplificada
           .eq('status', 'published')
-          .order('created_at', { ascending: false });
+          .order('created_at', { ascending: false })
+          .limit(10); // Limitar resultados para melhor performance
+          
+        console.log('Resposta da consulta:', { postsData, postsError });
           
         if (postsError) {
           console.error('Erro na consulta Supabase:', postsError);
-          throw new Error('Falha ao carregar os posts: ' + postsError.message);
+          setError('Falha ao carregar posts: ' + postsError.message);
+          setLoading(false);
+          return;
         }
         
         // Verificar se temos dados e evitar erros quando não há posts
@@ -51,19 +53,40 @@ const Inicial = () => {
         
         console.log('Posts encontrados:', postsData.length);
         
+        // Segunda consulta para obter autores dos posts
+        // Obter IDs de autores únicos
+        const authorIds = [...new Set(postsData.map(post => post.author_id))];
+        const { data: authorsData } = await supabase
+          .from('users')
+          .select('id, username, name, avatar')
+          .in('id', authorIds);
+        
+        // Criar mapa de autores para acesso rápido
+        const authorsMap = {};
+        if (authorsData) {
+          authorsData.forEach(author => {
+            authorsMap[author.id] = author;
+          });
+        }
+        
         // Processar os dados para um formato mais amigável
-        const processedPosts = postsData.map(post => ({
-          id: post.id,
-          title: post.title,
-          caption: post.caption,
-          content: post.content,
-          imageUrl: post.image_url,
-          author: post.users,
-          authorId: post.author_id,
-          createdAt: post.created_at,
-          likeCount: post.post_likes[0]?.count || 0,
-          categories: post.post_categories.map(cat => cat.category)
-        }));
+        const processedPosts = postsData.map(post => {
+          // Obter autor do mapa
+          const author = authorsMap[post.author_id] || { username: 'Usuário', name: 'Usuário' };
+          
+          return {
+            id: post.id,
+            title: post.title,
+            caption: post.caption,
+            content: post.content,
+            imageUrl: post.image_url,
+            author: author.name || author.username,
+            authorId: post.author_id,
+            createdAt: post.created_at,
+            likeCount: post.like_count || 0,
+            categories: [] // Simplificado temporariamente
+          };
+        });
         
         setAllPosts(processedPosts);
         

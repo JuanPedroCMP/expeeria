@@ -14,14 +14,23 @@ export const useAuth = () => {
     throw new Error("useAuth deve ser usado dentro de um AuthProvider. Verifique se o componente está dentro do AuthProvider no App.jsx");
   }
   
-  // Adicionar log para depuração
+  // Garantir que sessionChecked exista antes de usá-lo
+  if (authContext.sessionChecked === undefined) {
+    console.error('ERRO CRÍTICO: sessionChecked não está definido no contexto de autenticação');
+    // Forçar um valor default para evitar problemas no PrivateRoute
+    authContext.sessionChecked = true;
+  }
+  
+  // Adicionar log para depuração detalhada
   console.log('Estado atual do AuthContext:', {
     temUsuario: !!authContext.user,
     loading: authContext.loading,
     temErro: !!authContext.error,
-    sessionChecked: authContext.sessionChecked
+    sessionChecked: authContext.sessionChecked,
+    autenticado: !!authContext.user && authContext.sessionChecked
   });
   
+  // Extrair valores com garantia para sessionChecked
   const { 
     user, 
     loading, 
@@ -31,7 +40,8 @@ export const useAuth = () => {
     register, 
     updateProfile, 
     isAuthenticated,
-    sessionChecked 
+    // Garantia explícita que sessionChecked será retornado, mesmo se indefinido
+    sessionChecked = true 
   } = authContext;
   
   // Verificar se o usuário é o autor do conteúdo

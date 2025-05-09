@@ -11,18 +11,24 @@ export function AuthProvider({ children }) {
   const [error, setError] = useState(null);
   const [sessionChecked, setSessionChecked] = useState(false);
 
-  // Função para inicializar a autenticação
+  // Função simplificada para inicializar a autenticação - abordagem mais direta
   const initAuth = useCallback(async () => {
     try {
       setLoading(true);
-      console.log('Iniciando verificação de autenticação...');
+      console.log('Iniciando verificação simplificada de autenticação...');
 
-      // Verificar sessão atual
-      const { data: sessionData } = await supabase.auth.getSession();
-      console.log('Status da sessão:', sessionData ? 'Encontrada' : 'Não encontrada');
+      // Método mais direto para obter sessão
+      const { data, error } = await supabase.auth.getSession();
+      if (error) {
+        console.error('Erro ao obter sessão:', error);
+        setUser(null);
+        setLoading(false);
+        setSessionChecked(true);
+        return;
+      }
       
-      const hasSession = !!sessionData?.session;
-      
+      console.log('Resposta da sessão:', data);
+      const hasSession = data && data.session;      
       if (!hasSession) {
         console.log('Nenhuma sessão válida encontrada');
         // Não há sessão válida
