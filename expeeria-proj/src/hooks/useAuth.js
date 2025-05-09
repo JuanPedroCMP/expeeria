@@ -14,6 +14,14 @@ export const useAuth = () => {
     throw new Error("useAuth deve ser usado dentro de um AuthProvider. Verifique se o componente está dentro do AuthProvider no App.jsx");
   }
   
+  // Adicionar log para depuração
+  console.log('Estado atual do AuthContext:', {
+    temUsuario: !!authContext.user,
+    loading: authContext.loading,
+    temErro: !!authContext.error,
+    sessionChecked: authContext.sessionChecked
+  });
+  
   const { 
     user, 
     loading, 

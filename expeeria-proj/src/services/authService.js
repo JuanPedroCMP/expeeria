@@ -58,7 +58,7 @@ export const authService = {
    * @param {string} userData.password - Senha do usuário
    * @param {string} userData.username - Nome de usuário
    * @param {string} userData.fullName - Nome completo do usuário
-   * @returns {Promise} - Resultado da operação
+   * @returns {Promise<Object>} - Objeto contendo dados do usuário e sessão
    */
   async signUp(userData) {
     if (!userData) {
@@ -68,6 +68,8 @@ export const authService = {
     const { email, password, username, fullName } = userData;
     
     try {
+      console.log('Iniciando cadastro de usuário:', { email, username });
+      
       // Validar email antes de enviar para o Supabase
       if (!this.isValidEmail(email)) {
         throw new Error("Endereço de email inválido");
@@ -76,6 +78,17 @@ export const authService = {
       // Validar senha
       if (!password || password.length < 6) {
         throw new Error("A senha deve ter pelo menos 6 caracteres");
+      }
+      
+      // Verificar se o username já existe antes de tentar criar
+      const { data: existingUser, error: checkError } = await supabase
+        .from('users')
+        .select('username')
+        .eq('username', username)
+        .maybeSingle();
+        
+      if (existingUser) {
+        throw new Error("Este nome de usuário já está em uso. Escolha outro.");
       }
       
       // Registrar o usuário no serviço de autenticação
@@ -97,10 +110,10 @@ export const authService = {
         throw new Error("Erro ao criar usuário: dados incompletos retornados");
       }
 
-      console.log('Tentando criar perfil de usuário com ID:', authData.user.id);
+      console.log('Usuário criado com sucesso, ID:', authData.user.id);
 
+      // Criar o perfil do usuário na tabela users
       try {
-        // Criar o perfil do usuário na tabela users
         const userData = {
           id: authData.user.id,
           email,
@@ -120,7 +133,7 @@ export const authService = {
           })
         };
 
-        console.log('Dados a serem inseridos:', userData);
+        console.log('Criando perfil de usuário...');
         
         const { data: insertedProfile, error: profileError } = await supabase
           .from('users')
@@ -130,16 +143,39 @@ export const authService = {
 
         if (profileError) {
           console.error("Erro ao criar perfil:", profileError);
-          console.error("Código do erro:", profileError.code);
-          console.error("Mensagem do erro:", profileError.message);
-          console.error("Detalhes:", profileError.details);
-          // Não impede o fluxo principal, pois o usuário já foi criado
-        } else {
-          console.log('Perfil criado com sucesso:', insertedProfile);
+          
+          if (profileError.code === '23505') { // Código de erro para chave duplicada
+            throw new Error("Este email ou nome de usuário já está em uso.");
+          }
+          
+          if (profileError.code) {
+            // Se for um problema na inserção do perfil, é um erro crítico que deve interromper o fluxo
+            throw new Error(`Erro ao criar perfil: ${profileError.message || 'Erro desconhecido'}`);
+          }
         }
+        
+        console.log('Perfil criado com sucesso!');
+        
+        // Retornar os dados completos (incluindo o perfil)
+        return {
+          user: {
+            ...authData.user,
+            ...insertedProfile
+          },
+          session: authData.session
+        };
       } catch (profileErr) {
         console.error("Exceção ao criar perfil:", profileErr);
-        // Não impede o fluxo principal, pois o usuário já foi criado
+        // Se for um erro específico que definimos acima, devemos propagá-lo
+        if (profileErr.message && profileErr.message.includes('já está em uso')) {
+          throw profileErr;
+        }
+        
+        // Para outros erros, pelo menos retornamos o usuário básico
+        return {
+          user: authData.user,
+          session: authData.session
+        };
       }
 
       return authData;
@@ -199,19 +235,78 @@ export const authService = {
       
       if (error) throw error;
       
-      console.log("Login bem-sucedido, dados de retorno:", data);
+      console.log("Login bem-sucedido, verificando perfil do usuário");
       
-      // Garantir que o objeto retornado tenha o formato esperado pelo AuthContext
-      // O AuthContext espera um objeto com uma propriedade 'user'
-      if (data && data.session && data.user) {
-        return {
-          user: data.user, // Isso é o que o AuthContext espera
-          session: data.session
-        };
+      // Devemos garantir que temos um perfil completo do usuário
+      if (data && data.user) {
+        try {
+          // Buscar o perfil completo do usuário
+          const { data: userProfile, error: profileError } = await supabase
+            .from('users')
+            .select('*')
+            .eq('id', data.user.id)
+            .single();
+            
+          if (profileError) {
+            console.warn("Erro ao buscar perfil do usuário, usando dados básicos:", profileError);
+            
+            // Mesmo sem perfil completo, retornamos o usuário básico
+            return {
+              user: data.user,
+              session: data.session
+            };
+          }
+          
+          if (!userProfile) {
+            console.warn("Perfil do usuário não encontrado. Criando perfil básico...");
+            
+            // Se o perfil não existir, podemos tentar criá-lo
+            const defaultProfile = {
+              id: data.user.id,
+              email: data.user.email,
+              username: data.user.email.split('@')[0], // Username básico
+              name: data.user.email.split('@')[0], // Nome básico 
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+              status: 'active',
+              role: 'user'
+            };
+            
+            // Criar um perfil básico
+            const { data: newProfile, error: insertError } = await supabase
+              .from('users')
+              .insert(defaultProfile)
+              .select()
+              .single();
+            
+            if (insertError) {
+              console.error("Falha ao criar perfil básico:", insertError);
+              // Continuar com o usuário básico
+            } else {
+              console.log("Perfil básico criado com sucesso");
+              return {
+                user: { ...data.user, ...newProfile },
+                session: data.session
+              };
+            }
+          } else {
+            console.log("Perfil do usuário encontrado");
+            // Mesclar dados de autenticação com perfil do usuário
+            return {
+              user: { ...data.user, ...userProfile },
+              session: data.session
+            };
+          }
+        } catch (profileError) {
+          console.error("Erro ao processar perfil:", profileError);
+        }
       }
       
-      // Retornar dados da sessão e usuário em um formato adequado
-      return data;
+      // Formatação padrão de retorno
+      return {
+        user: data.user,
+        session: data.session
+      };
     } catch (error) {
       console.error("Erro ao fazer login:", error);
       

@@ -11,94 +11,133 @@ export function AuthProvider({ children }) {
   const [error, setError] = useState(null);
   const [sessionChecked, setSessionChecked] = useState(false);
 
+  // Função para inicializar a autenticação
+  const initAuth = useCallback(async () => {
+    try {
+      setLoading(true);
+      console.log('Iniciando verificação de autenticação...');
+
+      // Verificar sessão atual
+      const { data: sessionData } = await supabase.auth.getSession();
+      console.log('Status da sessão:', sessionData ? 'Encontrada' : 'Não encontrada');
+      
+      const hasSession = !!sessionData?.session;
+      
+      if (!hasSession) {
+        console.log('Nenhuma sessão válida encontrada');
+        // Não há sessão válida
+        setUser(null);
+        setLoading(false);
+        setSessionChecked(true);
+        return;
+      }
+      
+      console.log('Sessão válida encontrada, obtendo dados do usuário');
+      
+      // Buscar dados do usuário da sessão
+      const currentUser = sessionData.session.user;
+      
+      if (!currentUser || !currentUser.id) {
+        console.warn('Sessão encontrada, mas sem dados válidos de usuário');
+        // Sessão existe mas não tem dados válidos de usuário
+        await authService.signOut();
+        setUser(null);
+        setLoading(false);
+        setSessionChecked(true);
+        return;
+      }
+
+      console.log('Dados básicos do usuário encontrados, buscando perfil completo...');
+      
+      // Buscar perfil completo do usuário
+      try {
+        const { data: profile, error: profileError } = await supabase
+          .from('users')
+          .select('*')
+          .eq('id', currentUser.id)
+          .single();
+          
+        if (profileError) {
+          console.warn('Erro ao buscar perfil:', profileError.message);
+          
+          // Tentar criar um perfil básico se não existir
+          if (profileError.code === 'PGRST116') { // Not found
+            console.log('Perfil não encontrado, criando perfil básico...');
+            
+            const defaultProfile = {
+              id: currentUser.id,
+              email: currentUser.email,
+              username: currentUser.email.split('@')[0], // Username básico
+              name: currentUser.email.split('@')[0], // Nome básico 
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+              status: 'active',
+              role: 'user'
+            };
+            
+            const { data: newProfile, error: insertError } = await supabase
+              .from('users')
+              .insert(defaultProfile)
+              .select()
+              .single();
+            
+            if (insertError) {
+              console.error('Erro ao criar perfil básico:', insertError);
+              // Continuar com dados básicos
+              setUser(currentUser);
+            } else {
+              console.log('Perfil básico criado com sucesso');
+              setUser({
+                ...currentUser,
+                ...newProfile
+              });
+            }
+          } else {
+            // Outro tipo de erro, continuar com dados básicos
+            console.warn('Erro ao buscar perfil, usando dados básicos:', profileError);
+            setUser(currentUser);
+          }
+        } else if (!profile) {
+          console.warn('Perfil não encontrado, usando dados básicos');
+          setUser(currentUser);
+        } else {
+          console.log('Perfil completo encontrado, inicialização concluída');
+          // Combinar dados de autenticação com perfil
+          setUser({
+            ...currentUser,
+            ...profile
+          });
+        }
+      } catch (profileError) {
+        console.error('Exceção ao buscar perfil:', profileError);
+        // Continuar com os dados básicos do usuário
+        setUser(currentUser);
+      }
+    } catch (error) {
+      console.error('Erro ao inicializar estado de autenticação:', error);
+      setUser(null);
+    } finally {
+      console.log('Verificação de autenticação finalizada');
+      setLoading(false);
+      setSessionChecked(true);
+    }
+  }, []);
+
   // Verificar sessão ao iniciar
   useEffect(() => {
     let isMounted = true; // Flag para verificar se o componente está montado
     let safetyTimeout; // Referência para o timeout de segurança
-    let authStateSubscription; // Armazenar a referência da inscrição
     
-    // Configuração de timeout mais curto para não bloquear a interface
+    // Configuração de timeout para segurança
     safetyTimeout = setTimeout(() => {
       if (loading && isMounted) {
         console.log('Timeout de segurança acionado para AuthContext');
-        
-        // Tentativa simplificada sem verificar Supabase para evitar CORS
-        if (isMounted) {
-          // Definir um estado inicial mesmo sem confirmação completa
-          // Isso prioriza o funcionamento sobre segurança conforme solicitado
-          setLoading(false);
-          setSessionChecked(true);
-          
-          // Verificar se há dados de sessão no localStorage
-          try {
-            const localSession = localStorage.getItem('supabase.auth.token');
-            // Se há dados no storage, assumir que existe uma sessão válida
-            // Isso é uma solução de contorno que prioriza o funcionamento
-            if (localSession) {
-              // Tentar extrair informações básicas do usuário do localStorage
-              try {
-                const parsedSession = JSON.parse(localSession);
-                if (parsedSession?.currentSession?.user) {
-                  setUser(parsedSession.currentSession.user);
-                }
-              } catch (e) {
-                console.warn('Erro ao processar sessão local, continuando mesmo assim');
-              }
-            } else {
-              // Sem sessão no localStorage
-              setUser(null);
-            }
-          } catch (e) {
-            console.warn('Erro ao acessar localStorage, continuando mesmo assim');
-          }
-        }
+        setLoading(false);
+        setSessionChecked(true);
       }
     }, 3000); // Reduzido para 3 segundos para não bloquear a interface
 
-    const initAuth = async () => {
-      if (!isMounted) return;
-      setLoading(true);
-      
-      try {
-        // Verificar se há uma sessão ativa e válida
-        const hasSession = await authService.hasValidSession();
-        
-        if (hasSession && isMounted) {
-          // Buscar dados do usuário
-          const userData = await authService.getCurrentUser();
-          if (userData && isMounted) {
-            // Buscar perfil do usuário para dados adicionais
-            const { data: profile } = await supabase
-              .from('users')
-              .select('*')
-              .eq('id', userData.id)
-              .single();
-            
-            setUser({
-              ...userData,
-              ...profile
-            });
-          }
-        } else if (isMounted) {
-          // Explicitamente definir usuário como null se não houver sessão
-          setUser(null);
-        }
-      } catch (error) {
-        console.error('Erro ao inicializar autenticação:', error);
-        if (isMounted) {
-          setError('Houve um problema ao verificar sua autenticação');
-          // Garantir que o usuário seja null em caso de erro
-          setUser(null);
-        }
-      } finally {
-        // Garantir que o loading seja sempre definido como false após a verificação
-        if (isMounted) {
-          setLoading(false);
-          setSessionChecked(true);
-        }
-      }
-    };
-
+    // Iniciar verificação de autenticação
     initAuth();
     
     // Configurar listener para mudanças de autenticação
