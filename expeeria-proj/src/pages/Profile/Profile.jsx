@@ -30,7 +30,7 @@ export function Profile() {
   const [activeTab, setActiveTab] = useState('posts');
   const [loadingAction, setLoadingAction] = useState(false);
   const avatarInputRef = useRef(null);
-  const { getPostsByUser } = usePost();
+  const { loadAllPosts } = usePost();
 
   function toMultiArray(val) {
     if (!val) return [];
@@ -70,6 +70,23 @@ export function Profile() {
     }
   };
 
+  // Funu00e7u00e3o auxiliar para buscar posts de um usuau00e1rio
+  const getUserPosts = async (userId) => {
+    try {
+      console.log('Buscando posts para o usuau00e1rio:', userId);
+      const { data: posts, error } = await supabase
+        .from('posts')
+        .select('*')
+        .eq('author_id', userId);
+        
+      if (error) throw error;
+      return posts || [];
+    } catch (error) {
+      console.error('Erro ao buscar posts do usuau00e1rio:', error);
+      return [];
+    }
+  };
+
   // Método para buscar detalhes do perfil de um usuário
   const fetchProfile = async () => {
     setLoading(true);
@@ -84,15 +101,39 @@ export function Profile() {
         return;
       }
       
-      // Buscar dados do perfil
-      const { data, error: profileError } = await supabase
-        .from('users')
+      // Buscar dados do perfil - verificando se existe a tabela 'profiles' ou 'users'
+      let profileResponse = await supabase
+        .from('profiles')
         .select('*')
         .eq('id', profileId)
         .single();
       
-      if (profileError) throw profileError;
-      profileData = data;
+      // Se retornar erro, tentar a tabela 'users'
+      if (profileResponse.error) {
+        profileResponse = await supabase
+          .from('users')
+          .select('*')
+          .eq('id', profileId)
+          .single();
+      }
+      
+      // Se ainda tiver erro, tentar buscar diretamente os dados do auth
+      if (profileResponse.error && user && user.id === profileId) {
+        // Criar um objeto com os dados do usuau00e1rio logado
+        profileData = {
+          id: user.id,
+          email: user.email,
+          name: user.user_metadata?.name || user.user_metadata?.full_name || '',
+          avatar: user.user_metadata?.avatar_url || '',
+          username: user.user_metadata?.username || user.email?.split('@')[0] || '',
+          bio: user.user_metadata?.bio || '',
+          interests: user.user_metadata?.interests || [],
+          followers: [],
+          following: []
+        };
+      } else if (profileResponse.data) {
+        profileData = profileResponse.data;
+      }
       
       if (profileData) {
         // Definir o perfil e todos os campos relacionados
@@ -110,13 +151,13 @@ export function Profile() {
         setFollowers(followersList);
         setFollowing(followingList);
         
-        // Buscar posts do usuário usando o hook usePost
+        // Buscar posts do usuau00e1rio
         try {
-          const userPostsData = await getPostsByUser(profileData.id);
-          setUserPosts(userPostsData || []);
+          const userPostsData = await getUserPosts(profileData.id);
+          setUserPosts(userPostsData);
         } catch (postsError) {
-          console.error('Erro ao buscar posts do usuário:', postsError);
-          // Não interrompemos o fluxo principal se falhar ao buscar posts
+          console.error('Erro ao buscar posts do usuau00e1rio:', postsError);
+          setUserPosts([]);
         }
       } else {
         setError("Perfil não encontrado.");
@@ -142,66 +183,77 @@ export function Profile() {
       setLoadingAction(true);
       setError('');
       
-      // Buscar dados atuais do usuário logado
-      const { data: userData, error: userError } = await supabase
-        .from('users')
-        .select('following')
-        .eq('id', user.id)
-        .single();
+      // Criar o registro na tabela de seguidores
+      const { error: followError } = await supabase
+        .from('followers')
+        .insert({
+          follower_id: user.id,
+          following_id: targetId,
+          created_at: new Date().toISOString()
+        });
       
-      if (userError) throw userError;
-      
-      // Buscar dados atuais do perfil alvo
-      const { data: targetData, error: targetError } = await supabase
-        .from('users')
-        .select('followers')
-        .eq('id', targetId)
-        .single();
-      
-      if (targetError) throw targetError;
-      
-      // Preparar arrays de seguidores/seguindo
-      const userFollowing = toMultiArray(userData.following);
-      const targetFollowers = toMultiArray(targetData.followers);
-      
-      // Verificar se já está seguindo para evitar duplicações
-      if (!userFollowing.includes(targetId)) {
-        // Atualizar o usuário logado (seguindo)
-        const { error: updateUserError } = await supabase
-          .from('users')
-          .update({ following: [...userFollowing, targetId] })
-          .eq('id', user.id);
-          
-        if (updateUserError) throw updateUserError;
+      if (followError) {
+        // Se ocorrer erro, verificar se u00e9 por poluu00edtica de segurana
+        // e tentar atualizar arrays na tabela de usuários
+        console.log('Tentando mu00e9todo alternativo de follow:', followError);
+
+        // Buscar ambos os perfis para atualizar campos de arrays
+        const [userResp, targetResp] = await Promise.all([
+          supabase.from('profiles').select('following').eq('id', user.id).single(),
+          supabase.from('profiles').select('followers').eq('id', targetId).single()
+        ]);
         
-        // Atualizar o perfil alvo (seguidores)
-        const { error: updateTargetError } = await supabase
-          .from('users')
-          .update({ followers: [...targetFollowers, user.id] })
-          .eq('id', targetId);
-          
-        if (updateTargetError) throw updateTargetError;
+        // Verificar erros e tentar tabela 'users' se necessau00e1rio
+        const [userProfileData, targetProfileData] = await Promise.all([
+          userResp.error ? supabase.from('users').select('following').eq('id', user.id).single() : Promise.resolve(userResp),
+          targetResp.error ? supabase.from('users').select('followers').eq('id', targetId).single() : Promise.resolve(targetResp)
+        ]);
+
+        if (userProfileData.error && targetProfileData.error) {
+          throw new Error('Falha ao buscar perfis para atualizar');
+        }
+
+        const userFollowing = toMultiArray(userProfileData.data?.following);
+        const targetFollowers = toMultiArray(targetProfileData.data?.followers);
         
-        setSuccess(`Você agora está seguindo este usuário.`);
-        
-        // Atualizar perfil e lista de usuários
-        fetchProfile();
-        fetchAllUsers();
+        // Verificar duplicação
+        if (userFollowing.includes(targetId)) {
+          throw new Error('Você já segue este usuário');
+        }
+
+        // Determinar a tabela a ser usada
+        const table = userResp.error ? 'users' : 'profiles';
+
+        // Fazer as atualizações
+        await Promise.all([
+          supabase
+            .from(table)
+            .update({ following: [...userFollowing, targetId] })
+            .eq('id', user.id),
+          supabase
+            .from(table)
+            .update({ followers: [...targetFollowers, user.id] })
+            .eq('id', targetId)
+        ]);
       }
+      
+      setSuccess(`Você agora está seguindo este usuário.`);
+      
+      // Atualizar perfil e lista de usuários
+      fetchProfile();
+      fetchAllUsers();
     } catch (error) {
       console.error('Erro ao seguir usuário:', error);
       setError('Não foi possível seguir este usuário. Tente novamente.');
     } finally {
       setLoadingAction(false);
       
-      // Limpar mensagem de sucesso após 3 segundos
-      if (success) {
         setTimeout(() => setSuccess(''), 3000);
       }
     }
   };
 
-  // Função para parar de seguir outro usuário
+  // Função para deixar de seguir outro usuário
   const handleUnfollow = async (targetId) => {
     if (!user || !profile || user.id === targetId) return;
     
@@ -209,52 +261,61 @@ export function Profile() {
       setLoadingAction(true);
       setError('');
       
-      // Buscar dados atuais do usuário logado
-      const { data: userData, error: userError } = await supabase
-        .from('users')
-        .select('following')
-        .eq('id', user.id)
-        .single();
+      // Tentar remover da tabela de seguidores primeiro (método preferido)
+      const { error: unfollowError } = await supabase
+        .from('followers')
+        .delete()
+        .match({ follower_id: user.id, following_id: targetId });
       
-      if (userError) throw userError;
-      
-      // Buscar dados atuais do perfil alvo
-      const { data: targetData, error: targetError } = await supabase
-        .from('users')
-        .select('followers')
-        .eq('id', targetId)
-        .single();
-      
-      if (targetError) throw targetError;
-      
-      // Preparar arrays de seguidores/seguindo
-      const userFollowing = toMultiArray(userData.following);
-      const targetFollowers = toMultiArray(targetData.followers);
-      
-      // Verificar se já está seguindo
-      if (userFollowing.includes(targetId)) {
-        // Atualizar o usuário logado (seguindo)
-        const { error: updateUserError } = await supabase
-          .from('users')
-          .update({ following: userFollowing.filter(id => id !== targetId) })
-          .eq('id', user.id);
-          
-        if (updateUserError) throw updateUserError;
+      if (unfollowError) {
+        // Se ocorrer erro, tentar atualizar arrays na tabela de perfis
+        console.log('Tentando método alternativo de unfollow:', unfollowError);
+
+        // Buscar ambos os perfis para atualizar campos de arrays
+        const [userResp, targetResp] = await Promise.all([
+          supabase.from('profiles').select('following').eq('id', user.id).single(),
+          supabase.from('profiles').select('followers').eq('id', targetId).single()
+        ]);
         
-        // Atualizar o perfil alvo (seguidores)
-        const { error: updateTargetError } = await supabase
-          .from('users')
-          .update({ followers: targetFollowers.filter(id => id !== user.id) })
-          .eq('id', targetId);
-          
-        if (updateTargetError) throw updateTargetError;
+        // Verificar erros e tentar tabela 'users' se necessário
+        const [userProfileData, targetProfileData] = await Promise.all([
+          userResp.error ? supabase.from('users').select('following').eq('id', user.id).single() : Promise.resolve(userResp),
+          targetResp.error ? supabase.from('users').select('followers').eq('id', targetId).single() : Promise.resolve(targetResp)
+        ]);
+
+        if (userProfileData.error && targetProfileData.error) {
+          throw new Error('Falha ao buscar perfis para atualizar');
+        }
+
+        const userFollowing = toMultiArray(userProfileData.data?.following);
+        const targetFollowers = toMultiArray(targetProfileData.data?.followers);
         
-        setSuccess(`Você deixou de seguir este usuário.`);
-        
-        // Atualizar perfil e lista de usuários
-        fetchProfile();
-        fetchAllUsers();
+        // Verificar se é preciso deixar de seguir
+        if (!userFollowing.includes(targetId)) {
+          throw new Error('Você não segue este usuário');
+        }
+
+        // Determinar a tabela a ser usada
+        const table = userResp.error ? 'users' : 'profiles';
+
+        // Fazer as atualizações
+        await Promise.all([
+          supabase
+            .from(table)
+            .update({ following: userFollowing.filter(id => id !== targetId) })
+            .eq('id', user.id),
+          supabase
+            .from(table)
+            .update({ followers: targetFollowers.filter(id => id !== user.id) })
+            .eq('id', targetId)
+        ]);
       }
+      
+      setSuccess(`Você deixou de seguir este usuário.`);
+      
+      // Atualizar perfil e lista de usuários
+      fetchProfile();
+      fetchAllUsers();
     } catch (error) {
       console.error('Erro ao deixar de seguir usuário:', error);
       setError('Não foi possível deixar de seguir este usuário. Tente novamente.');
@@ -278,48 +339,60 @@ export function Profile() {
       setSuccess("");
       
       // Validação básica dos campos
-      if (!name.trim()) {
-        setError("O nome não pode estar vazio");
-        setLoadingAction(false);
+      if (!name || name.trim() === "") {
+        setError("O nome não pode estar vazio.");
         return;
       }
       
-      if (!email.trim() || !/^\S+@\S+\.\S+$/.test(email)) {
-        setError("E-mail inválido");
-        setLoadingAction(false);
-        return;
+      // Preparar dados de perfil atualizados
+      const updatedProfile = {
+        name: name.trim(),
+        bio: bio.trim(),
+        interests: interests,
+        avatar: avatar,
+        username: username.trim(),
+        // Não permitimos atualizar o email por aqui por segurança
+      };
+      
+      // Tentar atualizar na tabela 'profiles' primeiro
+      let updateResponse = await supabase
+        .from('profiles')
+        .update(updatedProfile)
+        .eq('id', id || user.id);
+      
+      // Se ocorrer erro, tentar atualizar na tabela 'users'
+      if (updateResponse.error) {
+        console.log('Tentando atualizar na tabela users:', updateResponse.error);
+        updateResponse = await supabase
+          .from('users')
+          .update(updatedProfile)
+          .eq('id', id || user.id);
       }
       
-      const { error: updateError } = await supabase
-        .from('users')
-        .update({
-          name,
-          email,
-          bio,
-          avatar,
-          interests
-        })
-        .eq('id', profile.id);
-        
-      if (updateError) throw updateError;
+      // Se ainda houver erro, atualizar diretamente os metadados do auth
+      if (updateResponse.error) {
+        console.log('Tentando atualizar metadados de auth:', updateResponse.error);
+        updateResponse = await supabase.auth.updateUser({
+          data: {
+            name: name.trim(),
+            full_name: name.trim(),
+            username: username.trim(),
+            bio: bio.trim(),
+            interests: interests,
+            avatar_url: avatar
+          }
+        });
+      }
       
+      if (updateResponse.error) {
+        throw updateResponse.error;
+      }
+      
+      setSuccess("Perfil atualizado com sucesso!");
       setEditing(false);
-      setSuccess("Perfil salvo com sucesso!");
       
-      // Atualiza os dados do perfil na tela
+      // Recarregar dados do perfil
       fetchProfile();
-      
-      // Se o usuário editou o próprio perfil, atualize o contexto
-      if (user && user.id === profile.id && setUser) {
-        setUser(prev => ({
-          ...prev,
-          name,
-          email,
-          bio,
-          avatar,
-          interests
-        }));
-      }
     } catch (error) {
       console.error('Erro ao salvar perfil:', error);
       setError("Erro ao salvar perfil. Tente novamente.");
