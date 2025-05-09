@@ -247,9 +247,7 @@ export function Profile() {
       setError('Não foi possível seguir este usuário. Tente novamente.');
     } finally {
       setLoadingAction(false);
-      
-        setTimeout(() => setSuccess(''), 3000);
-      }
+      setTimeout(() => setSuccess(''), 3000);
     }
   };
 
