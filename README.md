@@ -1,7 +1,5 @@
 # Expeeria – Plataforma Educacional Colaborativa
 
-![Expeeria Logo](./docs/images/expeeria-logo.png)
-
 ## 🚀 Visão Geral
 
 O **Expeeria** é uma plataforma colaborativa que conecta pessoas através da troca de conhecimentos e experiências. Nossa missão é criar um ambiente onde:
@@ -130,7 +128,7 @@ npm run dev
 
 ---
 
-## 6. Principais Componentes e Páginas
+## 5. Principais Componentes e Páginas
 
 ### Navbar/MenuRecolhivel
 - Navegação principal, menu lateral responsivo, fecha ao clicar fora ou pressionar ESC.
@@ -164,7 +162,7 @@ npm run dev
 
 ---
 
-## 7. Fluxo de Usuário
+## 6. Fluxo de Usuário
 
 1. **Cadastro:** Usuário informa nome, email, senha. Um nome de usuário único é gerado automaticamente.
 2. **Login:** Usuário acessa com email e senha.
@@ -176,7 +174,7 @@ npm run dev
 
 ---
 
-## 8. Permissões e Papéis
+## 7. Permissões e Papéis
 
 - **Usuário comum:** Pode editar apenas seu perfil e seus posts.
 - **Admin:** Pode editar/excluir qualquer post e visualizar todos os perfis.
@@ -184,7 +182,7 @@ npm run dev
 
 ---
 
-## 9. Soluções Técnicas Implementadas
+## 8. Soluções Técnicas Implementadas
 
 ### Posts de Exemplo
 
@@ -202,7 +200,7 @@ Para contornar o problema de conexão com o banco de dados, implementamos as seg
 
 ---
 
-## 10. Padrões de Código e Boas Práticas
+## 9. Padrões de Código e Boas Práticas
 
 Implementamos diversas práticas de desenvolvimento moderno para garantir a qualidade e manutenibilidade do código:
 

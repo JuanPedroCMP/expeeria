@@ -1,30 +1,30 @@
-# Soluu00e7u00e3o de Problemas (Troubleshooting) - Expeeria
+# Solução de Problemas (Troubleshooting) - Expeeria
 
-Este documento fornece soluu00e7u00f5es para problemas comuns que podem ocorrer durante o desenvolvimento ou uso da plataforma Expeeria.
+Este documento fornece soluções para problemas comuns que podem ocorrer durante o desenvolvimento ou uso da plataforma Expeeria.
 
-## u00cdndice
+## Índice
 
-1. [Problemas de Autenticau00e7u00e3o](#problemas-de-autenticau00e7u00e3o)
+1. [Problemas de Autenticação](#problemas-de-autenticação)
 2. [Problemas com Posts](#problemas-com-posts)
 3. [Erros no Banco de Dados](#erros-no-banco-de-dados)
 4. [Problemas de Performance](#problemas-de-performance)
 5. [Erros Comuns em Deploy](#erros-comuns-em-deploy)
 
-## Problemas de Autenticau00e7u00e3o
+## Problemas de Autenticação
 
 ### Loop de Carregamento Infinito
 
-**Problema:** A pu00e1gina fica em estado de carregamento infinito ao tentar verificar a sessu00e3o do usuu00e1rio.
+**Problema:** A página fica em estado de carregamento infinito ao tentar verificar a sessão do usuário.
 
-**Soluu00e7u00e3o:**
+**Solução:**
 
-1. O componente `PrivateRoute` agora implementa um timeout de seguranu00e7a:
+1. O componente `PrivateRoute` agora implementa um timeout de segurança:
    ```jsx
-   // Timeout de seguranu00e7a no PrivateRoute
+   // Timeout de segurança no PrivateRoute
    useEffect(() => {
      if (loading) {
        const timer = setTimeout(() => {
-         console.log('Timeout de seguranu00e7a do PrivateRoute acionado!');
+         console.log('Timeout de segurança do PrivateRoute acionado!');
          setTimeoutReached(true);
        }, 3000);
        return () => clearTimeout(timer);
@@ -34,19 +34,19 @@ Este documento fornece soluu00e7u00f5es para problemas comuns que podem ocorrer 
 
 2. Se o problema persistir, limpe o cache do navegador e os cookies.
 
-3. Verifique se as variu00e1veis de ambiente estu00e3o configuradas corretamente:
+3. Verifique se as variáveis de ambiente estão configuradas corretamente:
    ```
    VITE_SUPABASE_URL=sua-url-do-supabase
    VITE_SUPABASE_ANON_KEY=sua-chave-anonima
    ```
 
-### Erro "E-mail nu00e3o confirmado"
+### Erro "E-mail não confirmado"
 
-**Problema:** Ao tentar fazer login, recebe a mensagem que o e-mail nu00e3o foi confirmado.
+**Problema:** Ao tentar fazer login, recebe a mensagem que o e-mail não foi confirmado.
 
-**Soluu00e7u00e3o:**
+**Solução:**
 
-1. Verifique sua caixa de entrada (e pasta de spam) pelo e-mail de confirmau00e7u00e3o do Supabase.
+1. Verifique sua caixa de entrada (e pasta de spam) pelo e-mail de confirmação do Supabase.
 
 2. No Supabase Dashboard:
    - Acesse Authentication > Users e verifique o status do usuário
@@ -88,21 +88,21 @@ Este documento fornece soluu00e7u00f5es para problemas comuns que podem ocorrer 
    - Abra o Console do Navegador (F12)
    - Digite `localStorage.clear()` e pressione Enter
    - Recarregue a página
-   - Vu00e1 para `Authentication` > `Users`
-   - Localize o usuu00e1rio e clique em "View User"
+   - Vá para `Authentication` > `Users`
+   - Localize o usuário e clique em "View User"
    - Marque o email como confirmado (para fins de desenvolvimento)
 
-3. Em ambiente de desenvolvimento, vocu00ea pode desativar temporariamente a confirmau00e7u00e3o de e-mail:
-   - No Supabase Dashboard, vu00e1 para `Authentication` > `Providers` > `Email`
-   - Desmarque a opu00e7u00e3o "Confirm email"
+3. Em ambiente de desenvolvimento, você pode desativar temporariamente a confirmação de e-mail:
+   - No Supabase Dashboard, vá para `Authentication` > `Providers` > `Email`
+   - Desmarque a opção "Confirm email"
 
-### Sessu00e3o Perdida apu00f3s Recarregar a Pu00e1gina
+### Sessão Perdida após Recarregar a Página
 
-**Problema:** O login funciona, mas ao recarregar a pu00e1gina a sessu00e3o u00e9 perdida.
+**Problema:** O login funciona, mas ao recarregar a página a sessão é perdida.
 
-**Soluu00e7u00e3o:**
+**Solução:**
 
-Isso foi resolvido modificando a configurau00e7u00e3o de persistu00eancia do cliente Supabase:
+Isso foi resolvido modificando a configuração de persistência do cliente Supabase:
 
 ```javascript
 // src/services/supabase.js
