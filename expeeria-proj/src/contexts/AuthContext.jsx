@@ -2,221 +2,253 @@ import React, { createContext, useState, useEffect, useCallback } from 'react';
 import { authService } from '../services/authService';
 import supabase from '../services/supabase';
 
-// Criando o contexto de autenticação
+// Criando o contexto de autenticau00e7u00e3o
 export const AuthContext = createContext({});
+
+// Funu00e7u00e3o para limpar o localStorage de forma segura
+const cleanLocalStorage = () => {
+  try {
+    // Salvar apenas alguns itens importantes e remover tudo relacionado ao supabase
+    const itemsToKeep = {};
+    const supabaseKeysPattern = /sb-|supabase/;
+    
+    // Vamos manter apenas itens que nu00e3o su00e3o do Supabase
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && !supabaseKeysPattern.test(key)) {
+        try {
+          itemsToKeep[key] = localStorage.getItem(key);
+        } catch (e) {
+          console.warn('Erro ao acessar item do localStorage:', key);
+        }
+      }
+    }
+    
+    // Limpar completamente o localStorage
+    localStorage.clear();
+    
+    // Restaurar itens nu00e3o-supabase
+    Object.keys(itemsToKeep).forEach(key => {
+      localStorage.setItem(key, itemsToKeep[key]);
+    });
+    
+    console.log('LocalStorage limpo com sucesso de dados problemu00e1ticos do Supabase');
+    return true;
+  } catch (error) {
+    console.error('Erro ao limpar localStorage:', error);
+    return false;
+  }
+};
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [sessionChecked, setSessionChecked] = useState(false);
+  const [recoveryAttempt, setRecoveryAttempt] = useState(0);
 
-  // Função simplificada para inicializar a autenticação - abordagem mais direta
+  // Funu00e7u00e3o para inicializar a autenticau00e7u00e3o com recuperau00e7u00e3o
   const initAuth = useCallback(async () => {
     try {
       setLoading(true);
-      console.log('Iniciando verificação simplificada de autenticação...');
-
-      // Método mais direto para obter sessão
+      console.log(`Tentativa ${recoveryAttempt + 1} de inicializar autenticau00e7u00e3o...`);
+      
+      // Mu00e9todo para obter sessu00e3o
       const { data, error } = await supabase.auth.getSession();
+      
+      // DETECU00c7u00c3O DE ERROS: Se houver erro na sessu00e3o
       if (error) {
-        console.error('Erro ao obter sessão:', error);
-        setUser(null);
-        setLoading(false);
-        setSessionChecked(true);
-        return;
-      }
-      
-      console.log('Resposta da sessão:', data);
-      const hasSession = data && data.session;      
-      if (!hasSession) {
-        console.log('Nenhuma sessão válida encontrada');
-        // Não há sessão válida
-        setUser(null);
-        setLoading(false);
-        setSessionChecked(true);
-        return;
-      }
-      
-      console.log('Sessão válida encontrada, obtendo dados do usuário');
-      
-      // Buscar dados do usuário da sessão
-      const currentUser = sessionData.session.user;
-      
-      if (!currentUser || !currentUser.id) {
-        console.warn('Sessão encontrada, mas sem dados válidos de usuário');
-        // Sessão existe mas não tem dados válidos de usuário
-        await authService.signOut();
-        setUser(null);
-        setLoading(false);
-        setSessionChecked(true);
-        return;
-      }
-
-      console.log('Dados básicos do usuário encontrados, buscando perfil completo...');
-      
-      // Buscar perfil completo do usuário
-      try {
-        const { data: profile, error: profileError } = await supabase
-          .from('users')
-          .select('*')
-          .eq('id', currentUser.id)
-          .single();
+        console.error('Erro ao obter sessu00e3o:', error);
+        
+        // SISTEMA DE RECUPERAU00c7u00c3O - Se for primeira falha
+        if (recoveryAttempt === 0) {
+          console.warn('Primeiro erro de sessu00e3o detectado. Iniciando processo de recuperau00e7u00e3o...');
+          const cleaned = cleanLocalStorage();
+          setRecoveryAttempt(1);
           
-        if (profileError) {
-          console.warn('Erro ao buscar perfil:', profileError.message);
-          
-          // Tentar criar um perfil básico se não existir
-          if (profileError.code === 'PGRST116') { // Not found
-            console.log('Perfil não encontrado, criando perfil básico...');
+          // Tentar recuperar a sessu00e3o apu00f3s limpar localStorage
+          if (cleaned) {
+            console.log('Dados limpos, reiniciando cliente Supabase...');
             
-            const defaultProfile = {
-              id: currentUser.id,
-              email: currentUser.email,
-              username: currentUser.email.split('@')[0], // Username básico
-              name: currentUser.email.split('@')[0], // Nome básico 
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString(),
-              status: 'active',
-              role: 'user'
-            };
+            // Foru00e7ar o Supabase a criar uma nova instu00e2ncia de cliente
+            await supabase.auth.signOut();
             
-            const { data: newProfile, error: insertError } = await supabase
-              .from('users')
-              .insert(defaultProfile)
-              .select()
-              .single();
-            
-            if (insertError) {
-              console.error('Erro ao criar perfil básico:', insertError);
-              // Continuar com dados básicos
-              setUser(currentUser);
-            } else {
-              console.log('Perfil básico criado com sucesso');
-              setUser({
-                ...currentUser,
-                ...newProfile
-              });
-            }
-          } else {
-            // Outro tipo de erro, continuar com dados básicos
-            console.warn('Erro ao buscar perfil, usando dados básicos:', profileError);
-            setUser(currentUser);
+            // Reiniciar o processo apu00f3s um pequeno delay
+            setTimeout(() => {
+              initAuth();
+            }, 500);
+            return;
           }
-        } else if (!profile) {
-          console.warn('Perfil não encontrado, usando dados básicos');
-          setUser(currentUser);
-        } else {
-          console.log('Perfil completo encontrado, inicialização concluída');
-          // Combinar dados de autenticação com perfil
+        }
+        
+        // Se ainda estamos tendo problemas apu00f3s a limpeza
+        setUser(null);
+        setLoading(false);
+        setSessionChecked(true);
+        return;
+      }
+      
+      // Resetar contador de tentativas se chegamos aqui com sucesso
+      if (recoveryAttempt > 0) {
+        console.log('Recuperau00e7u00e3o bem-sucedida!');
+        setRecoveryAttempt(0);
+      }
+      
+      console.log('Resposta da sessu00e3o obtida com sucesso:', data);
+      const hasSession = data && data.session;      
+      
+      if (!hasSession) {
+        console.log('Nu00e3o hu00e1 sessu00e3o ativa');
+        setUser(null);
+        setLoading(false);
+        setSessionChecked(true);
+        return;
+      }
+      
+      // Obter dados do usuu00e1rio da sessu00e3o
+      const userData = data.session.user;
+      console.log('Dados do usuu00e1rio da sessu00e3o:', userData);
+      
+      if (userData) {
+        // Verificar tambu00e9m o perfil
+        try {
+          const { data: profileData } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', userData.id)
+            .single();
+            
           setUser({
-            ...currentUser,
-            ...profile
+            id: userData.id,
+            email: userData.email,
+            role: userData.user_metadata?.role || 'user',
+            name: profileData?.name,
+            username: profileData?.username,
+            avatar: profileData?.avatar
+          });
+        } catch (profileError) {
+          console.warn('Nu00e3o foi possu00edvel buscar o perfil, usando apenas dados bu00e1sicos:', profileError);
+          setUser({
+            id: userData.id,
+            email: userData.email,
+            role: userData.user_metadata?.role || 'user'
           });
         }
-      } catch (profileError) {
-        console.error('Exceção ao buscar perfil:', profileError);
-        // Continuar com os dados básicos do usuário
-        setUser(currentUser);
+      } else {
+        setUser(null);
       }
+      
+      setSessionChecked(true);
     } catch (error) {
-      console.error('Erro ao inicializar estado de autenticação:', error);
+      console.error('Erro ao inicializar estado de autenticau00e7u00e3o:', error);
       setUser(null);
     } finally {
-      console.log('Verificação de autenticação finalizada');
+      console.log('Verificau00e7u00e3o de autenticau00e7u00e3o finalizada');
       setLoading(false);
       setSessionChecked(true);
     }
-  }, []);
+  }, [recoveryAttempt]);
 
-  // Verificar sessão ao iniciar
+  // Verificar sessu00e3o ao iniciar
   useEffect(() => {
-    let isMounted = true; // Flag para verificar se o componente está montado
-    let safetyTimeout; // Referência para o timeout de segurança
+    let isMounted = true; // Flag para verificar se o componente estu00e1 montado
+    let safetyTimeout; // Referu00eancia para o timeout de seguranu00e7a
     
     // Contador de tentativas para evitar loops infinitos
     let retryCount = 0;
     const maxRetries = 2;
     
-    // Função de inicialização segura
+    // Funu00e7u00e3o de inicializau00e7u00e3o segura
     const safeInitAuth = async () => {
-      if (!isMounted || retryCount >= maxRetries) return;
-      
       try {
-        console.log(`Tentando inicializar sessão (tentativa ${retryCount + 1}/${maxRetries + 1})`);
+        if (!isMounted) return;
         await initAuth();
       } catch (error) {
-        console.error('Erro ao inicializar sessão:', error);
-        retryCount++;
+        console.error('Erro na inicializau00e7u00e3o segura:', error);
         
-        // Se falhar, definimos o estado padru00e3o
-        if (retryCount >= maxRetries && isMounted) {
-          console.log('Máximo de tentativas atingido, definindo estado padrão');
-          setUser(null);
+        // Tentar novamente se ainda nu00e3o excedemos o limite
+        if (retryCount < maxRetries && isMounted) {
+          retryCount++;
+          console.log(`Tentativa ${retryCount} de ${maxRetries} falhou, tentando novamente...`);
+          setTimeout(safeInitAuth, 1000 * retryCount); // Espera progressivamente mais tempo
+        } else if (isMounted) {
+          // Desistir e garantir que loading seja falso
           setLoading(false);
           setSessionChecked(true);
         }
       }
     };
     
-    // Configuração de timeout para segurança absoluta
+    // Configurau00e7u00e3o de timeout para seguranu00e7a absoluta
     safetyTimeout = setTimeout(() => {
       if (loading && isMounted) {
-        console.log('Timeout de segurança acionado para AuthContext');
+        console.log('Timeout de seguranu00e7a acionado para AuthContext');
         setLoading(false);
         setSessionChecked(true);
-        setUser(null); // Limpar usuário em caso de timeout para forçar login
+        
+        // Tentar auto-correu00e7u00e3o do localStorage se ainda estamos carregando apu00f3s timeout
+        cleanLocalStorage();
       }
-    }, 5000); // 5 segundos é tempo suficiente mesmo em conexões lentas
+    }, 5000); // 5 segundos u00e9 tempo suficiente mesmo em conexu00f5es lentas
 
-    // Iniciar verificação de autenticação
+    // Iniciar verificau00e7u00e3o de autenticau00e7u00e3o
     safeInitAuth();
     
-    // Configurar listener para mudanças de autenticação
-    const { data: { subscription }} = supabase.auth.onAuthStateChange(
+    // Configurar listener para mudanu00e7as de autenticau00e7u00e3o
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         console.log("Auth state changed:", event, !!session);
         
         if (!isMounted) return;
         
         if (event === 'SIGNED_IN' && session) {
-          setLoading(true); // Indicar carregamento quando o usuário fizer login
-          // Buscar usuário atual
           try {
-            const userData = await authService.getCurrentUser();
-            if (userData && isMounted) {
-              // Buscar perfil do usuário
-              const { data: profile } = await supabase
-                .from('users')
-                .select('*')
-                .eq('id', userData.id)
-                .single();
+            const userData = session.user;
+            
+            if (userData) {
+              // Buscar perfil do usuu00e1rio
+              try {
+                const { data: profileData, error: profileError } = await supabase
+                  .from('profiles')
+                  .select('*')
+                  .eq('id', userData.id)
+                  .single();
+                  
+                if (profileError && profileError.code !== 'PGRST116') {
+                  console.warn('Erro ao buscar perfil:', profileError);
+                }
                 
-              setUser({
-                ...userData,
-                ...profile
-              });
-            }
-          } catch (profileError) {
-            console.error('Erro ao buscar perfil:', profileError);
-            // Garantir que o usuário tenha pelo menos os dados básicos mesmo sem perfil
-            if (isMounted && session?.user) {
-              setUser(session.user);
+                // Combinar dados de autenticau00e7u00e3o com perfil
+                if (isMounted) {
+                  setUser({
+                    id: userData.id,
+                    email: userData.email,
+                    role: userData.user_metadata?.role || 'user',
+                    ...profileData
+                  });
+                }
+              } catch (profileError) {
+                console.error('Erro ao buscar perfil:', profileError);
+                // Ainda definir o usuu00e1rio mesmo sem perfil
+                if (isMounted) {
+                  setUser(userData);
+                }
+              }
             }
           } finally {
             if (isMounted) {
-              setLoading(false); // Garantir que loading seja false mesmo após erro
+              setLoading(false); // Garantir que loading seja false mesmo apu00f3s erro
               setSessionChecked(true);
             }
           }
         } else if (event === 'SIGNED_OUT') {
           if (isMounted) {
             setUser(null);
-            setLoading(false); // Garantir que loading seja false após logout
+            setLoading(false); // Garantir que loading seja false apu00f3s logout
             setSessionChecked(true);
           }
         } else {
-          // Garantir que loading seja false para outros eventos de autenticação
+          // Garantir que loading seja false para outros eventos de autenticau00e7u00e3o
           if (isMounted) {
             setLoading(false);
             setSessionChecked(true);
@@ -224,52 +256,40 @@ export function AuthProvider({ children }) {
         }
       }
     );
-    
-    // Definir um timeout de segurança para garantir que loading não fique travado
-    safetyTimeout = setTimeout(() => {
-      if (isMounted && loading) {
-        console.log("Timeout de segurança acionado para AuthContext");
-        setLoading(false);
-        setSessionChecked(true);
-        
-        // Verificar sessão de forma simplificada
-        authService.hasValidSession().then(hasSession => {
-          if (!hasSession && isMounted) {
-            setUser(null);
-          }
-        }).catch(() => {
-          // Em caso de erro, assume que não há sessão
-          if (isMounted) {
-            setUser(null);
-          }
-        });
-      }
-    }, 2000); // Reduzir para 2 segundos para melhor experiência do usuário
-    
-    // Limpar subscription e state quando o componente for desmontado
+
     return () => {
       isMounted = false;
-      // Limpar o timeout de segurança ao desmontar o componente
-      if (safetyTimeout) {
-        clearTimeout(safetyTimeout);
-      }
-      subscription?.unsubscribe();
+      clearTimeout(safetyTimeout);
+      subscription.unsubscribe();
     };
-  }, []);
+  }, [initAuth]);
 
-  // Função para reiniciar estado de autenticação em caso de problemas
-  const resetAuthState = useCallback(() => {
+  // Funu00e7u00e3o para redefinir o estado de autenticau00e7u00e3o 
+  // (uso avancu00e7ado para recuperau00e7u00e3o manual)
+  const resetAuthState = useCallback(async () => {
+    setError(null);
+    setLoading(true);
+    
+    // Limpar o localStorage de quaisquer dados corrompidos
+    cleanLocalStorage();
+    
+    // Foru00e7ar logout no Supabase para limpar o estado
+    try {
+      await supabase.auth.signOut();
+    } catch (e) {
+      console.warn('Erro ao fazer logout durante reset:', e);
+    }
+    
+    // Redefinir o estado
+    setUser(null);
     setLoading(false);
     setSessionChecked(true);
-    // Verificar sessão atual
-    authService.hasValidSession().then(hasSession => {
-      if (!hasSession) {
-        setUser(null);
-      }
-    });
+    setRecoveryAttempt(0);
+    
+    return true;
   }, []);
 
-  // Função de login
+  // Funu00e7u00e3o de login com recuperau00e7u00e3o integrada
   const login = useCallback(async (email, password) => {
     setLoading(true);
     setError(null);
@@ -279,39 +299,45 @@ export function AuthProvider({ children }) {
       const result = await authService.signIn({ email, password });
       console.log('Resultado do login:', result);
       
-      // Verificar se temos dados do usuário
-      if (!result || !result.user) {
-        throw new Error('Dados de usuário ausentes na resposta de autenticação');
+      // Verificar se temos dados do usuu00e1rio
+      if (!result.user) {
+        throw new Error(result.error || 'Falha ao login, sem detalhes do usuu00e1rio');
       }
       
-      const userData = result.user;
-      console.log('Dados do usuário obtidos:', userData.id);
+      const userData = {
+        id: result.user.id,
+        email: result.user.email,
+        role: result.user.user_metadata?.role || 'user'
+      };
       
-      // Buscar perfil do usuário
+      // Buscar dados de perfil para completar informau00e7u00f5es do usuu00e1rio
       try {
+        // Aguardar um momento para que o perfil seja criado se necessário
+        await new Promise(resolve => setTimeout(resolve, 200));
+        
         const { data: profile, error: profileError } = await supabase
-          .from('users')
+          .from('profiles')
           .select('*')
           .eq('id', userData.id)
           .single();
           
-        if (profileError) {
-          console.warn('Erro ao buscar perfil, continuando com dados básicos:', profileError);
+        if (profileError && profileError.code !== 'PGRST116') {
+          console.warn('Erro ao buscar perfil apu00f3s login:', profileError);
         }
         
-        // Mesmo com erro ao buscar perfil, definimos o usuário com os dados básicos
+        // Usuu00e1rio completo com dados do perfil
         const completeUser = {
           ...userData,
-          ...(profile || {})  // Usar perfil se disponível, ou objeto vazio
+          ...(profile || {})  // Usar perfil se disponu00edvel, ou objeto vazio
         };
         
-        console.log('Definindo usuário completo no contexto');
+        console.log('Definindo usuu00e1rio completo no contexto');
         setUser(completeUser);
         setSessionChecked(true);
         return completeUser;
       } catch (profileError) {
-        // Se houver erro ao buscar perfil, ainda definimos o usuário com dados básicos
-        console.warn('Erro ao buscar perfil, continuando com dados básicos:', profileError);
+        // Se houver erro ao buscar perfil, ainda definimos o usuu00e1rio com dados bu00e1sicos
+        console.warn('Erro ao buscar perfil, continuando com dados bu00e1sicos:', profileError);
         setUser(userData);
         setSessionChecked(true);
         return userData;
@@ -329,7 +355,7 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
-  // Função de logout
+  // Funu00e7u00e3o de logout
   const logout = useCallback(async () => {
     setLoading(true);
     try {
@@ -337,20 +363,18 @@ export function AuthProvider({ children }) {
       setUser(null);
     } catch (error) {
       console.error('Erro ao fazer logout:', error);
-      setError('Não foi possível sair. Tente novamente');
     } finally {
       setLoading(false);
     }
   }, []);
 
-  // Função de registro
-  const register = useCallback(async (userData) => {
+  // Funu00e7u00e3o de registro
+  const register = useCallback(async ({ email, password, name }) => {
     setLoading(true);
     setError(null);
     
     try {
-      const data = await authService.signUp(userData);
-      return data;
+      return await authService.signUp({ email, password, name });
     } catch (error) {
       console.error('Erro no registro:', error);
       setError(
@@ -363,36 +387,34 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
-  // Função para atualizar o perfil do usuário
+  // Outras funu00e7u00f5es do contexto...
   const updateProfile = useCallback(async (profileData) => {
-    if (!user) throw new Error('Usuário não autenticado');
+    if (!user) throw new Error('Usuu00e1rio nu00e3o autenticado');
     
     setLoading(true);
     setError(null);
     
     try {
-      // Atualizar apenas os dados do perfil
-      const { data: updatedProfile, error: profileError } = await supabase
-        .from('users')
+      // Atualizar os dados do perfil
+      const { error } = await supabase
+        .from('profiles')
         .update(profileData)
-        .eq('id', user.id)
-        .select()
-        .single();
+        .eq('id', user.id);
+        
+      if (error) throw error;
       
-      if (profileError) throw profileError;
-      
-      // Atualizar o usuário local
-      setUser((currentUser) => ({
-        ...currentUser,
-        ...updatedProfile,
+      // Atualizar o usuu00e1rio local com os novos dados
+      setUser(prevUser => ({
+        ...prevUser,
+        ...profileData
       }));
       
-      return updatedProfile;
+      return { success: true };
     } catch (error) {
       console.error('Erro ao atualizar perfil:', error);
       setError(
         error.message || 
-        'Falha ao atualizar perfil. Por favor, tente novamente.'
+        'Falha ao atualizar perfil. Tente novamente.'
       );
       throw error;
     } finally {
@@ -400,178 +422,26 @@ export function AuthProvider({ children }) {
     }
   }, [user]);
 
-  // Função para resetar senha
+  // Funu00e7u00e3o para redefinir senha
   const resetPassword = useCallback(async (email) => {
     setLoading(true);
     setError(null);
     
     try {
-      await authService.resetPassword(email);
-      return true;
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: window.location.origin + '/reset-password'
+      });
+      
+      if (error) throw error;
+      
+      return { success: true };
     } catch (error) {
-      console.error('Erro ao resetar senha:', error);
+      console.error('Erro ao solicitar redefiniu00e7u00e3o de senha:', error);
       setError(
         error.message || 
-        'Falha ao enviar email de recuperação. Tente novamente.'
+        'Falha ao enviar email de recuperau00e7u00e3o. Tente novamente.'
       );
       throw error;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  // Função para seguir usuário
-  const followUser = useCallback(async (userId) => {
-    if (!user) throw new Error('Usuário não autenticado');
-    
-    try {
-      // Atualizar a relação de seguidor
-      const { error } = await supabase
-        .from('user_followers')
-        .insert({
-          user_id: userId,  // O usuário que está sendo seguido
-          follower_id: user.id,  // O usuário que está seguindo
-          created_at: new Date().toISOString()
-        });
-      
-      if (error) throw error;
-      
-      // Atualizar o usuário local
-      setUser((currentUser) => {
-        if (!currentUser) return currentUser;
-        
-        return {
-          ...currentUser,
-          following: [...(currentUser.following || []), userId]
-        };
-      });
-      
-      return true;
-    } catch (error) {
-      console.error('Erro ao seguir usuário:', error);
-      throw error;
-    }
-  }, [user]);
-
-  // Função para deixar de seguir usuário
-  const unfollowUser = useCallback(async (userId) => {
-    if (!user) throw new Error('Usuário não autenticado');
-    
-    try {
-      // Remover a relação de seguidor
-      const { error } = await supabase
-        .from('user_followers')
-        .delete()
-        .match({
-          user_id: userId,  // O usuário que estava sendo seguido
-          follower_id: user.id  // O usuário que estava seguindo
-        });
-      
-      if (error) throw error;
-      
-      // Atualizar o usuário local
-      setUser((currentUser) => {
-        if (!currentUser) return currentUser;
-        
-        return {
-          ...currentUser,
-          following: (currentUser.following || []).filter(id => id !== userId)
-        };
-      });
-      
-      return true;
-    } catch (error) {
-      console.error('Erro ao deixar de seguir usuário:', error);
-      throw error;
-    }
-  }, [user]);
-
-  // Função para verificar se o usuário está seguindo outro
-  const isFollowing = useCallback(async (userId) => {
-    if (!user) return false;
-    
-    try {
-      const { data, error } = await supabase
-        .from('user_followers')
-        .select()
-        .match({
-          user_id: userId,
-          follower_id: user.id
-        })
-        .single();
-      
-      if (error && error.code !== 'PGRST116') return false; // PGRST116 é o código para 'no rows returned'
-      
-      return !!data;
-    } catch (error) {
-      console.error('Erro ao verificar seguidor:', error);
-      return false;
-    }
-  }, [user]);
-
-  // Verifica se o usuário é administrador
-  const isAdmin = useCallback(() => {
-    if (!user) return false;
-    return user.role === 'admin';
-  }, [user]);
-
-  // Verifica se o usuário é dono de um recurso
-  const isOwner = useCallback((resourceUserId) => {
-    if (!user) return false;
-    return user.id === resourceUserId;
-  }, [user]);
-
-  // Função para reconexão automática e revalidação de sessão
-  const reconnectAndValidate = useCallback(async () => {
-    if (!navigator.onLine) {
-      return { success: false, reason: 'offline' };
-    }
-    
-    setLoading(true);
-    setError(null);
-    
-    try {
-      // Tentar buscar a sessão atual do Supabase
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-      
-      if (sessionError) {
-        throw sessionError;
-      }
-      
-      if (!session) {
-        // Se não houver sessão, confirmar que o usuário está realmente deslogado
-        setUser(null);
-        return { success: true, authenticated: false };
-      }
-      
-      // Buscar dados do usuário com a sessão renovada
-      const userData = await authService.getCurrentUser();
-      
-      if (userData) {
-        // Buscar perfil atualizado
-        const { data: profile } = await supabase
-          .from('users')
-          .select('*')
-          .eq('id', userData.id)
-          .single();
-        
-        // Atualizar o estado do usuário com dados frescos
-        setUser({
-          ...userData,
-          ...profile
-        });
-        
-        return { success: true, authenticated: true };
-      } else {
-        // Se não conseguiu obter dados do usuário com uma sessão válida
-        setUser(null);
-        return { success: true, authenticated: false };
-      }
-    } catch (error) {
-      console.error('Erro durante a reconexão:', error);
-      setError('Falha ao reconectar. Por favor, faça login novamente.');
-      setUser(null);
-      return { success: false, reason: 'error', error };
     } finally {
       setLoading(false);
     }
@@ -589,14 +459,8 @@ export function AuthProvider({ children }) {
         register,
         updateProfile,
         resetPassword,
-        followUser,
-        unfollowUser,
-        isFollowing,
         isAuthenticated: !!user,
-        isAdmin,
-        isOwner,
-        resetAuthState,
-        reconnectAndValidate
+        resetAuthState
       }}
     >
       {children}
