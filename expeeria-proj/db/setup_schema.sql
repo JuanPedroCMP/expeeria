@@ -228,6 +228,15 @@ CREATE POLICY "Usuu00e1rios podem editar apenas seu pru00f3prio perfil"
   ON users FOR UPDATE
   USING (auth.uid() = id);
 
+CREATE POLICY "Permitir que novos usuários sejam inseridos durante registro"
+  ON users FOR INSERT
+  WITH CHECK (true);
+
+CREATE POLICY "Serviço pode inserir novos usuários sem restrição"
+  ON users FOR INSERT
+  TO authenticated, anon
+  WITH CHECK (true);
+
 -- Polu00edticas para posts
 CREATE POLICY "Posts publicados su00e3o visu00edveis para todos"
   ON posts FOR SELECT

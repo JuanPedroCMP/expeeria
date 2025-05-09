@@ -97,32 +97,45 @@ export const authService = {
         throw new Error("Erro ao criar usuário: dados incompletos retornados");
       }
 
+      console.log('Tentando criar perfil de usuário com ID:', authData.user.id);
+
       try {
         // Criar o perfil do usuário na tabela users
-        const { error: profileError } = await supabase
+        const userData = {
+          id: authData.user.id,
+          email,
+          password: '#hash_gerenciado_pelo_supabase_auth',  // O Supabase Auth gerencia as senhas
+          username,
+          name: fullName,
+          bio: '',
+          avatar: null,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          role: 'user',
+          status: 'active',
+          metadata: JSON.stringify({
+            lastLogin: new Date().toISOString(),
+            loginCount: 1,
+            preferences: {}
+          })
+        };
+
+        console.log('Dados a serem inseridos:', userData);
+        
+        const { data: insertedProfile, error: profileError } = await supabase
           .from('users')
-          .insert({
-            id: authData.user.id,
-            email,
-            password: '#hash_gerenciado_pelo_supabase_auth',  // O Supabase Auth gerencia as senhas
-            username,
-            name: fullName,
-            bio: '',
-            avatar: null,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-            role: 'user',
-            status: 'active',
-            metadata: JSON.stringify({
-              lastLogin: new Date().toISOString(),
-              loginCount: 1,
-              preferences: {}
-            })
-          });
+          .insert(userData)
+          .select()
+          .single();
 
         if (profileError) {
           console.error("Erro ao criar perfil:", profileError);
+          console.error("Código do erro:", profileError.code);
+          console.error("Mensagem do erro:", profileError.message);
+          console.error("Detalhes:", profileError.details);
           // Não impede o fluxo principal, pois o usuário já foi criado
+        } else {
+          console.log('Perfil criado com sucesso:', insertedProfile);
         }
       } catch (profileErr) {
         console.error("Exceção ao criar perfil:", profileErr);

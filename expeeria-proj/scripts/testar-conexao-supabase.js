@@ -1,8 +1,8 @@
 // Script para testar a conexu00e3o com o Supabase
 
 // CONFIGURAU00c7U00c3O: Substitua essas variáveis com os valores de seu arquivo .env.local
-const SUPABASE_URL = 'https://gbrbhlhlkalpeqpdzeof.supabase.co'; // Substitua pelo seu VITE_SUPABASE_URL
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdicmJobGhsa2FscGVxcGR6ZW9mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY3NDQ1MjIsImV4cCI6MjA2MjMyMDUyMn0.D5Z97vELybiFvqMLpe_N_XPgxg9nKNTUmFtzitPMfHE'; // Substitua pelo seu VITE_SUPABASE_ANON_KEY
+const SUPABASE_URL = 'https://gcwqtzpaekzfxljtgnrh.supabase.co'; // Substitua pelo seu VITE_SUPABASE_URL
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdjd3F0enBhZWt6ZnhsanRnbnJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY3NDg3MTUsImV4cCI6MjA2MjMyNDcxNX0.pOU9Ibecq_qNx3NB4GsIA-8yIAXfQvsvpoh2MPgvC2Y'; // Substitua pelo seu VITE_SUPABASE_ANON_KEY
 
 /**
  * INSTU00c7U00d5ES:

@@ -152,6 +152,7 @@
 .primaryButton:hover {
   transform: translateY(-3px);
   box-shadow: 0 6px 20px rgba(56, 189, 248, 0.6);
+  color: white;
 }
 
 .secondaryButton {
@@ -641,6 +642,7 @@
 .primaryButtonLarge:hover {
   transform: translateY(-5px);
   box-shadow: 0 15px 30px rgba(56, 189, 248, 0.6);
+  color: white;
 }
 
 .secondaryButtonLarge {
