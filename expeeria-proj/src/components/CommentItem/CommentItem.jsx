@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "../../hooks/useAuth";
 import { useComment } from "../../hooks/useComment";
 import styles from "./CommentItem.module.css";
@@ -15,14 +15,30 @@ export const  CommentItem = ({
   onDelete 
 }) => {
   const { user } = useAuth();
-  const { hasLikedComment, likeComment, unlikeComment } = useComment();
+  const { hasLikedComment, likeComment, unlikeComment, toggleLikeComment } = useComment();
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState(comment.content);
   const [showReplyForm, setShowReplyForm] = useState(false);
   const [replyContent, setReplyContent] = useState("");
+  const [isLiked, setIsLiked] = useState(false);
   
   const isCommentOwner = user && user.id === comment.user_id;
-  const isLiked = hasLikedComment(comment.id, postId);
+  
+  // Verificar se o comentário está curtido quando o componente monta
+  useEffect(() => {
+    if (user && comment.id) {
+      const checkLikeStatus = async () => {
+        try {
+          const liked = await hasLikedComment(comment.id);
+          setIsLiked(liked);
+        } catch (error) {
+          console.error('Erro ao verificar status de curtida:', error);
+        }
+      };
+      
+      checkLikeStatus();
+    }
+  }, [user, comment.id, hasLikedComment]);
   
   const handleLikeToggle = async (e) => {
     e.preventDefault();

@@ -4,6 +4,9 @@ import ReactMarkdown from "react-markdown";
 import style from "./PostPage.module.css";
 import { Button, CommentItem, Pagination } from "../../components";
 import { useAuth } from "../../hooks/useAuth";
+import { usePost } from "../../hooks/usePost";
+import { useComment } from "../../hooks/useComment";
+import { useNotification } from "../../hooks/useNotification";
 import supabase from "../../services/supabase";
 
 export const PostPage = () => {
@@ -16,12 +19,18 @@ export const PostPage = () => {
   const [comment, setComment] = useState("");
   const [userInput, setUserInput] = useState("");
   const { user } = useAuth();
-  
+  const { getPostById, toggleLikePost } = usePost();
+  const { loadComments, addComment, deleteComment } = useComment();
+  const { showSuccess, showError } = useNotification();
+
   // Estados para paginação de comentários
   const [currentPage, setCurrentPage] = useState(1);
   const commentsPerPage = 5; // Quantidade de comentários por página
   
-  // Buscar post e comentários do Supabase usando abordagem simplificada
+  // Verificar se o usuário é o autor do post ou administrador
+  const isOwnerOrAdmin = post && user && (user.id === post.authorId || user.role === "admin");
+
+  // Buscar post e comentários usando o hook usePost
   useEffect(() => {
     const fetchPostAndComments = async () => {
       try {
@@ -29,22 +38,9 @@ export const PostPage = () => {
         setLoading(true);
         setError(null); // Limpar erros anteriores
         
-        // PASSO 1: Buscar dados básicos do post (consulta simplificada)
-        const { data: postData, error: postError } = await supabase
-          .from('posts')
-          .select('*')  // Consulta simples, sem joins
-          .eq('id', id)
-          .single();
+        // Buscar o post usando o hook usePost
+        const postData = await getPostById(id);
           
-        console.log('Resultado da consulta de post:', { postData, postError });
-          
-        if (postError) {
-          console.error('Erro ao buscar post:', postError);
-          setError('Não foi possível carregar o post: ' + postError.message);
-          setLoading(false);
-          return;
-        }
-        
         if (!postData) {
           console.log('Post não encontrado');
           setError('Post não encontrado');
@@ -52,81 +48,57 @@ export const PostPage = () => {
           return;
         }
         
-        // PASSO 2: Obter informações do autor (simplificado - sem buscar perfil)
-        // A tabela 'profiles' não existe, então usamos diretamente o e-mail do autor
-        const authorData = {
-          id: postData.author_id,
-          name: postData.author_name || 'Usuário', // Usar author_name se existir
-          email: postData.author_email // Campo opcional
-        };
-        
-        console.log('Informações do autor (simplificado):', authorData);
-          
-        // PASSO 3: Buscar contagem de likes
-        const { count: likeCount, error: likeError } = await supabase
-          .from('post_likes')
-          .select('id', { count: 'exact', head: true })
-          .eq('post_id', id);
-          
-        console.log('Resultado da contagem de likes:', { likeCount, likeError });
-          
-        // PASSO 4: Buscar categorias do post
+        // Buscar categorias do post
         const { data: categoriesData, error: categoriesError } = await supabase
           .from('post_categories')
           .select('category')
           .eq('post_id', id);
           
-        console.log('Resultado da busca de categorias:', { categoriesData, categoriesError });
-        
-        // PASSO 5: Buscar comentários do post (consulta simplificada)
-        const { data: commentsRawData, error: commentsError } = await supabase
-          .from('comments')
-          .select('*')  // Sem joins complexos
-          .eq('post_id', id)
-          .order('created_at', { ascending: false });
-          
-        console.log('Resultado da busca de comentários:', { commentsRawData, commentsError });
-        
-        if (commentsError) {
-          console.warn('Erro ao buscar comentários:', commentsError);
-          // Não interrompe o fluxo, apenas mostra post sem comentários
+        if (categoriesError) {
+          console.warn('Erro ao buscar categorias:', categoriesError);
         }
         
-        // Processar dados do post combinando informações de todas as consultas
+        // Buscar comentários do post usando o hook useComment
+        const commentsRawData = await loadComments(id);
+        
+        // Preparar dados do post para exibição
         const processedPost = {
           id: postData.id,
           title: postData.title,
           caption: postData.caption,
           content: postData.content,
           imageUrl: postData.image_url,
-          author: authorData ? (authorData.name || authorData.username) : 'Usuário',
+          author: postData.author_name || 'Usuário',
           authorId: postData.author_id,
           createdAt: postData.created_at,
-          likeCount: likeCount || 0,
-          categories: categoriesData ? categoriesData.map(cat => cat.category) : []
+          categories: categoriesData ? categoriesData.map(cat => cat.category) : [],
+          likeCount: postData.like_count || 0
         };
         
-        // Processar comentários para exibição
-        let processedComments = [];
-        if (commentsRawData && commentsRawData.length > 0) {
-          processedComments = commentsRawData.map(comment => {
-            return {
-              id: comment.id,
-              text: comment.content,
-              user: comment.user_name || 'Usuário Anônimo',
-              userId: comment.user_id,
-              createdAt: comment.created_at
-            };
-          });
-        }
-        
-        console.log('Post processado:', processedPost);
-        console.log('Comentários processados:', processedComments);
-        
+        // Processar comentários
+        const processedComments = commentsRawData ? commentsRawData.map(c => ({
+          id: c.id,
+          postId: c.post_id,
+          userId: c.user_id,
+          content: c.content, // Alterado para corresponder ao formato do CommentItem
+          text: c.content,   // Mantido por compatibilidade
+          user: c.author_name || 'Anônimo',
+          created_at: c.created_at, // Formato usado pelo CommentItem
+          createdAt: c.created_at,  // Mantido por compatibilidade
+          profiles: { username: c.author_name || 'Anônimo' }, // Formato usado pelo CommentItem
+          user_id: c.user_id, // Formato usado pelo CommentItem
+          // Metadados para UI
+          isAuthor: user && c.user_id === user.id,
+          isPostAuthor: postData.author_id === c.user_id,
+          canDelete: user && (user.id === c.user_id || user.id === postData.author_id)
+        })) : [];
+
+        // Atualizar estados
         setPost(processedPost);
-        setComments(processedComments);
+        setComments(processedComments || []);
+        setError(null);
         
-        // Registrar visualização no localStorage para 'recentemente vistos'
+        // Registrar visualização no localStorage
         if (user) {
           try {
             const viewedPostsData = localStorage.getItem(`viewedPosts_${user.id}`);
@@ -135,33 +107,35 @@ export const PostPage = () => {
             // Manter apenas os últimos 10 posts visualizados
             viewedPosts = [id, ...viewedPosts.filter(postId => postId !== id)].slice(0, 10);
             localStorage.setItem(`viewedPosts_${user.id}`, JSON.stringify(viewedPosts));
-          } catch (error) {
-            console.error('Erro ao salvar post visualizado:', error);
+          } catch (storageError) {
+            console.error('Erro ao salvar post visualizado:', storageError);
           }
         }
-        
-        setLoading(false);
-      } catch (error) {
-        console.error('Erro ao buscar post:', error);
-        setError('Falha ao carregar o post. Tente novamente mais tarde.');
+      } catch (err) {
+        console.error('Erro ao processar dados do post:', err);
+        setError('Erro ao carregar o post: ' + (err.message || 'Erro desconhecido'));
+      } finally {
         setLoading(false);
       }
     };
     
-    fetchPostAndComments();
-  }, [id, user]);
+    if (id) {
+      fetchPostAndComments();
+    }
+  }, [id, user, getPostById]);
 
+  // Função para excluir o post
   const handleDelete = async (e) => {
     e.preventDefault();
     if (!user) {
-      alert("Você precisa estar logado para excluir!");
+      showError("Você precisa estar logado para excluir!");
       return;
     }
     if (!post) return;
     
     // Verificar se o usuário é o autor do post ou administrador
     if (user.id !== post.authorId && user.role !== 'admin') {
-      alert("Você não tem permissão para excluir este post.");
+      showError("Você não tem permissão para excluir este post.");
       return;
     }
     
@@ -175,198 +149,134 @@ export const PostPage = () => {
           
         if (error) throw error;
         
-        alert("Post excluído com sucesso!");
+        showSuccess("Post excluído com sucesso!");
         navigate('/'); // Redirecionar para a página inicial após excluir
       } catch (error) {
         console.error('Erro ao excluir post:', error);
-        alert("Erro ao excluir post. Tente novamente mais tarde.");
+        showError("Erro ao excluir post. Tente novamente mais tarde.");
       }
     }
   };
 
-  if (loading) return <p>Carregando...</p>;
-  if (error) return <p>{error}</p>;
-  if (!post) return <p>Post não encontrado.</p>;
-  
-  const isOwnerOrAdmin = user && (user.id === post.authorId || user.role === "admin");
-
+  // Função para adicionar um comentário
   const handleComment = async (e) => {
     e.preventDefault();
-    if (!(user || userInput) || !comment) return;
+    
+    if (!comment.trim()) {
+      showError('O comentário não pode estar vazio');
+      return;
+    }
     
     try {
-      // Preparar dados do comentário para compatibilidade com a estrutura do banco
-      const commentData = {
-        content: comment,
-        post_id: post.id,
-        user_id: user ? user.id : null, // Usando user_id em vez de author_id
-        user_name: user ? (user.name || user.email) : userInput, // Nome do usuário 
-        created_at: new Date().toISOString()
-      };
+      // Usar o hook useComment para adicionar o comentário
+      await addComment(id, comment.trim());
       
-      // Inserir comentário no Supabase
-      const { data: newComment, error } = await supabase
-        .from('comments')
-        .insert(commentData)
-        .select()
-        .single();
+      // Limpar o formulário
+      setComment('');
+      showSuccess('Comentário adicionado com sucesso!');
       
-      if (error) {
-        console.error('Erro ao adicionar comentário:', error);
-        alert(`Erro ao adicionar comentário: ${error.message || 'Tente novamente.'}`);
-        return;
-      }
+      // Recarregar os comentários para ter a versão mais atualizada
+      const updatedComments = await loadComments(id);
       
-      // Processar e adicionar o novo comentário à lista
-      const processedComment = {
-        id: newComment.id,
-        text: newComment.content,
-        user: newComment.user_name,
-        userId: newComment.user_id,
-        createdAt: newComment.created_at
-      };
+      // Processar os comentários atualizados para a UI
+      const processedComments = updatedComments.map(c => ({
+        id: c.id,
+        postId: c.post_id,
+        userId: c.user_id,
+        content: c.content,
+        text: c.content,
+        user: c.author_name || 'Anônimo',
+        created_at: c.created_at,
+        createdAt: c.created_at,
+        profiles: { username: c.author_name || 'Anônimo' },
+        user_id: c.user_id,
+        isAuthor: user && c.user_id === user.id,
+        isPostAuthor: post.authorId === c.user_id,
+        canDelete: user && (user.id === c.user_id || user.id === post.authorId)
+      }));
       
-      setComments([processedComment, ...comments]);
-      
-      // Limpar campos
-      setComment("");
-      if (!user) setUserInput("");
-      
-      // Após adicionar um comentário, voltar para a primeira página
-      setCurrentPage(1);
+      setComments(processedComments);
     } catch (error) {
       console.error('Erro ao adicionar comentário:', error);
-      alert('Erro ao adicionar comentário. Tente novamente.');
+      showError('Erro ao adicionar comentário: ' + (error.message || 'Falha na operação'));
     }
   };
 
   // Função para mudar de página
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
-    // Scroll para cima da seção de comentários
-    const commentsSection = document.querySelector(`.${style.commentsTitle}`);
+    // Opcionalmente, rolar para o topo da seção de comentários
+    const commentsSection = document.querySelector(`.${style.commentsContainer}`);
     if (commentsSection) {
-      commentsSection.scrollIntoView({ behavior: "smooth" });
+      commentsSection.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
   // Função para excluir comentário
   const handleDeleteComment = async (commentId) => {
-    if (!user) {
-      alert("Você precisa estar logado para excluir comentários!");
-      return;
-    }
+    if (!user || !commentId) return;
     
     try {
-      // Buscar o comentário para verificar se o usuário é o autor
-      const { data: comment, error: fetchError } = await supabase
-        .from('comments')
-        .select('user_id') // Usando user_id em vez de author_id
-        .eq('id', commentId)
-        .single();
-        
-      if (fetchError) throw fetchError;
-      
-      // Verificar se o usuário é o autor do comentário ou admin
-      if (comment.user_id !== user.id && user.role !== 'admin') {
-        alert("Você não tem permissão para excluir este comentário.");
+      // Confirmação de exclusão
+      if (!window.confirm('Tem certeza que deseja excluir este comentário?')) {
         return;
       }
       
-      if (window.confirm("Tem certeza que deseja excluir este comentário?")) {
-        // Excluir comentário
-        const { error } = await supabase
-          .from('comments')
-          .delete()
-          .eq('id', commentId);
-          
-        if (error) throw error;
-        
-        // Atualizar a lista de comentários localmente
-        setComments(comments.filter(c => c.id !== commentId));
-        alert("Comentário excluído com sucesso!");
+      // Verificar permissão para excluir
+      const targetComment = comments.find(c => c.id === commentId);
+      if (!targetComment) {
+        showError('Comentário não encontrado');
+        return;
       }
+      
+      // Apenas o autor do comentário ou o autor do post podem excluir
+      const canDelete = user.id === targetComment.userId || user.id === post.authorId;
+      if (!canDelete) {
+        showError('Você não tem permissão para excluir este comentário');
+        return;
+      }
+      
+      // Excluir usando o hook useComment
+      await deleteComment(commentId, post.id);
+      
+      // Remover do estado local
+      setComments(comments.filter(c => c.id !== commentId));
+      showSuccess('Comentário excluído com sucesso');
     } catch (error) {
       console.error('Erro ao excluir comentário:', error);
-      alert('Erro ao excluir comentário. Tente novamente.');
+      showError(`Erro ao excluir comentário: ${error.message || 'Tente novamente.'}`);
     }
   };
-  
+
   // Função para curtir post
   const handleLike = async () => {
     if (!user) {
-      alert("Você precisa estar logado para curtir!");
+      showError("Você precisa estar logado para curtir posts!");
       return;
     }
     
     try {
-      // Verificar se o post existe
-      if (!post) return;
+      // Atualização otimista da UI antes da resposta da API
+      const newLikeCount = post.likeCount + 1; // Incremento otimista
+      setPost(prev => ({ ...prev, likeCount: newLikeCount }));
       
-      // Abordagem simplificada para lidar com curtidas
-      // Em vez de usar o modelo tradicional de toggle (adicionar/remover like),
-      // vamos sempre incrementar o contador para simplificar
+      // Chamar a função toggleLikePost do hook usePost
+      const result = await toggleLikePost(post.id);
       
-      // Armazenar o estado atual de likes
-      const currentLikes = post.likeCount || 0;
-      
-      // Atualizar a interface imediatamente para feedback visual 
-      setPost({
-        ...post,
-        likeCount: currentLikes + 1
-      });
-      
-      // Tentar registrar o like no Supabase (ignorando erros de chave duplicada)
-      try {
-        await supabase
-          .from('post_likes')
-          .upsert({
-            post_id: post.id,
-            user_id: user.id,
-            created_at: new Date().toISOString()
-          }, { onConflict: 'post_id,user_id' });
-      } catch (err) {
-        console.log('Erro ao registrar like (não afeta a experiência do usuário):', err);
-        // Não mostramos erro ao usuário para não afetar a experiência
-      }
-    } catch (error) {
-      console.error('Erro ao processar curtida:', error);
-      // Interface já foi atualizada, não precisa mostrar erro ao usuário
-    }
-  };
-    
-    try {
-      // Buscar o comentário para verificar se o usuário é o autor
-      const { data: comment, error: fetchError } = await supabase
-        .from('comments')
-        .select('user_id') // Usando user_id em vez de author_id
-        .eq('id', commentId)
-        .single();
-        
-      if (fetchError) throw fetchError;
-      
-      // Verificar se o usuário é o autor do comentário ou admin
-      if (comment.user_id !== user.id && user.role !== 'admin') {
-        alert("Você não tem permissão para excluir este comentário.");
-        return;
+      if (!result.success) {
+        // Se falhar, reverter a atualização otimista
+        setPost(prev => ({ ...prev, likeCount: prev.likeCount - 1 }));
+        throw new Error('Falha ao processar curtida');
       }
       
-      if (window.confirm("Tem certeza que deseja excluir este comentário?")) {
-        // Excluir comentário
-        const { error } = await supabase
-          .from('comments')
-          .delete()
-          .eq('id', commentId);
-          
-        if (error) throw error;
-        
-        // Atualizar a lista de comentários localmente
-        setComments(comments.filter(c => c.id !== commentId));
-        alert("Comentário excluído com sucesso!");
-      }
-    } catch (error) {
-      console.error('Erro ao excluir comentário:', error);
-      alert('Erro ao excluir comentário. Tente novamente.');
+      // Atualizar o estado com o valor real retornado
+      setPost(prev => ({
+        ...prev,
+        likeCount: result.liked ? prev.likeCount : prev.likeCount - 2 // Ajustar com base no resultado real
+      }));
+    } catch (err) {
+      console.error('Erro ao curtir post:', err);
+      showError("Erro ao curtir o post. Tente novamente.");
     }
   };
   
@@ -383,7 +293,7 @@ export const PostPage = () => {
   if (error) {
     return (
       <div className={style.postContainer}>
-        <h2>Erro ao carregar o post</h2>
+        <h2>Erro ao carregar post</h2>
         <p>{error}</p>
         <Button destino="/" texto="Voltar para a página inicial" />
       </div>
@@ -399,8 +309,6 @@ export const PostPage = () => {
       </div>
     );
   }
-  
-  // A variável isOwnerOrAdmin já foi declarada anteriormente
 
   return (
     <>

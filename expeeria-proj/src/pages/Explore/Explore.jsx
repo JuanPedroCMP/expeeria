@@ -3,7 +3,7 @@ import { Card } from "../../components/Card/Card";
 import style from "./Explore.module.css";
 import { categoriasPadrao } from "../../utils/categoriasPadrao";
 import { useNavigate } from "react-router-dom";
-import supabase from "../../services/supabase";
+import { usePost } from "../../hooks/usePost";
 
 const PAGE_SIZE = 8;
 
@@ -26,51 +26,30 @@ export function Explore() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showCategories, setShowCategories] = useState(false);
+  const { getPosts, loading: postsLoading, error: postsError } = usePost();
   
-  // Buscar posts do Supabase
+  // Buscar posts usando o hook usePost
   useEffect(() => {
     const fetchPosts = async () => {
       try {
         setLoading(true);
-        // Buscar posts com contagens de likes e informações do autor
-        const { data: postsData, error: postsError } = await supabase
-          .from('posts')
-          .select(`
-            *,
-            users!author_id (id, username, name, avatar),
-            post_likes!post_id (count),
-            post_categories!post_id (category)
-          `)
-          .eq('status', 'published')
-          .order('created_at', { ascending: false });
-          
-        if (postsError) throw postsError;
         
-        // Processar os dados para um formato mais amigável
-        const processedPosts = postsData.map(post => ({
-          id: post.id,
-          title: post.title,
-          caption: post.caption,
-          content: post.content,
-          imageUrl: post.image_url,
-          author: post.users?.name || post.users?.username || 'Usuário',
-          authorId: post.author_id,
-          createdAt: post.created_at,
-          likeCount: post.post_likes[0]?.count || 0,
-          categories: post.post_categories.map(cat => cat.category)
-        }));
+        // Usar o hook usePost para buscar todos os posts
+        const postsData = await getPosts();
         
-        setAllPosts(processedPosts);
-        setLoading(false);
+        // Os posts já vem processados pelo hook, apenas passar para o estado
+        setAllPosts(postsData);
+        setError(null);
       } catch (error) {
         console.error('Erro ao buscar posts:', error);
         setError('Falha ao carregar posts. Tente novamente mais tarde.');
+      } finally {
         setLoading(false);
       }
     };
     
     fetchPosts();
-  }, []);
+  }, [getPosts]);
 
   // Salva filtros no localStorage
   useEffect(() => {

@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { NewPost } from "../NewPost/NewPost";
-import supabase from "../../services/supabase";
 import { useNotification } from "../../hooks/useNotification";
 import { useAuth } from "../../hooks/useAuth";
+import { usePost } from "../../hooks/usePost";
 
 export const EditPost = () => {
   const { id } = useParams();
@@ -13,24 +13,21 @@ export const EditPost = () => {
   const [error, setError] = useState(null);
   const { showSuccess, showError } = useNotification();
   const { user } = useAuth();
+  const { getPostById, updatePost } = usePost();
 
-  // Buscar os dados do post diretamente do Supabase
+  // Buscar os dados do post usando o hook usePost
   useEffect(() => {
     const fetchPost = async () => {
       try {
         setLoading(true);
         setError(null);
         
-        // Buscar o post
-        const { data: postData, error: postError } = await supabase
-          .from('posts')
-          .select('*')
-          .eq('id', id)
-          .single();
-          
-        if (postError) throw postError;
+        // Buscar o post usando o hook usePost
+        const postData = await getPostById(id);
+        if (!postData) throw new Error('Post não encontrado');
         
-        // Buscar as categorias do post
+        // Buscar as categorias do post (ainda precisamos fazer isso separadamente)
+        // No futuro podemos melhorar o hook usePost para incluir categorias
         const { data: categoriesData, error: categoriesError } = await supabase
           .from('post_categories')
           .select('category')
@@ -46,7 +43,7 @@ export const EditPost = () => {
           content: postData.content,
           imageUrl: postData.image_url,
           author: postData.author_id,
-          area: categoriesData.map(cat => cat.category)
+          area: categoriesData?.map(cat => cat.category) || []
         };
         
         // Verificar se o usuário tem permissão para editar este post
@@ -68,24 +65,21 @@ export const EditPost = () => {
     if (id) {
       fetchPost();
     }
-  }, [id, user]);
+  }, [id, user, getPostById]);
 
   // Função para salvar a edição do post
   const handleEdit = async (dadosEditados) => {
     try {
-      // Atualizar os dados básicos do post
-      const { error: updateError } = await supabase
-        .from('posts')
-        .update({
-          title: dadosEditados.title,
-          caption: dadosEditados.caption,
-          content: dadosEditados.content,
-          image_url: dadosEditados.image_url,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', id);
-        
-      if (updateError) throw updateError;
+      // Preparar dados para atualização
+      const postData = {
+        title: dadosEditados.title,
+        caption: dadosEditados.caption,
+        content: dadosEditados.content,
+        image_url: dadosEditados.imageUrl || dadosEditados.image_url
+      };
+      
+      // Atualizar o post usando o hook usePost
+      await updatePost(id, postData);
       
       // Remover categorias antigas e adicionar as novas
       if (dadosEditados.area && dadosEditados.area.length > 0) {

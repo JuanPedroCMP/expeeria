@@ -1,8 +1,8 @@
 import React from 'react';
 import { createContext, useEffect, useState } from "react";
 import { AuthProvider } from './AuthContext';
-import { PostProvider } from './PostContext';
-import { CommentProvider } from './CommentContext';
+// PostProvider removido - agora usamos o hook usePost diretamente com Supabase
+// CommentProvider removido - agora usamos o hook useComment diretamente com Supabase
 import { NotificationProvider } from './NotificationContext';
 
 // eslint-disable-next-line react-refresh/only-export-components
@@ -22,11 +22,7 @@ export function AppProvider({ children }) {
   return (
     <AuthProvider>
       <NotificationProvider>
-        <PostProvider>
-          <CommentProvider>
-            {children}
-          </CommentProvider>
-        </PostProvider>
+        {children}
       </NotificationProvider>
     </AuthProvider>
   );

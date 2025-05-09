@@ -1,11 +1,11 @@
-import { PostProvider } from "../../contexts/PostContext";
 import { Recomendacoes } from "../../components/Recomendacoes/Recomendacoes";
 import { useAuth } from "../../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import style from "./Inicial.module.css";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Card } from "../../components/Card/Card";
-import supabase from "../../services/supabase";
+import { usePost } from "../../hooks/usePost";
+import { categoriasPadrao } from "../../utils/categoriasPadrao";
 
 const Inicial = () => {
   const { user } = useAuth();
@@ -13,36 +13,26 @@ const Inicial = () => {
   const [allPosts, setAllPosts] = useState([]);
   const [trendingPosts, setTrendingPosts] = useState([]);
   const [recentlyViewedPosts, setRecentlyViewedPosts] = useState([]);
+  const [categorizedPosts, setCategorizedPosts] = useState({});
+  const [popularCategories, setPopularCategories] = useState([]);
+  const [currentCarouselIndex, setCurrentCarouselIndex] = useState(0);
+  const [activeCategory, setActiveCategory] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const carouselRef = useRef(null);
+  const { getPosts } = usePost();
 
-  // Carregar todos os posts do Supabase
+  // Carregar todos os posts usando o hook usePost
   useEffect(() => {
     const fetchPosts = async () => {
       try {
         setLoading(true);
         setError(null); // Limpar erros anteriores
-        console.log('Iniciando busca simplificada de posts...');
+        console.log('Iniciando busca de posts usando usePost...');
         
-        // Consulta simplificada para reduzir chances de erro
-        // Apenas informações básicas dos posts, sem junções complexas
-        const { data: postsData, error: postsError } = await supabase
-          .from('posts')
-          .select('*')  // Consulta simplificada
-          .eq('status', 'published')
-          .order('created_at', { ascending: false })
-          .limit(10); // Limitar resultados para melhor performance
-          
-        console.log('Resposta da consulta:', { postsData, postsError });
-          
-        if (postsError) {
-          console.error('Erro na consulta Supabase:', postsError);
-          setError('Falha ao carregar posts: ' + postsError.message);
-          setLoading(false);
-          return;
-        }
+        // Usar o hook usePost para buscar todos os posts
+        const postsData = await getPosts();
         
-        // Verificar se temos dados e evitar erros quando não há posts
         if (!postsData || postsData.length === 0) {
           console.log('Nenhum post encontrado');
           setAllPosts([]);
@@ -53,59 +43,64 @@ const Inicial = () => {
         
         console.log('Posts encontrados:', postsData.length);
         
-        // Segunda consulta para obter autores dos posts
-        // Obter IDs de autores únicos
-        const authorIds = [...new Set(postsData.map(post => post.author_id))];
-        const { data: authorsData } = await supabase
-          .from('users')
-          .select('id, username, name, avatar')
-          .in('id', authorIds);
-        
-        // Criar mapa de autores para acesso rápido
-        const authorsMap = {};
-        if (authorsData) {
-          authorsData.forEach(author => {
-            authorsMap[author.id] = author;
-          });
-        }
-        
-        // Processar os dados para um formato mais amigável
-        const processedPosts = postsData.map(post => {
-          // Obter autor do mapa
-          const author = authorsMap[post.author_id] || { username: 'Usuário', name: 'Usuário' };
-          
-          return {
-            id: post.id,
-            title: post.title,
-            caption: post.caption,
-            content: post.content,
-            imageUrl: post.image_url,
-            author: author.name || author.username,
-            authorId: post.author_id,
-            createdAt: post.created_at,
-            likeCount: post.like_count || 0,
-            categories: [] // Simplificado temporariamente
-          };
-        });
-        
-        setAllPosts(processedPosts);
+        // Posts já vem processados do hook usePost
+        setAllPosts(postsData);
         
         // Ordenar por curtidas para trending posts
-        const trending = [...processedPosts]
+        const trending = [...postsData]
           .sort((a, b) => b.likeCount - a.likeCount)
-          .slice(0, 3);
+          .slice(0, 5); // Aumentando para 5 posts em destaque para o carrossel
         setTrendingPosts(trending);
         
-        setLoading(false);
+        // Categorizar posts
+        const categorized = {};
+        const categoryCount = {};
+        
+        // Processar posts em categorias e contar ocorrências
+        postsData.forEach(post => {
+          // Garantir que post.categories seja sempre um array
+          const categories = Array.isArray(post.categories) ? post.categories : [];
+          
+          if (categories.length === 0) {
+            // Se não houver categorias, adicionar a 'Geral'
+            if (!categorized['Geral']) categorized['Geral'] = [];
+            categorized['Geral'].push(post);
+            categoryCount['Geral'] = (categoryCount['Geral'] || 0) + 1;
+          } else {
+            // Adicionar a todas as categorias que o post pertence
+            categories.forEach(category => {
+              if (!categorized[category]) categorized[category] = [];
+              categorized[category].push(post);
+              categoryCount[category] = (categoryCount[category] || 0) + 1;
+            });
+          }
+        });
+        
+        setCategorizedPosts(categorized);
+        
+        // Encontrar as categorias mais populares (com mais posts)
+        const popularCats = Object.keys(categoryCount)
+          .sort((a, b) => categoryCount[b] - categoryCount[a])
+          .slice(0, 5); // Pegar as 5 categorias mais populares
+        
+        setPopularCategories(popularCats);
+        
+        // Definir a categoria ativa inicialmente como a mais popular
+        if (popularCats.length > 0 && !activeCategory) {
+          setActiveCategory(popularCats[0]);
+        }
       } catch (error) {
         console.error('Erro ao buscar posts:', error);
         setError('Falha ao carregar posts. Tente novamente mais tarde.');
+      } finally {
         setLoading(false);
       }
     };
     
     fetchPosts();
-  }, []);
+    // Removendo activeCategory das dependências para evitar chamadas desnecessárias à API
+    // quando o usuário apenas altera a categoria visualizada
+  }, [user, getPosts]);
 
   // Carregar posts recentemente visualizados do localStorage
   useEffect(() => {
@@ -126,10 +121,39 @@ const Inicial = () => {
       }
     }
   }, [allPosts, user]);
+  
+  // Configura um timer para o carrossel automático
+  useEffect(() => {
+    if (trendingPosts.length <= 1) return;
+    
+    const timer = setInterval(() => {
+      setCurrentCarouselIndex(prevIndex => (prevIndex + 1) % trendingPosts.length);
+    }, 5000); // Mudar a cada 5 segundos
+    
+    return () => clearInterval(timer);
+  }, [trendingPosts]);
+  
+  // Função para navegar para o próximo slide do carrossel
+  const nextSlide = () => {
+    setCurrentCarouselIndex(prevIndex => (prevIndex + 1) % trendingPosts.length);
+  };
+  
+  // Função para navegar para o slide anterior do carrossel
+  const prevSlide = () => {
+    setCurrentCarouselIndex(prevIndex => 
+      prevIndex === 0 ? trendingPosts.length - 1 : prevIndex - 1
+    );
+  };
+  
+  // Função para mudar a categoria ativa
+  const handleCategoryChange = (category) => {
+    setActiveCategory(category);
+  };
 
   return (
-    <PostProvider>
+    <>
       <div className={style.homeContainer}>
+        {/* Header principal com chamada para ação */}
         <div className={style.welcomeBox}>
           <h2>
             {user
@@ -158,89 +182,214 @@ const Inicial = () => {
         )}
 
         {/* Indicador de carregamento */}
-        {loading && (
+        {loading ? (
           <div className={style.loadingContainer}>
-            <p>Carregando posts...</p>
+            <div className={style.spinner}></div>
+            <p>Carregando conteúdo personalizado...</p>
           </div>
-        )}
-
-        {/* Continue de onde parou - posts visualizados recentemente */}
-        {!loading && user && recentlyViewedPosts.length > 0 && (
-          <div className={style.recentlyViewedSection}>
-            <h3>Continue de onde parou</h3>
-            <div className={style.recentlyViewedGrid}>
-              {recentlyViewedPosts.map((post) => (
-                <div
-                  key={post.id}
-                  onClick={() => navigate(`/post/${post.id}`)}
-                  className={style.recentCard}
-                >
-                  <Card
-                    TituloCard={post.title}
-                    SubTitulo={
-                      post.categories?.length > 0 ? post.categories.join(", ") : "Geral"
-                    }
-                    Descricao={post.caption}
-                    likes={post.likeCount || 0}
-                    id={post.id}
-                    imageUrl={post.imageUrl}
-                  />
+        ) : (
+          <>
+            {/* Carrossel de destaques */}
+            {trendingPosts.length > 0 && (
+              <div className={style.carouselSection}>
+                <h3>
+                  <span className={style.icon}>⭐</span>
+                  Destaques da comunidade
+                </h3>
+                <div className={style.carouselContainer} ref={carouselRef}>
+                  <button 
+                    className={`${style.carouselButton} ${style.prevButton}`}
+                    onClick={prevSlide}
+                    aria-label="Post anterior"
+                  >
+                    ❮
+                  </button>
+                  
+                  <div className={style.carouselTrack} style={{ transform: `translateX(-${currentCarouselIndex * 100}%)` }}>
+                    {trendingPosts.map((post, index) => (
+                      <div 
+                        key={post.id}
+                        className={style.carouselSlide}
+                        onClick={() => navigate(`/post/${post.id}`)}
+                      >
+                        <div className={style.carouselContent}>
+                          <div 
+                            className={style.carouselImage}
+                            style={{ backgroundImage: `url(${post.imageUrl || '/placeholder-post.jpg'})` }}
+                          >
+                            <div className={style.slideBadges}>
+                              <span className={style.likeBadge}>❤️ {post.likeCount || 0}</span>
+                              {post.categories && post.categories[0] && (
+                                <span className={style.categoryBadge}>{post.categories[0]}</span>
+                              )}
+                            </div>
+                          </div>
+                          <div className={style.carouselInfo}>
+                            <h4>{post.title}</h4>
+                            <p>{post.caption}</p>
+                            <div className={style.postMeta}>
+                              <span className={style.postAuthor}>Por {post.author || 'Autor desconhecido'}</span>
+                              <button 
+                                className={style.readMoreBtn}
+                                onClick={(e) => {
+                                  e.stopPropagation(); // Evitar propagação para o slide inteiro
+                                  navigate(`/post/${post.id}`);
+                                }}
+                              >
+                                Leia mais
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  <button 
+                    className={`${style.carouselButton} ${style.nextButton}`}
+                    onClick={nextSlide}
+                    aria-label="Próximo post"
+                  >
+                    ❯
+                  </button>
+                  
+                  <div className={style.carouselIndicators}>
+                    {trendingPosts.map((_, index) => (
+                      <button 
+                        key={index}
+                        className={`${style.indicator} ${index === currentCarouselIndex ? style.active : ''}`}
+                        onClick={() => setCurrentCarouselIndex(index)}
+                        aria-label={`Ir para slide ${index + 1}`}
+                      />
+                    ))}
+                  </div>
                 </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Recomendações personalizadas para usuário logado */}
-        {!loading && <Recomendacoes />}
-
-        {/* Seção de posts em destaque */}
-        {!loading && trendingPosts.length > 0 && (
-          <div className={style.trendingSection}>
-            <h3>Destaques da comunidade</h3>
-            <div className={style.trendingGrid}>
-              {trendingPosts.map((post) => (
-                <div
-                  key={post.id}
-                  onClick={() => navigate(`/post/${post.id}`)}
-                  className={style.trendingCard}
-                >
-                  <Card
-                    TituloCard={post.title}
-                    SubTitulo={
-                      post.categories?.length > 0 ? post.categories.join(", ") : "Geral"
-                    }
-                    Descricao={post.caption}
-                    likes={post.likeCount || 0}
-                    id={post.id}
-                    imageUrl={post.imageUrl}
-                  />
+              </div>
+            )}
+            
+            {/* Continue de onde parou - posts visualizados recentemente */}
+            {user && recentlyViewedPosts.length > 0 && (
+              <div className={style.recentlyViewedSection}>
+                <h3>
+                  <span className={style.icon}>📝</span>
+                  Continue de onde parou
+                </h3>
+                <div className={style.recentlyViewedGrid}>
+                  {recentlyViewedPosts.map((post) => (
+                    <div
+                      key={post.id}
+                      onClick={() => navigate(`/post/${post.id}`)}
+                      className={style.recentCard}
+                    >
+                      <Card
+                        TituloCard={post.title}
+                        SubTitulo={
+                          post.categories?.length > 0 ? post.categories.join(", ") : "Geral"
+                        }
+                        Descricao={post.caption}
+                        likes={post.likeCount || 0}
+                        id={post.id}
+                        imageUrl={post.imageUrl}
+                      />
+                    </div>
+                  ))}
                 </div>
-              ))}
+              </div>
+            )}
+            
+            {/* Seção de Categorias Populares */}
+            {popularCategories.length > 0 && (
+              <div className={style.categoriesSection}>
+                <h3>
+                  <span className={style.icon}>📃</span>
+                  Explore por categoria
+                </h3>
+                <div className={style.categoriesTabs}>
+                  {popularCategories.map(category => (
+                    <button
+                      key={category}
+                      className={`${style.categoryTab} ${activeCategory === category ? style.activeTab : ''}`}
+                      onClick={() => handleCategoryChange(category)}
+                    >
+                      {category}
+                    </button>
+                  ))}
+                </div>
+                
+                <div className={style.categoryContent}>
+                  {activeCategory && categorizedPosts[activeCategory] && categorizedPosts[activeCategory].length > 0 ? (
+                    <>
+                      <div className={style.categoryPostsGrid}>
+                        {categorizedPosts[activeCategory].slice(0, 3).map(post => (
+                          <div
+                            key={post.id}
+                            onClick={() => navigate(`/post/${post.id}`)}
+                            className={style.categoryCard}
+                          >
+                            <Card
+                              TituloCard={post.title}
+                              SubTitulo={activeCategory}
+                              Descricao={post.caption}
+                              likes={post.likeCount || 0}
+                              id={post.id}
+                              imageUrl={post.imageUrl}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                      
+                      {categorizedPosts[activeCategory].length > 3 && (
+                        <div className={style.viewMoreContainer}>
+                          <button 
+                            className={style.viewMoreBtn}
+                            onClick={() => navigate(`/explorar?categoria=${encodeURIComponent(activeCategory)}`)}
+                          >
+                            Ver mais em {activeCategory}
+                          </button>
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <div className={style.noPostsContainer}>
+                      <p>Nenhum post encontrado na categoria <strong>{activeCategory}</strong>.</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+            
+            {/* Recomendações personalizadas para usuário logado */}
+            {user && <Recomendacoes />}
+
+            {/* Mensagem quando não há posts para exibir */}
+            {!error && trendingPosts.length === 0 && (
+              <div className={style.noPostsContainer}>
+                <p>Ainda não há posts publicados. Seja o primeiro a compartilhar!</p>
+                <button
+                  className={style.criarPostBtn}
+                  onClick={() => navigate("/criar_post")}
+                  disabled={!user}
+                >
+                  Criar post agora
+                </button>
+              </div>
+            )}
+
+            {/* Chamada para ação de explorar */}
+            <div className={style.exploreCallout}>
+              <h3>Descubra mais conteúdo</h3>
+              <p>Encontre posts sobre os temas que você mais gosta na página Explore</p>
+              <button 
+                className={style.exploreBtn}
+                onClick={() => navigate("/explorar")}
+              >
+                Ir para Explore
+              </button>
             </div>
-          </div>
+          </>
         )}
-
-        {/* Mensagem quando não há posts para exibir */}
-        {!loading && !error && trendingPosts.length === 0 && (
-          <div className={style.noPostsContainer}>
-            <p>Ainda não há posts publicados. Seja o primeiro a compartilhar!</p>
-          </div>
-        )}
-
-        {/* Chamada para ação de explorar */}
-        <div className={style.exploreCallout}>
-          <h3>Descubra mais conteúdo</h3>
-          <p>Encontre posts sobre os temas que você mais gosta na página Explore</p>
-          <button 
-            className={style.exploreBtn}
-            onClick={() => navigate("/explorar")}
-          >
-            Ir para Explore
-          </button>
-        </div>
       </div>
-    </PostProvider>
+    </>
   );
 };
 

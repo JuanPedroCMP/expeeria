@@ -7,6 +7,7 @@ import { categoriasPadrao } from "../../utils/categoriasPadrao";
 import { useAuth } from "../../hooks/useAuth";
 import { UploadImage } from "../UploadImage/UploadImage";
 import { useNotification } from "../../hooks/useNotification";
+import { usePost } from "../../hooks/usePost";
 import supabase from "../../services/supabase";
 
 // Import de funções de log para debugging
@@ -19,6 +20,7 @@ export const NewPost = ({
 }) => {
   const { user } = useAuth();
   const { showSuccess, showError } = useNotification();
+  const { createPost } = usePost();
   const [title, setTitle] = useState(postOriginal?.title || "");
   const [caption, setCaption] = useState(postOriginal?.caption || "");
   const [content, setContent] = useState(postOriginal?.content || "");
@@ -87,14 +89,10 @@ export const NewPost = ({
         showSuccess("Post editado com sucesso!");
       } else {
         try {
-          // Usar Supabase diretamente para criar o post
-          const { data: novoPost, error: postError } = await supabase
-            .from('posts')
-            .insert(postData)
-            .select()
-            .single();
-            
-          if (postError) throw postError;
+          // Usar o hook usePost para criar o post
+          const novoPost = await createPost(postData);
+          
+          if (!novoPost) throw new Error('Falha ao criar o post');
           
           console.log("Post criado com sucesso:", novoPost);
           
