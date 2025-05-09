@@ -4,7 +4,6 @@ import { MenuRecolhivel } from "./MenuRecolhivel/MenuRecolhivel";
 import { SearchBar } from "./SearchBar";
 import { useAuth } from "../../hooks/useAuth";
 import { Avatar } from "../Avatar/Avatar";
-import { ThemeToggle } from "../ThemeToggle";
 import styles from "./Navbar.module.css";
 
 /**

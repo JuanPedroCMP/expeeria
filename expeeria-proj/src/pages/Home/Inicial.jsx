@@ -21,6 +21,8 @@ const Inicial = () => {
     const fetchPosts = async () => {
       try {
         setLoading(true);
+        console.log('Iniciando busca de posts...');
+        
         // Buscar posts com contagens de likes e informações do autor
         const { data: postsData, error: postsError } = await supabase
           .from('posts')
@@ -33,7 +35,21 @@ const Inicial = () => {
           .eq('status', 'published')
           .order('created_at', { ascending: false });
           
-        if (postsError) throw postsError;
+        if (postsError) {
+          console.error('Erro na consulta Supabase:', postsError);
+          throw new Error('Falha ao carregar os posts: ' + postsError.message);
+        }
+        
+        // Verificar se temos dados e evitar erros quando não há posts
+        if (!postsData || postsData.length === 0) {
+          console.log('Nenhum post encontrado');
+          setAllPosts([]);
+          setTrendingPosts([]);
+          setLoading(false);
+          return;
+        }
+        
+        console.log('Posts encontrados:', postsData.length);
         
         // Processar os dados para um formato mais amigável
         const processedPosts = postsData.map(post => ({
