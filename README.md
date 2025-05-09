@@ -1,5 +1,14 @@
 # Expeeria – Plataforma Educacional Colaborativa
 
+👉 **Acesse agora:** [https://expeeria.vercel.app/apresentacao](https://expeeria.vercel.app/apresentacao)
+
+## ⚠️ AVISO
+- O projeto está em desenvolvimento e ainda não possui funcionalidade completa.
+- Quando você estiver enfrentando dificuldades no site, por favor, limpe os dados do site no dispositivo e tente novamente. (Exemplo: No Chrome, vá em Configurações > Privacidade e segurança > Cookies e dados do site > Limpar dados do site.)
+- Ainda temos alguns defeitos que ainda não foram corrigidos porque não deu tempo.
+-  A edição de perfil e de posts ainda não está funcionando.
+- Contato: juan.pereira26@etec.sp.gov.br ou juanpedrocmp.15@gmail.com
+
 ## 🚀 Visão Geral
 
 O **Expeeria** é uma plataforma colaborativa que conecta pessoas através da troca de conhecimentos e experiências. Nossa missão é criar um ambiente onde:
