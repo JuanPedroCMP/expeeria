@@ -1,30 +1,29 @@
 # Expeeria – Plataforma Educacional Colaborativa
 
-## ⚠️ AVISO IMPORTANTE ⚠️
+![Expeeria Logo](./docs/images/expeeria-logo.png)
 
-**Atualmente existe um problema de conexão com o banco de dados Supabase** que não foi possível resolver a tempo. Por essa razão:  
+## 🚀 Visão Geral
 
-- **O sistema de usuários não está funcionando** (registro, login, perfis)  
-- **A criação e visualização de posts está comprometida**  
-- **A página de apresentação** (/presentation) **está funcionando com dados de exemplo** incorporados diretamente no componente  
+O **Expeeria** é uma plataforma colaborativa que conecta pessoas através da troca de conhecimentos e experiências. Nossa missão é criar um ambiente onde:
 
-A interface e navegação entre páginas estão disponíveis para demonstração do design e layout do projeto.
+- 🌱 **Experiências são valorizadas** como formas legítimas de ensino e aprendizado
+- 🤝 **Conexões significativas** são estabelecidas entre pessoas com interesses complementares
+- 📚 **Conhecimento é compartilhado** de forma direta, prática e acessível
+- 🚀 **Comunidades crescem** através da colaboração mútua
 
-## 🌐 Acesse a Demonstração
+## 🌐 Acesse o Projeto
 
-👉 **Acesse agora:** [https://expeeria.vercel.app/presentation](https://expeeria.vercel.app/apresentacao)
+👉 **Acesse agora:** [https://expeeria.vercel.app](https://expeeria.vercel.app)
 
-> Recomendamos acessar diretamente a página de apresentação (/presentation) que foi especialmente preparada para funcionar sem dependência do banco de dados.
+## 📚 Documentação
 
-## 🔍 Página de Apresentação
+Encontram-se na pasta [/docs](/docs) os arquivos detalhados de documentação do projeto:
 
-A página de apresentação (/presentation) foi desenvolvida como uma solução para os problemas de conexão com o banco de dados. Ela apresenta:
-
-- **Posts de exemplo incorporados** diretamente no componente React
-- **Design completo e moderno** com animações e gradientes
-- **Interface responsiva** adaptada para todos os tamanhos de tela
-- **Cards de conteúdo** exibindo posts educacionais em várias categorias
-- **Seções informativas** sobre o projeto e seus objetivos
+- [🧩 Arquitetura](./docs/arquitetura.md) - Estrutura técnica do projeto
+- [🔧 Guia de Instalação](./docs/instalacao.md) - Como configurar e rodar o projeto
+- [🔄 Workflows](./docs/workflows.md) - Principais fluxos de usuário
+- [📝 API](./docs/api.md) - Documentação da API Supabase
+- [🛠️ Troubleshooting](./docs/troubleshooting.md) - Soluções para problemas comuns
 
 As informações exibidas nesta página foram estruturadas para demonstrar a proposta do Expeeria, mesmo sem a funcionalidade completa do banco de dados.
 
@@ -36,14 +35,15 @@ As informações exibidas nesta página foram estruturadas para demonstrar a pro
 2. [Funcionalidades](#2-funcionalidades)
 3. [Tecnologias Utilizadas](#3-tecnologias-utilizadas)
 4. [Como Rodar o Projeto](#4-como-rodar-o-projeto)
-5. [Principais Componentes e Páginas](#6-principais-componentes-e-páginas)
-6. [Fluxo de Usuário](#7-fluxo-de-usuário)
-7. [Permissões e Papéis](#8-permissões-e-papéis)
-8. [Soluções Técnicas Implementadas](#9-soluções-técnicas-implementadas)
-9. [Padrões de Código e Boas Práticas](#10-padrões-de-código-e-boas-práticas)
+5. [Principais Componentes e Páginas](#5-principais-componentes-e-páginas)
+6. [Fluxo de Usuário](#6-fluxo-de-usuário)
+7. [Permissões e Papéis](#7-permissões-e-papéis)
+8. [Soluções Técnicas Implementadas](#8-soluções-técnicas-implementadas)
+9. [Padrões de Código e Boas Práticas](#9-padrões-de-código-e-boas-práticas)
 10. [Integrantes do Grupo](#10-integrantes-do-grupo)
 11. [Planos Futuros](#11-planos-futuros)
 12. [Ideia da Startup](#12-sobre-a-ideia-da-startup)
+13. [Recentes Melhorias de Sistema](#13-recentes-melhorias-de-sistema)
 
 ---
 
@@ -325,3 +325,34 @@ O **Expeeria** é uma plataforma digital onde pessoas compartilham, trocam e adq
 >
 > “Transforme o que você sabe em uma ponte para o que quer aprender.”
 
+---
+
+## 13. Recentes Melhorias de Sistema
+
+### Visualização de Posts
+
+Implementamos soluções robustas para resolver os problemas de visualização de posts:
+
+- **Mecanismo de Auto-Recuperação**: O sistema agora detecta automaticamente problemas na sessão e limpa o localStorage sem necessidade de intervenção manual.
+
+- **Simplificação do Carregamento de Dados**: Reformulamos a forma como os posts e comentários são carregados, tornando o processo mais estável e reduzindo a chance de falhas.
+
+- **Melhor Tratamento de Erros**: Implementamos feedbacks mais claros durante o processo de autenticação e carregamento de dados.
+
+### Interface de Usuário
+
+Melhoramos significativamente o CSS dos componentes principais:
+
+- **Página de Post**:
+  - Layout mais moderno e responsivo
+  - Melhores espaçamentos e hierarquia visual
+  - Botões com efeitos visuais aprimorados
+  - Exibição otimizada para dispositivos móveis
+
+- **Criação de Post**:
+  - Formulário mais organizado e acessível
+  - Editor de markdown com melhor usabilidade
+  - Seleção de categorias mais intuitiva
+  - Design consistente em todos os elementos
+
+Essas melhorias tornam o sistema mais robusto e oferecem uma melhor experiência ao usuário, mantendo a integridade dos dados e a fluidez na navegação.
