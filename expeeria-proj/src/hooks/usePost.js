@@ -1,57 +1,89 @@
-import { useContext, useCallback } from 'react';
-import { PostContext } from '../contexts/PostContext';
+import { useState, useCallback } from 'react';
+import supabase from '../services/supabase';
+import { useAuth } from './useAuth';
 
 /**
- * Hook personalizado para acessar e manipular posts
- * Facilita o reuso das funcionalidades de posts em diferentes componentes
+ * Hook simplificado para acessar e manipular posts diretamente com o Supabase
+ * Esta versão usa Supabase diretamente em vez de depender do PostContext
  */
 export const usePost = () => {
-  const postContext = useContext(PostContext);
-  
-  if (!postContext) {
-    console.error('Erro crítico: usePost usado fora de um PostProvider');
-    throw new Error("usePost deve ser usado dentro de um PostProvider. Verifique se o componente está dentro do PostProvider no App.jsx ou página específica");
-  }
-  
-  // Desestruturar todos os valores disponíveis do contexto com nomes consistentes
-  const { 
-    posts, 
-    userPosts,
-    explorePosts,
-    feedPosts,
-    currentPost,
-    loading, 
-    error, 
-    loadAllPosts, 
-    loadFeed,
-    loadExplore,
-    loadUserPosts,
-    loadPost, 
-    createPost, 
-    updatePost, 
-    deletePost, 
-    likePost,
-    unlikePost, 
-    hasLiked,
-    addComment,
-    deleteComment,
-    searchPosts
-  } = postContext;
+  const [posts, setPosts] = useState([]);
+  const [currentPost, setCurrentPost] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const { user } = useAuth();
   
   // Buscar um post por ID com cache local
-  const getPostById = useCallback((id) => {
+  const getPostById = useCallback(async (id) => {
+    // Verificar se já temos o post em cache
     const post = posts.find(post => post.id === id);
     
     if (post) {
-      return Promise.resolve(post);
+      return post;
     }
     
-    return loadPost(id);
-  }, [posts, loadPost]);
+    // Caso contrário, buscar do Supabase
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const { data, error: postError } = await supabase
+        .from('posts')
+        .select('*')
+        .eq('id', id)
+        .single();
+      
+      if (postError) throw postError;
+      if (!data) throw new Error('Post não encontrado');
+      
+      // Guardar o post encontrado no estado local
+      setCurrentPost(data);
+      return data;
+    } catch (err) {
+      console.error('Erro ao buscar post:', err);
+      setError(err.message);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, [posts]);
+  
+  // Carregar todos os posts
+  const loadAllPosts = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const { data, error: postsError } = await supabase
+        .from('posts')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (postsError) throw postsError;
+      
+      setPosts(data);
+      return data;
+    } catch (err) {
+      console.error('Erro ao carregar posts:', err);
+      setError(err.message);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+  
+  // Carregar um post específico pelo ID
+  const loadPost = useCallback(async (id) => {
+    return getPostById(id);
+  }, [getPostById]);
   
   // Toggle de curtida em um post com verificação de autenticação
   const toggleLikePost = useCallback(async (postId) => {
     try {
+      if (!user) {
+        throw new Error('Você precisa estar logado para curtir posts');
+      }
+      
       if (!postId) {
         throw new Error('ID do post não especificado para curtir/descurtir');
       }
@@ -64,28 +96,51 @@ export const usePost = () => {
         throw new Error('Post não encontrado. Ele pode ter sido removido.');
       }
       
-      const isLiked = hasLiked(postId);
+      // Verifica se já curtiu o post
+      const { data: existingLike } = await supabase
+        .from('post_likes')
+        .select('*')
+        .eq('post_id', postId)
+        .eq('user_id', user.id)
+        .maybeSingle();
       
-      // Aplicar otimisticamente a mudança na interface antes da resposta da API
-      // para melhorar a experiência do usuário
-      if (isLiked) {
-        await unlikePost(postId);
-      } else {
-        await likePost(postId);
+      let liked = false;
+      
+      // Se já curtiu, remove a curtida
+      if (existingLike) {
+        await supabase
+          .from('post_likes')
+          .delete()
+          .eq('post_id', postId)
+          .eq('user_id', user.id);
+        liked = false;
+      } 
+      // Senão, adiciona a curtida
+      else {
+        await supabase
+          .from('post_likes')
+          .insert({
+            post_id: postId,
+            user_id: user.id,
+            created_at: new Date().toISOString()
+          });
+        liked = true;
       }
       
-      return { success: true, liked: !isLiked };
+      // Atualiza o post no estado local
+      if (currentPost && currentPost.id === postId) {
+        setCurrentPost({
+          ...currentPost,
+          likeCount: currentPost.likeCount + (liked ? 1 : -1)
+        });
+      }
+      
+      return { success: true, liked };
     } catch (error) {
       console.error("Erro ao alternar curtida do post:", error);
-      
-      // Tratamento de erros específicos
-      if (error.message.includes('não autenticado') || error.message.includes('login')) {
-        throw new Error('Faça login para curtir posts');
-      }
-      
       throw error;
     }
-  }, [hasLiked, unlikePost, likePost, posts, getPostById]);
+  }, [user, posts, getPostById, currentPost]);
   
   // Filtragem de posts - versão otimizada
   const filterPosts = useCallback((filterConfig) => {
@@ -272,12 +327,113 @@ export const usePost = () => {
     }
   }, [posts]);
   
+  // Verificar se o usuário curtiu um post
+  const hasLiked = useCallback(async (postId) => {
+    if (!user || !postId) return false;
+    
+    try {
+      const { data, error } = await supabase
+        .from('post_likes')
+        .select('id')
+        .eq('post_id', postId)
+        .eq('user_id', user.id)
+        .maybeSingle();
+      
+      if (error) throw error;
+      return !!data;
+    } catch (err) {
+      console.error('Erro ao verificar curtida:', err);
+      return false;
+    }
+  }, [user]);
+  
+  // Criar um novo post
+  const createPost = useCallback(async (postData) => {
+    if (!user) throw new Error('Você precisa estar logado para criar um post');
+    
+    setLoading(true);
+    setError(null);
+    
+    try {
+      // Inserir o post na tabela posts
+      const { data, error: insertError } = await supabase
+        .from('posts')
+        .insert({
+          ...postData,
+          author_id: user.id,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        })
+        .select()
+        .single();
+      
+      if (insertError) throw insertError;
+      
+      // Atualizar o cache local
+      setPosts(prev => [data, ...prev]);
+      
+      return data;
+    } catch (err) {
+      console.error('Erro ao criar post:', err);
+      setError(err.message);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, [user]);
+  
+  // Atualizar um post existente
+  const updatePost = useCallback(async (postId, postData) => {
+    if (!user) throw new Error('Você precisa estar logado para editar um post');
+    
+    setLoading(true);
+    setError(null);
+    
+    try {
+      // Verificar se o usuário é o autor do post
+      const { data: postToUpdate } = await supabase
+        .from('posts')
+        .select('author_id')
+        .eq('id', postId)
+        .single();
+      
+      if (!postToUpdate) throw new Error('Post não encontrado');
+      if (postToUpdate.author_id !== user.id && user.role !== 'admin') {
+        throw new Error('Você não tem permissão para editar este post');
+      }
+      
+      // Atualizar o post
+      const { data, error: updateError } = await supabase
+        .from('posts')
+        .update({
+          ...postData,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', postId)
+        .select()
+        .single();
+      
+      if (updateError) throw updateError;
+      
+      // Atualizar o cache local
+      setPosts(prev => prev.map(post => post.id === postId ? data : post));
+      if (currentPost?.id === postId) {
+        setCurrentPost(data);
+      }
+      
+      return data;
+    } catch (err) {
+      console.error('Erro ao atualizar post:', err);
+      setError(err.message);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, [user, currentPost]);
+  
   return {
     // Estado
     posts,
-    userPosts,
-    explorePosts,
-    feedPosts,
     currentPost,
     loading,
     error,
@@ -287,25 +443,16 @@ export const usePost = () => {
     fetchPost: loadPost,
     hasLikedPost: hasLiked,
     
-    // Métodos nativos do contexto
+    // Métodos principais
     loadAllPosts,
-    loadFeed,
-    loadExplore,
-    loadUserPosts,
     loadPost,
     createPost,
     updatePost,
-    deletePost,
-    likePost,
-    unlikePost,
-    hasLiked,
-    addComment,
-    deleteComment,
-    searchPosts,
     
-    // Métodos auxiliares deste hook
+    // Métodos auxiliares
     getPostById,
     toggleLikePost,
-    filterPosts
+    filterPosts,
+    hasLiked
   };
 };
