@@ -8,6 +8,7 @@ import { categoriasPadrao } from "../../utils/categoriasPadrao";
 import { useAuth } from "../../hooks/useAuth";
 import { UploadImage } from "../UploadImage/UploadImage";
 import { useNotification } from "../../hooks/useNotification";
+import supabase from "../../services/supabase";
 
 // Import de funções de log para debugging
 const DEBUG = true; // Ative para modo de desenvolvimento, desative para produção
@@ -55,28 +56,32 @@ export const NewPost = ({
       return;
     }
     
-    // Verificar se a função createPost está disponível
-    if (!createPost && DEBUG) {
-      console.error("Erro: função createPost não está disponível no hook usePost");
-      setError("Erro interno: função de criação não está disponível. Contate o suporte.");
+    // Verificar se o usuário está autenticado
+    if (!user?.id) {
+      setError("Você precisa estar logado para criar um post.");
       setLoading(false);
       return;
     }
 
     try {
-      // Usar o array completo de áreas em vez de extrair apenas o primeiro elemento
+      // Preparar os dados do post adaptados para o Supabase
       const postData = {
         title,
         caption,
         content,
-        area: area, // Enviando o array completo de categorias
-        imageUrl,
-        user_id: user.id,
+        author_id: user.id,
+        image_url: imageUrl,
+        status: 'published',
         created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        published_at: new Date().toISOString(),
+        like_count: 0,
+        comment_count: 0,
+        view_count: 0,
+        metadata: JSON.stringify({ readTime: Math.ceil(content.length / 1000) })
       };
 
       console.log("Enviando dados do post:", postData);
-      console.log("Função de criação de post disponível:", !!createPost);
 
       if (modoEdicao && onSubmitEdicao) {
         await onSubmitEdicao(postData);
@@ -84,28 +89,48 @@ export const NewPost = ({
         showSuccess("Post editado com sucesso!");
       } else {
         try {
-          const novoPost = await createPost(postData);
-          console.log("Resposta ao criar post:", novoPost);
-          if (novoPost) {
-            setSuccess("Post criado com sucesso!");
-            showSuccess("Post criado com sucesso!");
-            // Limpar formulário
-            setTitle("");
-            setCaption("");
-            setContent("");
-            setImageUrl("");
-            setAuthor("");
-            setArea([]);
-          } else {
-            // Caso createPost retorne null (indicando erro)
-            setError("Não foi possível criar o post. Tente novamente.");
-            showError("Não foi possível criar o post. Tente novamente.");
+          // Usar Supabase diretamente para criar o post
+          const { data: novoPost, error: postError } = await supabase
+            .from('posts')
+            .insert(postData)
+            .select()
+            .single();
+            
+          if (postError) throw postError;
+          
+          console.log("Post criado com sucesso:", novoPost);
+          
+          // Adicionar categorias ao post
+          if (area && area.length > 0) {
+            const categorias = area.map(cat => ({
+              post_id: novoPost.id,
+              category: cat
+            }));
+            
+            const { error: catError } = await supabase
+              .from('post_categories')
+              .insert(categorias);
+              
+            if (catError) {
+              console.error("Erro ao adicionar categorias:", catError);
+              // Não impede o fluxo principal, pois o post já foi criado
+            }
           }
-        } catch (createError) {
-          // Tratamento específico para erro de criação do post
-          console.error("Erro específico ao criar post:", createError);
-          setError(createError.message || "Erro ao criar o post.");
-          showError(createError.message || "Erro ao criar o post.");
+          
+          setSuccess("Post criado com sucesso!");
+          showSuccess("Post criado com sucesso!");
+          
+          // Limpar formulário
+          setTitle("");
+          setCaption("");
+          setContent("");
+          setImageUrl("");
+          setAuthor("");
+          setArea([]);
+        } catch (error) {
+          console.error("Erro ao criar post:", error);
+          setError(`Não foi possível criar o post: ${error.message || 'Erro desconhecido'}`);
+          showError("Não foi possível criar o post. Tente novamente.");
         }
       }
     } catch (err) {

@@ -1,14 +1,14 @@
 import { useState, useEffect, useRef } from "react";
-import { usePost } from "../../hooks/usePost";
 import { Card } from "../../components/Card/Card";
 import style from "./Explore.module.css";
 import { categoriasPadrao } from "../../utils/categoriasPadrao";
 import { useNavigate } from "react-router-dom";
+import supabase from "../../services/supabase";
 
 const PAGE_SIZE = 8;
 
 export function Explore() {
-  const { posts } = usePost();
+  const [allPosts, setAllPosts] = useState([]);
   const [search, setSearch] = useState(() => localStorage.getItem("explore_search") || "");
   const [selectedAreas, setSelectedAreas] = useState(() => {
     try {
@@ -23,8 +23,54 @@ export function Explore() {
   const [showCount, setShowCount] = useState(PAGE_SIZE);
   const loader = useRef();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [showCategories, setShowCategories] = useState(false);
+  
+  // Buscar posts do Supabase
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        setLoading(true);
+        // Buscar posts com contagens de likes e informações do autor
+        const { data: postsData, error: postsError } = await supabase
+          .from('posts')
+          .select(`
+            *,
+            users!author_id (id, username, name, avatar),
+            post_likes!post_id (count),
+            post_categories!post_id (category)
+          `)
+          .eq('status', 'published')
+          .order('created_at', { ascending: false });
+          
+        if (postsError) throw postsError;
+        
+        // Processar os dados para um formato mais amigável
+        const processedPosts = postsData.map(post => ({
+          id: post.id,
+          title: post.title,
+          caption: post.caption,
+          content: post.content,
+          imageUrl: post.image_url,
+          author: post.users?.name || post.users?.username || 'Usuário',
+          authorId: post.author_id,
+          createdAt: post.created_at,
+          likeCount: post.post_likes[0]?.count || 0,
+          categories: post.post_categories.map(cat => cat.category)
+        }));
+        
+        setAllPosts(processedPosts);
+        setLoading(false);
+      } catch (error) {
+        console.error('Erro ao buscar posts:', error);
+        setError('Falha ao carregar posts. Tente novamente mais tarde.');
+        setLoading(false);
+      }
+    };
+    
+    fetchPosts();
+  }, []);
 
   // Salva filtros no localStorage
   useEffect(() => {
@@ -49,7 +95,7 @@ export function Explore() {
   }, []);
 
   // Filtro e busca
-  let filtered = posts;
+  let filtered = allPosts;
   if (search) {
     filtered = filtered.filter(
       (p) =>
@@ -60,9 +106,9 @@ export function Explore() {
   }
   if (selectedAreas.length > 0) {
     filtered = filtered.filter((p) =>
-      Array.isArray(p.area)
-        ? selectedAreas.some((a) => p.area.includes(a))
-        : selectedAreas.includes(p.area)
+      Array.isArray(p.categories)
+        ? selectedAreas.some((a) => p.categories.includes(a))
+        : selectedAreas.includes(p.categories)
     );
   }
   if (author) {
@@ -101,7 +147,7 @@ export function Explore() {
     setLoading(true);
     const timeout = setTimeout(() => setLoading(false), 400);
     return () => clearTimeout(timeout);
-  }, [search, selectedAreas, author, dateFrom, dateTo, posts]);
+  }, [search, selectedAreas, author, dateFrom, dateTo, allPosts]);
 
   return (
     <div className={style.exploreContainer}>
@@ -171,6 +217,14 @@ export function Explore() {
           Limpar filtros
         </button>
       </form>
+      
+      {/* Mensagem de erro */}
+      {error && (
+        <div className={style.errorMessage}>
+          <p>{error}</p>
+        </div>
+      )}
+            
       <div className={style.cardsGrid}>
         {loading ? (
           <div className={style.nenhum}>Carregando posts...</div>
@@ -186,11 +240,12 @@ export function Explore() {
               <Card
                 TituloCard={post.title}
                 SubTitulo={
-                  Array.isArray(post.area) ? post.area.join(", ") : post.area
+                  post.categories?.length > 0 ? post.categories.join(", ") : "Geral"
                 }
-                Descrisao={post.caption}
-                likes={post.likes}
+                Descricao={post.caption}
+                likes={post.likeCount || 0}
                 id={post.id}
+                imageUrl={post.imageUrl}
               />
             </div>
           ))

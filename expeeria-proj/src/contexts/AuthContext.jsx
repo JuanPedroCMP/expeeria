@@ -457,7 +457,7 @@ export function AuthProvider({ children }) {
       if (userData) {
         // Buscar perfil atualizado
         const { data: profile } = await supabase
-          .from('profiles')
+          .from('users')
           .select('*')
           .eq('id', userData.id)
           .single();

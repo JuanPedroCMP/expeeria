@@ -452,3 +452,16 @@
     gap: 5px;
   }
 }
+
+/* Estilos para mensagens de erro */
+.errorMessage {
+  background: rgba(220, 38, 38, 0.1);
+  border-left: 4px solid #ef4444;
+  border-radius: 0.5rem;
+  padding: 1rem 1.5rem;
+  margin: 1rem 0;
+  color: #ef4444;
+  animation: fadeIn 0.3s ease-out;
+  text-align: center;
+  font-weight: 500;
+}

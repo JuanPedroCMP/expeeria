@@ -5,6 +5,7 @@ import style from "./Profile.module.css";
 import { categoriasPadrao } from "../../utils/categoriasPadrao";
 import { useParams, useNavigate } from "react-router-dom";
 import { UploadImage } from "../../components/UploadImage";
+import supabase from "../../services/supabase";
 
 export function Profile() {
   const { user, signOut, setUser } = useAuth();
@@ -44,7 +45,6 @@ export function Profile() {
   const fetchAllUsers = async () => {
     try {
       const res = await api.get("/users");
-      setAllUsers(res.data);
     } catch {
       setAllUsers([]);
     }
@@ -55,31 +55,56 @@ export function Profile() {
       setLoading(true);
       setError("");
       try {
-        let res;
+        let profileData;
         if (!user && !id) {
           setError("Você precisa estar logado para acessar o perfil.");
           setLoading(false);
           return;
         }
+        
+        // Usar Supabase diretamente em vez da API
         if (id) {
-          res = await api.get(`/users?id=${id}`);
+          const { data, error: profileError } = await supabase
+            .from('users')
+            .select('*')
+            .eq('id', id)
+            .single();
+          
+          if (profileError) throw profileError;
+          profileData = data;
         } else if (user) {
-          res = await api.get(`/users?email=${user.email}`);
+          // Se não tiver ID mas tiver usuário logado, usar o ID do usuário logado
+          const { data, error: profileError } = await supabase
+            .from('users')
+            .select('*')
+            .eq('id', user.id)
+            .single();
+          
+          if (profileError) throw profileError;
+          profileData = data;
         }
-        if (res && res.data && res.data[0]) {
-          setProfile(res.data[0]);
-          setBio(res.data[0]?.bio || "");
-          setAvatar(res.data[0]?.avatar || "");
-          setInterests(toMultiArray(res.data[0]?.interests));
-          setName(res.data[0]?.name || "");
-          setEmail(res.data[0]?.email || "");
-          // Busca posts do usuário
-          const postsRes = await api.get(`/posts?userId=${res.data[0].id}`);
-          setUserPosts(postsRes.data);
+        
+        if (profileData) {
+          setProfile(profileData);
+          setBio(profileData?.bio || "");
+          setAvatar(profileData?.avatar || "");
+          setInterests(toMultiArray(profileData?.interests));
+          setName(profileData?.name || "");
+          setEmail(profileData?.email || "");
+          
+          // Busca posts do usuário usando Supabase
+          const { data: posts, error: postsError } = await supabase
+            .from('posts')
+            .select('*')
+            .eq('author_id', profileData.id)
+            .order('created_at', { ascending: false });
+          
+          if (postsError) throw postsError;
+          setUserPosts(posts || []);
         } else {
           setError("Perfil não encontrado.");
         }
-      } catch{
+      } catch {
         setError("Erro ao carregar perfil. Tente novamente.");
       }
       setLoading(false);

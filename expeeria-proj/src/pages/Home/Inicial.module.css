@@ -409,3 +409,49 @@
     padding: 1rem;
   }
 }
+
+/* Estilos para mensagens de erro */
+.errorMessage {
+  background: rgba(220, 38, 38, 0.1);
+  border-left: 4px solid #ef4444;
+  border-radius: 0.5rem;
+  padding: 1rem 1.5rem;
+  margin: 1rem 0;
+  color: #ef4444;
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Estilos para o container de carregamento */
+.loadingContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  margin: 1rem 0;
+  background: rgba(30, 41, 59, 0.5);
+  border-radius: 1rem;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}
+
+/* Estilos para o contêiner quando não há posts */
+.noPostsContainer {
+  text-align: center;
+  color: var(--primary-300, #7dd3fc);
+  font-size: 1.25rem;
+  margin: 2rem 0;
+  padding: 2rem;
+  background: rgba(15, 23, 42, 0.5);
+  border-radius: 1rem;
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.1),
+    0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  animation: fadeIn 0.5s ease-out;
+}

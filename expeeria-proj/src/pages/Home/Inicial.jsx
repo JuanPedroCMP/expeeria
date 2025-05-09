@@ -3,36 +3,80 @@ import { Recomendacoes } from "../../components/Recomendacoes/Recomendacoes";
 import { useAuth } from "../../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import style from "./Inicial.module.css";
-import { usePost } from "../../hooks/usePost";
 import { useEffect, useState } from "react";
 import { Card } from "../../components/Card/Card";
+import supabase from "../../services/supabase";
 
 const Inicial = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { posts } = usePost();
+  const [allPosts, setAllPosts] = useState([]);
   const [trendingPosts, setTrendingPosts] = useState([]);
   const [recentlyViewedPosts, setRecentlyViewedPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Buscar posts em destaque (trending) - posts com mais likes
+  // Carregar todos os posts do Supabase
   useEffect(() => {
-    if (posts && posts.length > 0) {
-      const trending = [...posts]
-        .sort((a, b) => (b.likes?.length || 0) - (a.likes?.length || 0))
-        .slice(0, 3);
-      setTrendingPosts(trending);
-    }
-  }, [posts]);
+    const fetchPosts = async () => {
+      try {
+        setLoading(true);
+        // Buscar posts com contagens de likes e informações do autor
+        const { data: postsData, error: postsError } = await supabase
+          .from('posts')
+          .select(`
+            *,
+            users!author_id (id, username, name, avatar),
+            post_likes!post_id (count),
+            post_categories!post_id (category)
+          `)
+          .eq('status', 'published')
+          .order('created_at', { ascending: false });
+          
+        if (postsError) throw postsError;
+        
+        // Processar os dados para um formato mais amigável
+        const processedPosts = postsData.map(post => ({
+          id: post.id,
+          title: post.title,
+          caption: post.caption,
+          content: post.content,
+          imageUrl: post.image_url,
+          author: post.users,
+          authorId: post.author_id,
+          createdAt: post.created_at,
+          likeCount: post.post_likes[0]?.count || 0,
+          categories: post.post_categories.map(cat => cat.category)
+        }));
+        
+        setAllPosts(processedPosts);
+        
+        // Ordenar por curtidas para trending posts
+        const trending = [...processedPosts]
+          .sort((a, b) => b.likeCount - a.likeCount)
+          .slice(0, 3);
+        setTrendingPosts(trending);
+        
+        setLoading(false);
+      } catch (error) {
+        console.error('Erro ao buscar posts:', error);
+        setError('Falha ao carregar posts. Tente novamente mais tarde.');
+        setLoading(false);
+      }
+    };
+    
+    fetchPosts();
+  }, []);
 
   // Carregar posts recentemente visualizados do localStorage
   useEffect(() => {
-    if (user) {
+    if (user && allPosts.length > 0) {
       try {
         const viewedPostsData = localStorage.getItem(`viewedPosts_${user.id}`);
         if (viewedPostsData) {
           const viewedPostIds = JSON.parse(viewedPostsData);
           // Filtrar os posts que o usuário visualizou recentemente
-          const recentPosts = posts.filter(post => 
+          const recentPosts = allPosts.filter(post => 
             viewedPostIds.includes(post.id)
           ).slice(0, 3); // Limitar a 3 posts
           
@@ -42,7 +86,7 @@ const Inicial = () => {
         console.error("Erro ao carregar posts visualizados:", error);
       }
     }
-  }, [posts, user]);
+  }, [allPosts, user]);
 
   return (
     <PostProvider>
@@ -61,13 +105,28 @@ const Inicial = () => {
           <button
             className={style.criarPostBtn}
             onClick={() => navigate("/criar_post")}
+            disabled={!user}
           >
             + Criar novo post
           </button>
         </div>
 
+        {/* Mensagem de erro */}
+        {error && (
+          <div className={style.errorMessage}>
+            <p>{error}</p>
+          </div>
+        )}
+
+        {/* Indicador de carregamento */}
+        {loading && (
+          <div className={style.loadingContainer}>
+            <p>Carregando posts...</p>
+          </div>
+        )}
+
         {/* Continue de onde parou - posts visualizados recentemente */}
-        {user && recentlyViewedPosts.length > 0 && (
+        {!loading && user && recentlyViewedPosts.length > 0 && (
           <div className={style.recentlyViewedSection}>
             <h3>Continue de onde parou</h3>
             <div className={style.recentlyViewedGrid}>
@@ -80,10 +139,10 @@ const Inicial = () => {
                   <Card
                     TituloCard={post.title}
                     SubTitulo={
-                      Array.isArray(post.area) ? post.area.join(", ") : post.area
+                      post.categories?.length > 0 ? post.categories.join(", ") : "Geral"
                     }
                     Descricao={post.caption}
-                    likes={post.likes}
+                    likes={post.likeCount || 0}
                     id={post.id}
                     imageUrl={post.imageUrl}
                   />
@@ -94,32 +153,41 @@ const Inicial = () => {
         )}
 
         {/* Recomendações personalizadas para usuário logado */}
-        <Recomendacoes />
+        {!loading && <Recomendacoes />}
 
         {/* Seção de posts em destaque */}
-        <div className={style.trendingSection}>
-          <h3>Destaques da comunidade</h3>
-          <div className={style.trendingGrid}>
-            {trendingPosts.map((post) => (
-              <div
-                key={post.id}
-                onClick={() => navigate(`/post/${post.id}`)}
-                className={style.trendingCard}
-              >
-                <Card
-                  TituloCard={post.title}
-                  SubTitulo={
-                    Array.isArray(post.area) ? post.area.join(", ") : post.area
-                  }
-                  Descricao={post.caption}
-                  likes={post.likes}
-                  id={post.id}
-                  imageUrl={post.imageUrl}
-                />
-              </div>
-            ))}
+        {!loading && trendingPosts.length > 0 && (
+          <div className={style.trendingSection}>
+            <h3>Destaques da comunidade</h3>
+            <div className={style.trendingGrid}>
+              {trendingPosts.map((post) => (
+                <div
+                  key={post.id}
+                  onClick={() => navigate(`/post/${post.id}`)}
+                  className={style.trendingCard}
+                >
+                  <Card
+                    TituloCard={post.title}
+                    SubTitulo={
+                      post.categories?.length > 0 ? post.categories.join(", ") : "Geral"
+                    }
+                    Descricao={post.caption}
+                    likes={post.likeCount || 0}
+                    id={post.id}
+                    imageUrl={post.imageUrl}
+                  />
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
+
+        {/* Mensagem quando não há posts para exibir */}
+        {!loading && !error && trendingPosts.length === 0 && (
+          <div className={style.noPostsContainer}>
+            <p>Ainda não há posts publicados. Seja o primeiro a compartilhar!</p>
+          </div>
+        )}
 
         {/* Chamada para ação de explorar */}
         <div className={style.exploreCallout}>
