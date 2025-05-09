@@ -343,8 +343,7 @@ export const PostPage = () => {
     );
   }
   
-  // Verificar se o usuário é dono do post ou administrador
-  const isOwnerOrAdmin = user && (user.id === post.authorId || user.role === 'admin');
+  // A variável isOwnerOrAdmin já foi declarada anteriormente
 
   return (
     <>
