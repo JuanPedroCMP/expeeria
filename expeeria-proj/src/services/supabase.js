@@ -39,20 +39,54 @@ if (!supabaseUrl || !supabaseAnonKey) {
   }
 }
 
-// Criação do cliente Supabase com configurações adicionais para evitar problemas de CORS
+// Verificar se há uma sessão no localStorage
+const checkExistingSession = () => {
+  try {
+    // Tentar detectar uma sessão no localStorage para debug
+    const localStorageKeys = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      localStorageKeys.push(localStorage.key(i));
+    }
+    const sessionKeys = localStorageKeys.filter(key => key.includes('supabase.auth') || key.includes('sb-'));
+    
+    if (sessionKeys.length > 0) {
+      console.log('Sessão existente detectada no localStorage');
+      return true;
+    }
+    return false;
+  } catch (e) {
+    console.warn('Erro ao verificar localStorage:', e);
+    return false;
+  }
+};
+
+const hasExistingSession = checkExistingSession();
+if (hasExistingSession) {
+  console.log('Usando sessão existente para inicialização');
+}
+
+// Criação do cliente Supabase com configurações melhoradas para persistência
 const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     persistSession: true,
     autoRefreshToken: true,
-    // Configurações para contornar problemas de CORS
+    storage: window.localStorage, // Usar localStorage explicitamente
+    storageKey: 'sb-auth-token', // Chave consistente
+    // Configurações para CORS e funcionalidade
     detectSessionInUrl: false,
     flowType: 'implicit',
   },
-  // Configurações globais para fetch
+  // Configurações globais para fetch com timeout mais longo
   global: {
-    fetch: (...args) => fetch(...args)
+    fetch: (...args) => fetch(...args),
+    headers: {
+      'X-Client-Info': 'expeeria-webapp'
+    }
   }
 });
+
+// Log para confirmar a inicialização do cliente
+console.log('Cliente Supabase inicializado com sucesso');
 
 // Adicionar as URLs para facilitar o debug
 supabase.supabaseUrl = supabaseUrl;

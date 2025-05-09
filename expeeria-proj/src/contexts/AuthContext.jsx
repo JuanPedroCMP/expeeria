@@ -128,17 +128,43 @@ export function AuthProvider({ children }) {
     let isMounted = true; // Flag para verificar se o componente está montado
     let safetyTimeout; // Referência para o timeout de segurança
     
-    // Configuração de timeout para segurança
+    // Contador de tentativas para evitar loops infinitos
+    let retryCount = 0;
+    const maxRetries = 2;
+    
+    // Função de inicialização segura
+    const safeInitAuth = async () => {
+      if (!isMounted || retryCount >= maxRetries) return;
+      
+      try {
+        console.log(`Tentando inicializar sessão (tentativa ${retryCount + 1}/${maxRetries + 1})`);
+        await initAuth();
+      } catch (error) {
+        console.error('Erro ao inicializar sessão:', error);
+        retryCount++;
+        
+        // Se falhar, definimos o estado padru00e3o
+        if (retryCount >= maxRetries && isMounted) {
+          console.log('Máximo de tentativas atingido, definindo estado padrão');
+          setUser(null);
+          setLoading(false);
+          setSessionChecked(true);
+        }
+      }
+    };
+    
+    // Configuração de timeout para segurança absoluta
     safetyTimeout = setTimeout(() => {
       if (loading && isMounted) {
         console.log('Timeout de segurança acionado para AuthContext');
         setLoading(false);
         setSessionChecked(true);
+        setUser(null); // Limpar usuário em caso de timeout para forçar login
       }
-    }, 3000); // Reduzido para 3 segundos para não bloquear a interface
+    }, 5000); // 5 segundos é tempo suficiente mesmo em conexões lentas
 
     // Iniciar verificação de autenticação
-    initAuth();
+    safeInitAuth();
     
     // Configurar listener para mudanças de autenticação
     const { data: { subscription }} = supabase.auth.onAuthStateChange(

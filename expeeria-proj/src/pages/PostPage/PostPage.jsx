@@ -313,6 +313,39 @@ export const PostPage = () => {
     }
   };
   
+  // Adicionar carregamento condicional
+  if (loading) {
+    return (
+      <div className={style.postContainer}>
+        <h2>Carregando post...</h2>
+        <div className={style.loadingSpinner}></div>
+      </div>
+    );
+  }
+  
+  if (error) {
+    return (
+      <div className={style.postContainer}>
+        <h2>Erro ao carregar o post</h2>
+        <p>{error}</p>
+        <Button destino="/" texto="Voltar para a página inicial" />
+      </div>
+    );
+  }
+  
+  if (!post) {
+    return (
+      <div className={style.postContainer}>
+        <h2>Post não encontrado</h2>
+        <p>O post que você está procurando não existe ou foi removido.</p>
+        <Button destino="/" texto="Voltar para a página inicial" />
+      </div>
+    );
+  }
+  
+  // Verificar se o usuário é dono do post ou administrador
+  const isOwnerOrAdmin = user && (user.id === post.authorId || user.role === 'admin');
+
   return (
     <>
       <div className={style.postContainer}>
