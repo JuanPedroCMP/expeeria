@@ -11,7 +11,7 @@
   max-width: 50px; /* Limita o tamanho mu00e1ximo */
   max-height: 50px; /* Limita o tamanho mu00e1ximo */
   border-radius: 50%; /* Garante que seja redondo */
-  background: linear-gradient(135deg, var(--primary-700, #0369a1), var(--primary-800, #075985));
+  background: #0369a1; /* Cor su00f3lida para maior contraste */
   color: white;
   display: flex;
   align-items: center;
@@ -20,8 +20,8 @@
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
   cursor: pointer;
   transition: all 0.3s ease;
-  z-index: 99;
-  opacity: 0.9;
+  z-index: 999; /* Aumentado para garantir visibilidade */
+  padding: 0; /* Remove qualquer padding que possa distorcer o formato */
 }
 
 .toggleButton:hover {
