@@ -212,35 +212,22 @@ const Inicial = () => {
                         className={style.carouselSlide}
                         onClick={() => navigate(`/post/${post.id}`)}
                       >
-                        <div className={style.carouselContent}>
-                          <div 
-                            className={style.carouselImage}
-                            style={{ backgroundImage: `url(${post.imageUrl || '/placeholder-post.jpg'})` }}
-                          >
-                            <div className={style.slideBadges}>
-                              <span className={style.likeBadge}>❤️ {post.likeCount || 0}</span>
-                              {post.categories && post.categories[0] && (
-                                <span className={style.categoryBadge}>{post.categories[0]}</span>
-                              )}
-                            </div>
-                          </div>
-                          <div className={style.carouselInfo}>
-                            <h4>{post.title}</h4>
-                            <p>{post.caption}</p>
-                            <div className={style.postMeta}>
-                              <span className={style.postAuthor}>Por {post.author || 'Autor desconhecido'}</span>
-                              <button 
-                                className={style.readMoreBtn}
-                                onClick={(e) => {
-                                  e.stopPropagation(); // Evitar propagação para o slide inteiro
-                                  navigate(`/post/${post.id}`);
-                                }}
-                              >
-                                Leia mais
-                              </button>
-                            </div>
-                          </div>
-                        </div>
+                        <Card
+                          id={post.id}
+                          title={post.title}
+                          caption={post.caption}
+                          content={post.content}
+                          imageUrl={post.imageUrl}
+                          likeCount={post.likeCount}
+                          commentCount={post.commentCount}
+                          author={post.author}
+                          createdAt={post.createdAt || post.created_at}
+                          categories={post.categories}
+                          category={post.categories && post.categories[0]}
+                          tags={post.tags}
+                          onClick={() => navigate(`/post/${post.id}`)}
+                          className={style.carouselCard}
+                        />
                       </div>
                     ))}
                   </div>

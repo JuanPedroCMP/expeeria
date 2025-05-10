@@ -1,44 +1,49 @@
-import React, { useState, useEffect } from "react";
-import { useAuth } from "../../hooks/useAuth";
-import { Navigate, useLocation } from "react-router-dom";
-import { LoadingSpinner } from "../LoadingSpinner";
+import React, { useEffect, useState } from 'react';
+import { Navigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../../hooks/useAuth';
+import { LoadingSpinner } from '../LoadingSpinner';
 
+// Componente para rota protegida - versão aprimorada para maior confiabilidade
 export function PrivateRoute({ children }) {
-  // Obter dados de autenticação
-  const { user, loading, sessionChecked } = useAuth();
   const location = useLocation();
+  const { user, loading, sessionChecked } = useAuth();
+  const [showFallback, setShowFallback] = useState(false);
+  const [authTimeout, setAuthTimeout] = useState(false);
   
-  // Anti-bloqueio: usar um timeout para evitar a tela de carregamento interminável
-  const [timeoutReached, setTimeoutReached] = useState(false);
-  
-  // Configurar timeout de segurança (3 segundos)
+  // Timeout de segurança para não deixar usuário preso em tela de loading
   useEffect(() => {
-    // Se estiver carregando, iniciar timeout
+    // Se demorar mais de 3 segundos para verificar a sessão, considera um timeout
+    const securityTimer = setTimeout(() => {
+      if (loading && !sessionChecked) {
+        console.warn('Timeout de autenticação acionado no PrivateRoute');
+        setAuthTimeout(true);
+      }
+    }, 3000);
+    
+    return () => clearTimeout(securityTimer);
+  }, [loading, sessionChecked]);
+  
+  // Redireciona para login se:
+  // 1. A sessão foi verificada e não há usuário, ou
+  // 2. Ocorreu um timeout de autenticação
+  if ((sessionChecked && !user) || authTimeout) {
+    console.log('Redirecionando para login: sessionChecked=', sessionChecked, 'user=', !!user, 'authTimeout=', authTimeout);
+    return <Navigate to="/login" state={{ from: location, message: authTimeout ? "Falha na verificação da sessão. Por favor, faça login novamente." : undefined }} replace />;
+  }
+  
+  // Efeito para mostrar o fallback após 300ms se ainda estiver carregando
+  useEffect(() => {
+    // Só mostra o fallback se estiver carregando para evitar flash
     if (loading) {
-      const timer = setTimeout(() => {
-        console.log('Timeout de segurança do PrivateRoute acionado!');
-        setTimeoutReached(true);
-      }, 3000);
-      
-      // Limpar timeout se o carregamento terminar
+      const timer = setTimeout(() => setShowFallback(true), 300);
       return () => clearTimeout(timer);
     }
+    
+    setShowFallback(false);
   }, [loading]);
   
-  // Verificação para possível bloqueio
-  const possibleBlockage = loading && !sessionChecked && !timeoutReached;
-  
-  // Log para depuração
-  console.log('PrivateRoute - Estado atual:', { 
-    temUsuario: !!user, 
-    loading, 
-    sessionChecked, 
-    timeoutReached, 
-    possibleBlockage
-  });
-  
-  // Mostra spinner de carregamento somente por um tempo limitado
-  if (possibleBlockage) {
+  // Se ainda está carregando e passou tempo suficiente, mostra o spinner
+  if ((loading || !sessionChecked) && showFallback && !authTimeout) {
     return (
       <div className="auth-container fade-in">
         <div className="auth-card" style={{ maxWidth: '400px', textAlign: 'center', padding: '2rem' }}>
@@ -51,7 +56,7 @@ export function PrivateRoute({ children }) {
       </div>
     );
   }
-
+  
   // Redireciona para login se não houver usuário autenticado
   // Preserva a rota original no state para redirecionamento após login
   if (!user) {

@@ -1,0 +1,112 @@
+/**
+ * Definiu00e7u00f5es de temas para a aplicau00e7u00e3o Expeeria
+ * Estes estilos complementam as oju00e7u00f5es de acessibilidade
+ */
+
+:root {
+  /* Tema padru00e3o - varu00edu00e1veis ju00e1 definidas no CSS principal */
+}
+
+/* Tema escuro - tons mais escuros que o padru00e3o */
+.theme-dark {
+  --background-principal: #0f172a;
+  --background-secundario: #141e33;
+  --texto-principal: #f1f5f9;
+  --texto-secundario: #cbd5e1;
+  --borda: rgba(255, 255, 255, 0.08);
+  --destaque-primario: #0ea5e9;
+  --destaque-secundario: #7dd3fc;
+  --sombra-suave: 0 4px 6px rgba(0, 0, 0, 0.3);
+  --sombra-media: 0 10px 15px rgba(0, 0, 0, 0.4);
+  --erro: #f87171;
+  --sucesso: #4ade80;
+  --primary-300: #7dd3fc;
+  --primary-400: #38bdf8;
+  --primary-500: #0ea5e9;
+  --primary-600: #0284c7;
+  --primary-700: #0369a1;
+  --primary-800: #075985;
+  --secondary-300: #c4b5fd;
+  --secondary-400: #a78bfa;
+  --secondary-500: #8b5cf6;
+  --secondary-600: #7c3aed;
+  --secondary-700: #6d28d9;
+}
+
+/* Tema de alto contraste para melhor visibilidade */
+.theme-highContrast {
+  --background-principal: #000000;
+  --background-secundario: #121212;
+  --texto-principal: #ffffff;
+  --texto-secundario: #f0f0f0;
+  --borda: rgba(255, 255, 255, 0.2);
+  --destaque-primario: #ffff00;
+  --destaque-secundario: #00ffff;
+  --sombra-suave: 0 4px 6px rgba(0, 0, 0, 0.5);
+  --sombra-media: 0 10px 15px rgba(0, 0, 0, 0.6);
+  --erro: #ff0000;
+  --sucesso: #00ff00;
+  --primary-300: #ffff00;
+  --primary-400: #ffff33;
+  --primary-500: #ffff66;
+  --primary-600: #ffff99;
+  --primary-700: #ffffcc;
+  --primary-800: #eeeeee;
+  --secondary-300: #00ffff;
+  --secondary-400: #33ffff;
+  --secondary-500: #66ffff;
+  --secondary-600: #99ffff;
+  --secondary-700: #ccffff;
+}
+
+/* Tema colorido com paleta mais viva */
+.theme-colorful {
+  --background-principal: #1e1e2f;
+  --background-secundario: #27273c;
+  --texto-principal: #ffffff;
+  --texto-secundario: #d1d1e0;
+  --borda: rgba(255, 255, 255, 0.12);
+  --destaque-primario: #6366f1;
+  --destaque-secundario: #a5b4fc;
+  --sombra-suave: 0 4px 6px rgba(0, 0, 0, 0.3);
+  --sombra-media: 0 10px 15px rgba(0, 0, 0, 0.4);
+  --erro: #fb7185;
+  --sucesso: #34d399;
+  --primary-300: #a5b4fc;
+  --primary-400: #818cf8;
+  --primary-500: #6366f1;
+  --primary-600: #4f46e5;
+  --primary-700: #4338ca;
+  --primary-800: #3730a3;
+  --secondary-300: #fbcfe8;
+  --secondary-400: #f9a8d4;
+  --secondary-500: #ec4899;
+  --secondary-600: #db2777;
+  --secondary-700: #be185d;
+}
+
+/* Tema calmo com cores mais suaves */
+.theme-calm {
+  --background-principal: #134e4a;
+  --background-secundario: #115e59;
+  --texto-principal: #f0fdfa;
+  --texto-secundario: #ccfbf1;
+  --borda: rgba(255, 255, 255, 0.12);
+  --destaque-primario: #14b8a6;
+  --destaque-secundario: #5eead4;
+  --sombra-suave: 0 4px 6px rgba(0, 0, 0, 0.2);
+  --sombra-media: 0 10px 15px rgba(0, 0, 0, 0.3);
+  --erro: #f43f5e;
+  --sucesso: #10b981;
+  --primary-300: #5eead4;
+  --primary-400: #2dd4bf;
+  --primary-500: #14b8a6;
+  --primary-600: #0d9488;
+  --primary-700: #0f766e;
+  --primary-800: #115e59;
+  --secondary-300: #bae6fd;
+  --secondary-400: #7dd3fc;
+  --secondary-500: #38bdf8;
+  --secondary-600: #0ea5e9;
+  --secondary-700: #0284c7;
+}

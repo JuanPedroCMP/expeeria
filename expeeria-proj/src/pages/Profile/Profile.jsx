@@ -7,6 +7,7 @@ import { UploadImage } from "../../components/UploadImage";
 import supabase from "../../services/supabase";
 import { usePost } from "../../hooks/usePost";
 import { Card } from "../../components/Card/Card";
+import { Skeleton } from "../../components/Skeleton/Skeleton";
 
 export function Profile() {
   const { user, signOut, setUser } = useAuth();
@@ -565,10 +566,19 @@ export function Profile() {
             <div className={style.tabContent}>
               <h3 className={style.sectionHeading}>
                 <span className={style.sectionIcon}>📝</span>
-                Posts publicados
+                Posts ({loading ? '...' : userPosts.length})
               </h3>
               
-              {userPosts.length > 0 ? (
+              {loading ? (
+                <div className={style.userPostsGrid}>
+                  {/* Exibe skeletons durante o carregamento */}
+                  {[1, 2, 3].map(index => (
+                    <div key={index} className={style.skeletonCard}>
+                      <Skeleton type="card" height="280px" />
+                    </div>
+                  ))}
+                </div>
+              ) : userPosts.length > 0 ? (
                 <div className={style.userPostsGrid}>
                   {userPosts.map((post) => (
                     <div
@@ -641,12 +651,25 @@ export function Profile() {
           {activeTab === 'seguidores' && (
             <div className={style.tabContent}>
               <h3 className={style.sectionHeading}>
-                <span className={style.sectionIcon}>👥</span>
-                Seguidores ({followers.length})
+                <span className={style.sectionIcon}>👤</span>
+                Seguidores ({loading ? '...' : followers.length})
               </h3>
               
               <div className={style.followSection}>
-                {followers.length > 0 ? (
+                {loading ? (
+                  <div className={style.skeletonFollowers}>
+                    {[1, 2, 3].map(index => (
+                      <div key={index} className={style.userItemSkeleton}>
+                        <Skeleton type="avatar" width="40px" height="40px" />
+                        <div className={style.userInfoSkeleton}>
+                          <Skeleton type="text" width="120px" height="18px" />
+                          <Skeleton type="text" width="80px" height="14px" />
+                        </div>
+                        <Skeleton type="button" width="100px" height="30px" />
+                      </div>
+                    ))}
+                  </div>
+                ) : followers.length > 0 ? (
                   <div>
                     {allUsers
                       .filter(u => followers.includes(u.id))
@@ -710,12 +733,25 @@ export function Profile() {
           {activeTab === 'seguindo' && (
             <div className={style.tabContent}>
               <h3 className={style.sectionHeading}>
-                <span className={style.sectionIcon}>👤</span>
-                Seguindo ({following.length})
+                <span className={style.sectionIcon}>👥</span>
+                Seguindo ({loading ? '...' : following.length})
               </h3>
               
               <div className={style.followSection}>
-                {following.length > 0 ? (
+                {loading ? (
+                  <div className={style.skeletonFollowers}>
+                    {[1, 2, 3].map(index => (
+                      <div key={index} className={style.userItemSkeleton}>
+                        <Skeleton type="avatar" width="40px" height="40px" />
+                        <div className={style.userInfoSkeleton}>
+                          <Skeleton type="text" width="120px" height="18px" />
+                          <Skeleton type="text" width="80px" height="14px" />
+                        </div>
+                        <Skeleton type="button" width="100px" height="30px" />
+                      </div>
+                    ))}
+                  </div>
+                ) : following.length > 0 ? (
                   <div>
                     {allUsers
                       .filter(u => following.includes(u.id))
