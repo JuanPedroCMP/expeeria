@@ -695,18 +695,25 @@
 }
 
 .indicator {
-  width: 0.75rem;
-  height: 0.75rem;
+  width: 12px;
+  height: 12px;
+  min-width: 12px;
+  min-height: 12px;
+  max-width: 12px;
+  max-height: 12px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.3);
   border: none;
   cursor: pointer;
   transition: all 0.2s ease;
+  padding: 0;
 }
 
 .indicator.active {
   background: var(--primary-500, #0ea5e9);
   transform: scale(1.2);
+  width: 12px;
+  height: 12px;
 }
 
 /* Estilos para a seção de categorias */

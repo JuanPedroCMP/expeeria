@@ -39,7 +39,9 @@ const Card = (props) => {
     // Suporte a propriedades adicionais
     category,
     categoria,
-    tags
+    tags,
+    // Nova propriedade para controlar visibilidade do botão compartilhar
+    hideShareButton = false
   } = props;
   
   // Normalizando os dados para garantir compatibilidade com diferentes formatos
@@ -146,13 +148,15 @@ const Card = (props) => {
               {normalizedComments}
             </span>
             
-            <ShareButton 
-              url={window.location.origin + `/post/${id}`}
-              title={normalizedTitle}
-              description={normalizedDescription}
-              size="sm"
-              className={styles.shareButton}
-            />
+            {!hideShareButton && (
+              <ShareButton 
+                url={window.location.origin + `/post/${id}`}
+                title={normalizedTitle}
+                description={normalizedDescription}
+                size="sm"
+                className={styles.shareButton}
+              />
+            )}
           </div>
         </div>
       </div>

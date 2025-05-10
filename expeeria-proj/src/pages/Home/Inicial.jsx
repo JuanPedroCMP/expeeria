@@ -227,6 +227,7 @@ const Inicial = () => {
                           tags={post.tags}
                           onClick={() => navigate(`/post/${post.id}`)}
                           className={style.carouselCard}
+                          hideShareButton={true}
                         />
                       </div>
                     ))}
