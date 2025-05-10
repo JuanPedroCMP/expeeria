@@ -13,8 +13,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 48px;
-  height: 48px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
   background: linear-gradient(135deg, var(--primary-500, #0ea5e9), var(--primary-600, #0284c7));
   color: white;
@@ -231,8 +231,8 @@
   }
   
   .accessibilityButton {
-    width: 44px;
-    height: 44px;
+    width: 50px;
+    height: 50px;
   }
   
   .panelTitle {

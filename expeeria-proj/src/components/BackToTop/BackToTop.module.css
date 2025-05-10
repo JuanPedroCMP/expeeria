@@ -3,8 +3,8 @@
   position: fixed;
   bottom: 30px;
   right: 90px;
-  width: 44px;
-  height: 44px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
   background: linear-gradient(135deg, var(--primary-500, #0ea5e9), var(--primary-600, #0284c7));
   color: white;
@@ -40,9 +40,9 @@
 @media (max-width: 768px) {
   .backToTopButton {
     bottom: 20px;
-    right: 150px;
-    width: 44px;
-    height: 44px;
+    right: 160px;
+    width: 50px;
+    height: 50px;
   }
   
   .backToTopButton svg {
@@ -55,6 +55,8 @@
 @media screen and (max-width: 480px) {
   .backToTopButton {
     bottom: 15px;
-    right: 200px;
+    right: 150px;
+    width: 50px;
+    height: 50px;
   }
 }

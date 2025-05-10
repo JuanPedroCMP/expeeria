@@ -4,8 +4,8 @@
   position: fixed;
   bottom: 30px;
   right: 30px;
-  width: 44px;
-  height: 44px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
   background: linear-gradient(135deg, var(--primary-700, #0369a1), var(--primary-800, #075985));
   color: white;
@@ -164,7 +164,9 @@
 @media (max-width: 768px) {
   .toggleButton {
     bottom: 20px;
-    right: 80px;
+    right: 90px;
+    width: 50px;
+    height: 50px;
   }
   
   .screenReaderPanel {
@@ -177,9 +179,9 @@
 @media (max-width: 480px) {
   .toggleButton {
     bottom: 15px;
-    right: 120px;
-    width: 44px;
-    height: 44px;
+    right: 70px;
+    width: 50px;
+    height: 50px;
   }
   
   .screenReaderPanel {

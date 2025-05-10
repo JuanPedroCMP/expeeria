@@ -171,17 +171,19 @@ const ScreenReader = () => {
         title="Leitor de tela">
         <svg 
           xmlns="http://www.w3.org/2000/svg" 
-          width="24" 
-          height="24" 
+          width="28" 
+          height="28" 
           viewBox="0 0 24 24" 
           fill="none" 
           stroke="currentColor" 
           strokeWidth="2" 
           strokeLinecap="round" 
           strokeLinejoin="round">
-          <path d="M8 3h9a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"></path>
-          <path d="M12 9v7"></path>
-          <path d="M15 12H9"></path>
+          <path d="M15 8a7.4 7.4 0 0 1 4 6"></path>
+          <path d="M17.7 15c.1-.5.3-1 .3-1.5a9 9 0 0 0-9-9"></path>
+          <path d="M10 5.2A9 9 0 0 0 5 13.5"></path>
+          <path d="M7.1 14a7.4 7.4 0 0 1 1-3.4"></path>
+          <circle cx="12" cy="12" r="2"></circle>
         </svg>
       </button>
       

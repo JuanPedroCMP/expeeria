@@ -81,11 +81,10 @@ const AccessibilityMenu = () => {
         aria-label="Menu de acessibilidade"
         aria-expanded={isOpen}
       >
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <circle cx="12" cy="12" r="10"></circle>
-          <path d="M8 11a4 4 0 1 1 8 0"></path>
-          <path d="M10 14h4"></path>
-          <path d="M12 17v-3"></path>
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="9"></circle>
+          <path d="M12 8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"></path>
+          <path d="M12 16c-1.7 0-3-1.3-3-3v3m6 0v-3c0 1.7-1.3 3-3 3"></path>
         </svg>
       </button>
       {isOpen && (
