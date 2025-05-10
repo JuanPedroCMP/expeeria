@@ -1,17 +1,22 @@
 import React, { createContext, useState, useCallback } from 'react';
+import { ToastContainer } from '../components/Toast/Toast';
 
 // Criação do contexto
 export const NotificationContext = createContext({
   notifications: [],
+  toasts: [],
   addNotification: () => {},
-  removeNotification: () => {}
+  removeNotification: () => {},
+  addToast: () => {},
+  removeToast: () => {}
 });
 
 /**
- * Provider para gerenciar notificações globalmente na aplicação
+ * Provider para gerenciar notificações e toasts globalmente na aplicação
  */
 export const NotificationProvider = ({ children }) => {
   const [notifications, setNotifications] = useState([]);
+  const [toasts, setToasts] = useState([]);
   
   // Adicionar uma nova notificação
   const addNotification = useCallback((notification) => {
@@ -56,19 +61,43 @@ export const NotificationProvider = ({ children }) => {
     );
   }, []);
   
+  // Adicionar um novo toast
+  const addToast = useCallback(({ message, type = 'success', duration = 3000 }) => {
+    const id = Date.now() + Math.random().toString(36).substring(2, 9);
+    setToasts(prev => [...prev, { id, message, type, duration }]);
+    return id;
+  }, []);
+  
+  // Remover um toast pelo ID
+  const removeToast = useCallback((id) => {
+    setToasts(prev => prev.filter(toast => toast.id !== id));
+  }, []);
+  
+  // Funções de conveniência para diferentes tipos de toast
+  const showToast = useCallback((message, type = 'success', duration = 3000) => {
+    return addToast({ message, type, duration });
+  }, [addToast]);
+  
   // Exportar o contexto com seus valores e funções
   const contextValue = {
     notifications,
+    toasts,
     addNotification,
     removeNotification,
     clearNotifications,
     markAsRead,
-    markAllAsRead
+    markAllAsRead,
+    addToast,
+    removeToast,
+    showToast
   };
   
   return (
     <NotificationContext.Provider value={contextValue}>
       {children}
+      {toasts.length > 0 && (
+        <ToastContainer toasts={toasts} onClose={removeToast} />
+      )}
     </NotificationContext.Provider>
   );
 };

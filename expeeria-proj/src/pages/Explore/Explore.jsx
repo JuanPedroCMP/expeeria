@@ -84,30 +84,52 @@ export function Explore() {
     );
   }
   if (selectedAreas.length > 0) {
-    filtered = filtered.filter((p) =>
-      Array.isArray(p.categories)
-        ? selectedAreas.some((a) => p.categories.includes(a))
-        : selectedAreas.includes(p.categories)
-    );
+    filtered = filtered.filter((p) => {
+      // Tratar diferentes formatos de categorias
+      const postCategories = p.categories || p.area || [];
+      const categoriesArray = Array.isArray(postCategories) ? postCategories : [postCategories];
+      return selectedAreas.some((a) => categoriesArray.includes(a));
+    });
   }
   if (author) {
     filtered = filtered.filter(
-      (p) => p.author && p.author.toLowerCase().includes(author.toLowerCase())
+      (p) => {
+        const authorName = p.author || p.author_name || '';
+        return authorName.toLowerCase().includes(author.toLowerCase());
+      }
     );
   }
   if (dateFrom) {
-    filtered = filtered.filter(
-      (p) => new Date(p.createdAt) >= new Date(dateFrom)
-    );
+    filtered = filtered.filter(p => {
+      try {
+        const postDate = new Date(p.createdAt || p.created_at || 0);
+        return !isNaN(postDate.getTime()) && postDate >= new Date(dateFrom);
+      } catch {
+        return true; // Em caso de erro, manter o post
+      }
+    });
   }
   if (dateTo) {
-    filtered = filtered.filter(
-      (p) => new Date(p.createdAt) <= new Date(dateTo)
-    );
+    filtered = filtered.filter(p => {
+      try {
+        const postDate = new Date(p.createdAt || p.created_at || 0);
+        return !isNaN(postDate.getTime()) && postDate <= new Date(dateTo);
+      } catch {
+        return true; // Em caso de erro, manter o post
+      }
+    });
   }
 
   // Ordenação: sempre mais recentes primeiro
-  filtered = filtered.slice().sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  filtered = filtered.slice().sort((a, b) => {
+    try {
+      const dateA = new Date(a.createdAt || a.created_at || 0);
+      const dateB = new Date(b.createdAt || b.created_at || 0);
+      return dateB - dateA;
+    } catch {
+      return 0; // Em caso de erro, manter a ordem original
+    }
+  });
 
   // Paginação
   const paginated = filtered.slice(0, showCount);

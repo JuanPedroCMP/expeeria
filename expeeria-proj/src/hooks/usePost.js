@@ -442,6 +442,7 @@ export const usePost = () => {
     fetchPosts: loadAllPosts,
     fetchPost: loadPost,
     hasLikedPost: hasLiked,
+    getPosts: loadAllPosts, // Alias adicionado para compatibilidade com componentes existentes
     
     // Métodos principais
     loadAllPosts,

@@ -46,6 +46,22 @@ export function AuthProvider({ children }) {
   const [error, setError] = useState(null);
   const [sessionChecked, setSessionChecked] = useState(false);
   const [recoveryAttempt, setRecoveryAttempt] = useState(0);
+  
+  // Timeout de seguranu00e7a para evitar bloqueio indefinido
+  useEffect(() => {
+    // Se continuar carregando por muito tempo (5 segundos), considera timeout
+    const securityTimeout = setTimeout(() => {
+      if (loading && !sessionChecked) {
+        console.log('Timeout de seguranu00e7a acionado para AuthContext');
+        setLoading(false);
+        setSessionChecked(true);
+        // Limpar localStorage como medida de emergência
+        cleanLocalStorage();
+      }
+    }, 5000);
+    
+    return () => clearTimeout(securityTimeout);
+  }, [loading, sessionChecked]);
 
   // Funu00e7u00e3o para inicializar a autenticau00e7u00e3o com recuperau00e7u00e3o
   const initAuth = useCallback(async () => {

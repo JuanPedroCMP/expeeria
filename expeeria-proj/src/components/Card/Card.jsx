@@ -12,14 +12,35 @@ const Card = (props) => {
     TituloCard, 
     SubTitulo, 
     Descricao, 
-    likes, 
+    likes = 0, 
     comments = 0,
     id, 
     imageUrl, 
     author,
     createdAt,
-    onClick
+    onClick,
+    // Compatibilidade com diferentes formatos de dados
+    title,
+    caption,
+    content,
+    like_count,
+    likeCount,
+    comment_count,
+    commentCount,
+    image_url,
+    created_at,
+    author_name
   } = props;
+  
+  // Normalizando os dados para garantir compatibilidade
+  const normalizedTitle = TituloCard || title || '';
+  const normalizedSubtitle = SubTitulo || '';
+  const normalizedDescription = Descricao || caption || (content?.substring(0, 120) + (content?.length > 120 ? '...' : '')) || '';
+  const normalizedLikes = likes || likeCount || like_count || 0;
+  const normalizedComments = comments || commentCount || comment_count || 0;
+  const normalizedImageUrl = imageUrl || image_url || '';
+  const normalizedAuthor = author || author_name || '';
+  const normalizedCreatedAt = createdAt || created_at || '';
   
   const { likePost, unlikePost, hasLikedPost } = usePost();
   const { user } = useAuth();
@@ -45,7 +66,7 @@ const Card = (props) => {
   };
   
   // Formatar data se disponível
-  const formattedDate = createdAt ? new Date(createdAt).toLocaleDateString('pt-BR', {
+  const formattedDate = normalizedCreatedAt ? new Date(normalizedCreatedAt).toLocaleDateString('pt-BR', {
     day: '2-digit',
     month: '2-digit',
     year: 'numeric'
@@ -53,19 +74,19 @@ const Card = (props) => {
 
   return (
     <div className={`${styles.card} card post-card slide-up`} onClick={handleCardClick}>
-      {imageUrl && (
+      {normalizedImageUrl && (
         <div className={styles.imageContainer}>
-          <img src={imageUrl} alt={TituloCard} className={`${styles.cardImage} post-image`} />
+          <img src={normalizedImageUrl} alt={normalizedTitle} className={`${styles.cardImage} post-image`} />
         </div>
       )}
       <div className={`${styles.cardContent} post-content`}>
-        <h3 className={`${styles.cardTitle} post-title`}>{TituloCard}</h3>
-        {SubTitulo && <div className="badge badge-primary mb-sm">{SubTitulo}</div>}
-        <p className={`${styles.cardDescription} post-caption`}>{Descricao}</p>
+        <h3 className={`${styles.cardTitle} post-title`}>{normalizedTitle}</h3>
+        {normalizedSubtitle && <div className="badge badge-primary mb-sm">{normalizedSubtitle}</div>}
+        <p className={`${styles.cardDescription} post-caption`}>{normalizedDescription}</p>
         
-        {author && (
+        {normalizedAuthor && (
           <div className="post-author mt-sm mb-sm">
-            <small className="text-secondary">Por {author}</small>
+            <small className="text-secondary">Por {normalizedAuthor}</small>
             {formattedDate && <small className="text-terciario">{' • '}{formattedDate}</small>}
           </div>
         )}
@@ -73,7 +94,7 @@ const Card = (props) => {
         <div className={`${styles.cardFooter} post-footer`}>
           <div className="post-stats">
             <LikeButton 
-              count={likes || 0}
+              count={normalizedLikes}
               isLiked={isLiked}
               onLike={handleLike}
               onUnlike={handleUnlike}
@@ -85,7 +106,7 @@ const Card = (props) => {
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
               </svg>
-              {comments}
+              {normalizedComments}
             </span>
           </div>
         </div>
