@@ -4,9 +4,13 @@
   position: fixed;
   bottom: 30px;
   right: 30px;
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
+  width: 50px; /* Tamanho fixo */
+  height: 50px; /* Mesma medida para garantir um cu00edrculo perfeito */
+  min-width: 50px; /* Evita que seja redimensionado */
+  min-height: 50px; /* Evita que seja redimensionado */
+  max-width: 50px; /* Limita o tamanho mu00e1ximo */
+  max-height: 50px; /* Limita o tamanho mu00e1ximo */
+  border-radius: 50%; /* Garante que seja redondo */
   background: linear-gradient(135deg, var(--primary-700, #0369a1), var(--primary-800, #075985));
   color: white;
   display: flex;
@@ -165,8 +169,14 @@
   .toggleButton {
     bottom: 20px;
     right: 90px;
+    /* Mantu00e9m as propriedades que garantem o formato redondo */
     width: 50px;
     height: 50px;
+    min-width: 50px;
+    min-height: 50px;
+    max-width: 50px;
+    max-height: 50px;
+    background: #0369a1; /* Cor su00f3lida para maior contraste */
   }
   
   .screenReaderPanel {
@@ -180,8 +190,13 @@
   .toggleButton {
     bottom: 15px;
     right: 70px;
+    /* Mantu00e9m as propriedades que garantem o formato redondo */
     width: 50px;
     height: 50px;
+    min-width: 50px;
+    min-height: 50px;
+    max-width: 50px;
+    max-height: 50px;
   }
   
   .screenReaderPanel {

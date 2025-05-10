@@ -51,17 +51,16 @@ const BackToTop = () => {
     >
       <svg 
         xmlns="http://www.w3.org/2000/svg" 
-        width="28" 
-        height="28" 
+        width="30" 
+        height="30" 
         viewBox="0 0 24 24" 
         fill="none" 
         stroke="currentColor" 
-        strokeWidth="2" 
+        strokeWidth="2.5" 
         strokeLinecap="round" 
         strokeLinejoin="round"
       >
-        <circle cx="12" cy="12" r="10"></circle>
-        <polyline points="16 14 12 10 8 14"></polyline>
+        <path d="M18 15l-6-6-6 6"></path>
       </svg>
     </button>
   );

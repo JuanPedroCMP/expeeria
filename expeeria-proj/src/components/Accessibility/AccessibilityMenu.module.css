@@ -13,9 +13,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
+  width: 50px; /* Tamanho fixo */
+  height: 50px; /* Mesma medida para garantir um cu00edrculo perfeito */
+  min-width: 50px; /* Evita que seja redimensionado */
+  min-height: 50px; /* Evita que seja redimensionado */
+  max-width: 50px; /* Limita o tamanho mu00e1ximo */
+  max-height: 50px; /* Limita o tamanho mu00e1ximo */
+  border-radius: 50%; /* Garante que seja redondo */
+  padding: 0; /* Remove qualquer padding que possa distorcer o formato */
   background: linear-gradient(135deg, var(--primary-500, #0ea5e9), var(--primary-600, #0284c7));
   color: white;
   border: none;
@@ -231,8 +236,14 @@
   }
   
   .accessibilityButton {
+    /* Mantu00e9m as propriedades que garantem o formato redondo */
     width: 50px;
     height: 50px;
+    min-width: 50px;
+    min-height: 50px;
+    max-width: 50px;
+    max-height: 50px;
+    background: #0ea5e9; /* Cor su00f3lida para maior contraste */
   }
   
   .panelTitle {
