@@ -19,7 +19,7 @@ import { ErrorBoundary } from "./components/ErrorBoundary/ErrorBoundary";
 import { AccessibilityMenu } from "./components/Accessibility/AccessibilityMenu";
 import { BackToTop } from "./components/BackToTop/BackToTop";
 import { ScreenReader } from "./components/ScreenReader/ScreenReader";
-import { ThemeSelector } from "./components/ThemeSelector/ThemeSelector";
+// import { ThemeSelector } from "./components/ThemeSelector/ThemeSelector"; // Removido temporariamente
 
 export default function App() {
   return (
@@ -31,9 +31,7 @@ export default function App() {
           <AccessibilityMenu />
           <BackToTop />
           <ScreenReader />
-          <div className="accessibilityFeatures">
-            <ThemeSelector />
-          </div>
+          {/* Seletor de temas removido temporariamente */}
         </BrowserRouter>
       </AppProvider>
     </ErrorBoundary>

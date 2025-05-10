@@ -2,7 +2,7 @@
 
 .toggleButton {
   position: fixed;
-  bottom: 90px;
+  bottom: 30px;
   right: 30px;
   width: 44px;
   height: 44px;
@@ -32,7 +32,7 @@
 
 .screenReaderPanel {
   position: fixed;
-  bottom: 150px;
+  bottom: 90px;
   right: 30px;
   width: 280px;
   background-color: var(--background-secundario, #1e293b);
@@ -163,12 +163,12 @@
 /* Estilos responsivos */
 @media (max-width: 768px) {
   .toggleButton {
-    bottom: 125px;
-    right: 20px;
+    bottom: 20px;
+    right: 80px;
   }
   
   .screenReaderPanel {
-    bottom: 175px;
+    bottom: 80px;
     right: 20px;
     width: 260px;
   }
@@ -176,14 +176,14 @@
 
 @media (max-width: 480px) {
   .toggleButton {
-    bottom: 110px;
-    right: 15px;
-    width: 40px;
-    height: 40px;
+    bottom: 15px;
+    right: 120px;
+    width: 44px;
+    height: 44px;
   }
   
   .screenReaderPanel {
-    bottom: 160px;
+    bottom: 80px;
     right: 15px;
     width: 240px;
   }

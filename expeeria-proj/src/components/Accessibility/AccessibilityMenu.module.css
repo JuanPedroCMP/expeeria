@@ -1,8 +1,8 @@
 /* Estilos para o componente AccessibilityMenu */
 .accessibilityWrapper {
   position: fixed;
-  bottom: 90px;
-  right: 30px;
+  bottom: 30px;
+  left: 30px;
   z-index: 999;
   display: flex;
   flex-direction: column;
@@ -13,8 +13,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 44px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   background: linear-gradient(135deg, var(--primary-500, #0ea5e9), var(--primary-600, #0284c7));
   color: white;
@@ -38,8 +38,8 @@
 
 .accessibilityPanel {
   position: absolute;
-  bottom: 0;
-  right: 55px;
+  bottom: 60px;
+  left: 0;
   width: 320px;
   background: rgba(30, 41, 59, 0.95);
   border-radius: 12px;
@@ -204,28 +204,35 @@
 @media (max-width: 768px) {
   .accessibilityPanel {
     width: 290px;
+    bottom: 60px;
   }
   
   .optionButton {
     padding: 0.4rem 0.6rem;
     font-size: 0.8rem;
   }
+  
+  .accessibilityWrapper {
+    bottom: 20px;
+    left: 20px;
+  }
 }
 
 @media (max-width: 480px) {
   .accessibilityPanel {
     width: 260px;
-    right: 0;
+    left: 0;
+    bottom: 60px;
   }
   
   .accessibilityWrapper {
     bottom: 15px;
-    right: 15px;
+    left: 15px;
   }
   
   .accessibilityButton {
-    width: 48px;
-    height: 48px;
+    width: 44px;
+    height: 44px;
   }
   
   .panelTitle {
