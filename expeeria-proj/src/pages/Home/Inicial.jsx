@@ -215,20 +215,29 @@ const Inicial = () => {
                         <div className={style.carouselContent}>
                           <div 
                             className={style.carouselImage}
-                            style={{ backgroundImage: `url(${post.imageUrl || '/placeholder-post.jpg'})` }}
+                            style={{ backgroundImage: `url(${post.imageUrl || post.image_url || '/placeholder-post.jpg'})` }}
                           >
                             <div className={style.slideBadges}>
-                              <span className={style.likeBadge}>❤️ {post.likeCount || 0}</span>
-                              {post.categories && post.categories[0] && (
-                                <span className={style.categoryBadge}>{post.categories[0]}</span>
-                              )}
+                              <span className={style.likeBadge}>❤️ {post.likeCount || post.like_count || 0}</span>
+                              {(() => {
+                                // Normalização das categorias/assuntos
+                                const categories = Array.isArray(post.categories) ? post.categories :
+                                  post.subject ? [post.subject] :
+                                  post.categoria ? [post.categoria] : [];
+                                
+                                return categories.length > 0 && (
+                                  <span className={style.categoryBadge}>{categories[0]}</span>
+                                );
+                              })()}
                             </div>
                           </div>
                           <div className={style.carouselInfo}>
-                            <h4>{post.title}</h4>
-                            <p>{post.caption}</p>
+                            <h4>{post.title || post.titulo || 'Sem título'}</h4>
+                            <p>{post.caption || post.descricao || post.resumo || post.content || ''}</p>
                             <div className={style.postMeta}>
-                              <span className={style.postAuthor}>Por {post.author || 'Autor desconhecido'}</span>
+                              <span className={style.postAuthor}>
+                                Por {post.author || post.autor || post.username || 'Autor desconhecido'}
+                              </span>
                               <button 
                                 className={style.readMoreBtn}
                                 onClick={(e) => {
@@ -327,12 +336,12 @@ const Inicial = () => {
                             className={style.categoryCard}
                           >
                             <Card
-                              TituloCard={post.title}
+                              TituloCard={post.title || post.titulo || 'Sem título'}
                               SubTitulo={activeCategory}
-                              Descricao={post.caption}
-                              likes={post.likeCount || 0}
+                              Descricao={post.caption || post.descricao || post.resumo || post.content || ''}
+                              likes={post.likeCount || post.like_count || 0}
                               id={post.id}
-                              imageUrl={post.imageUrl}
+                              imageUrl={post.imageUrl || post.image_url || '/placeholder-post.jpg'}
                             />
                           </div>
                         ))}
