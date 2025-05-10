@@ -3,7 +3,7 @@ import styles from './AccessibilityMenu.module.css';
 
 /**
  * Componente AccessibilityMenu
- * Menu flutuante para ajustes de acessibilidade como tamanho de fonte, contraste e reduu00e7u00e3o de animau00e7u00f5es
+ * Menu flutuante para ajustes de acessibilidade como tamanho de fonte, contraste e redução de animações
  */
 const AccessibilityMenu = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -14,7 +14,7 @@ const AccessibilityMenu = () => {
     dyslexicFont: false
   });
 
-  // Carregar configurau00e7u00f5es salvas no localStorage
+  // Carregar configurações salvas no localStorage
   useEffect(() => {
     const savedSettings = localStorage.getItem('accessibilitySettings');
     if (savedSettings) {
@@ -23,7 +23,7 @@ const AccessibilityMenu = () => {
     }
   }, []);
 
-  // Aplicar configurau00e7u00f5es u00e0 pu00e1gina
+  // Aplicar configurações à página
   const applySettings = (newSettings) => {
     // Aplicar tamanho de fonte
     document.documentElement.setAttribute('data-font-size', newSettings.fontSize);
@@ -31,7 +31,7 @@ const AccessibilityMenu = () => {
     // Aplicar contraste
     document.documentElement.setAttribute('data-contrast', newSettings.contrast);
     
-    // Aplicar reduu00e7u00e3o de animau00e7u00f5es
+    // Aplicar redução de animações
     if (newSettings.reduceMotion) {
       document.documentElement.classList.add('reduce-motion');
     } else {
@@ -45,11 +45,11 @@ const AccessibilityMenu = () => {
       document.documentElement.classList.remove('dyslexic-font');
     }
     
-    // Salvar configurau00e7u00f5es no localStorage
+    // Salvar configurações no localStorage
     localStorage.setItem('accessibilitySettings', JSON.stringify(newSettings));
   };
 
-  // Atualizar uma configurau00e7u00e3o especu00edfica
+  // Atualizar uma configuração específica
   const updateSetting = (key, value) => {
     const newSettings = { ...settings, [key]: value };
     setSettings(newSettings);
@@ -61,7 +61,7 @@ const AccessibilityMenu = () => {
     setIsOpen(!isOpen);
   };
 
-  // Resetar configurau00e7u00f5es para o padru00e3o
+  // Resetar configurações para o padrão
   const resetSettings = () => {
     const defaultSettings = {
       fontSize: 'medium',
@@ -75,23 +75,24 @@ const AccessibilityMenu = () => {
 
   return (
     <div className={styles.accessibilityWrapper}>
-      <button 
-        className={styles.accessibilityButton}
+      <button
         onClick={toggleMenu}
+        className={styles.accessibilityButton}
         aria-label="Menu de acessibilidade"
         aria-expanded={isOpen}
       >
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <circle cx="12" cy="12" r="10"></circle>
           <circle cx="12" cy="12" r="4"></circle>
-          <line x1="21.17" y1="8" x2="12" y2="8"></line>
-          <line x1="3.95" y1="6.06" x2="8.54" y2="14"></line>
-          <line x1="10.88" y1="21.94" x2="15.46" y2="14"></line>
+          <line x1="4.93" y1="4.93" x2="9.17" y2="9.17"></line>
+          <line x1="14.83" y1="14.83" x2="19.07" y2="19.07"></line>
+          <line x1="14.83" y1="9.17" x2="19.07" y2="4.93"></line>
+          <line x1="14.83" y1="9.17" x2="18.36" y2="5.64"></line>
+          <line x1="4.93" y1="19.07" x2="9.17" y2="14.83"></line>
         </svg>
       </button>
-      
       {isOpen && (
-        <div className={styles.accessibilityPanel} role="dialog" aria-label="Opu00e7u00f5es de acessibilidade">
+        <div className={styles.accessibilityPanel} role="dialog" aria-label="Opções de acessibilidade">
           <h2 className={styles.panelTitle}>Acessibilidade</h2>
           
           <div className={styles.settingGroup}>
@@ -109,7 +110,7 @@ const AccessibilityMenu = () => {
                 onClick={() => updateSetting('fontSize', 'medium')}
                 aria-pressed={settings.fontSize === 'medium'}
               >
-                Mu00e9dia
+                Média
               </button>
               <button 
                 className={`${styles.optionButton} ${settings.fontSize === 'large' ? styles.active : ''}`}
@@ -157,7 +158,7 @@ const AccessibilityMenu = () => {
                   checked={settings.reduceMotion}
                   onChange={(e) => updateSetting('reduceMotion', e.target.checked)}
                 />
-                <span className={styles.toggleText}>Reduzir animau00e7u00f5es</span>
+                <span className={styles.toggleText}>Reduzir animações</span>
               </label>
             </div>
           </div>
@@ -180,7 +181,7 @@ const AccessibilityMenu = () => {
             <button 
               className={styles.resetButton}
               onClick={resetSettings}
-              aria-label="Resetar todas as configurau00e7u00f5es de acessibilidade"
+              aria-label="Resetar todas as configurações de acessibilidade"
             >
               Resetar
             </button>

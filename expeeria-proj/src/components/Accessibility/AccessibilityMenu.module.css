@@ -1,8 +1,8 @@
 /* Estilos para o componente AccessibilityMenu */
 .accessibilityWrapper {
   position: fixed;
-  bottom: 20px;
-  right: 20px;
+  bottom: 90px;
+  right: 30px;
   z-index: 999;
   display: flex;
   flex-direction: column;
@@ -13,8 +13,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 56px;
-  height: 56px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   background: linear-gradient(135deg, var(--primary-500, #0ea5e9), var(--primary-600, #0284c7));
   color: white;
@@ -38,8 +38,8 @@
 
 .accessibilityPanel {
   position: absolute;
-  bottom: 70px;
-  right: 0;
+  bottom: 0;
+  right: 55px;
   width: 320px;
   background: rgba(30, 41, 59, 0.95);
   border-radius: 12px;

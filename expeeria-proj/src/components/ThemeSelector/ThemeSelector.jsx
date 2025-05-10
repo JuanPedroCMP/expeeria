@@ -4,13 +4,13 @@ import styles from './ThemeSelector.module.css';
 /**
  * Componente ThemeSelector
  * 
- * Permite que o usuu00e1rio selecione entre difierentes temas para a aplicau00e7u00e3o.
- * Os temas su00e3o aplicados atravu00e9s de classes CSS no elemento root.
+ * Permite que o usuário selecione entre diferentes temas para a aplicação.
+ * Os temas são aplicados através de classes CSS no elemento root.
  */
 const ThemeSelector = () => {
-  // Temas disponu00edveis
+  // Temas disponíveis
   const themes = [
-    { id: 'default', name: 'Padru00e3o', color: '#0ea5e9' },
+    { id: 'default', name: 'Padrão', color: '#0ea5e9' },
     { id: 'dark', name: 'Escuro', color: '#1e293b' },
     { id: 'highContrast', name: 'Alto Contraste', color: '#000000' },
     { id: 'colorful', name: 'Colorido', color: '#6366f1' },
@@ -30,7 +30,7 @@ const ThemeSelector = () => {
     }
   }, []);
 
-  // Funu00e7u00e3o para aplicar o tema selecionado
+  // Função para aplicar o tema selecionado
   const applyTheme = (themeId) => {
     // Remover todas as classes de tema anteriores
     document.documentElement.classList.remove(
@@ -48,14 +48,14 @@ const ThemeSelector = () => {
     localStorage.setItem('expeeria-theme', themeId);
   };
 
-  // Funu00e7u00e3o para alterar o tema
+  // Função para alterar o tema
   const changeTheme = (themeId) => {
     setCurrentTheme(themeId);
     applyTheme(themeId);
     setIsOpen(false);
   };
 
-  // Funu00e7u00e3o para alternar a visibilidade do menu
+  // Função para alternar a visibilidade do menu
   const toggleMenu = () => {
     setIsOpen(!isOpen);
   };
@@ -72,11 +72,17 @@ const ThemeSelector = () => {
         aria-expanded={isOpen}
         aria-haspopup="true"
       >
-        <div 
-          className={styles.themeButtonColor} 
-          style={{ backgroundColor: currentThemeObj.color }}
-        />
-        <span>Tema</span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="5" />
+          <path d="M12 1v2" />
+          <path d="M12 21v2" />
+          <path d="M4.22 4.22l1.42 1.42" />
+          <path d="M18.36 18.36l1.42 1.42" />
+          <path d="M1 12h2" />
+          <path d="M21 12h2" />
+          <path d="M4.22 19.78l1.42-1.42" />
+          <path d="M18.36 5.64l1.42-1.42" />
+        </svg>
       </button>
 
       {isOpen && (

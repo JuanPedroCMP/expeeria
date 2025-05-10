@@ -1,13 +1,11 @@
 /**
- * Definiu00e7u00f5es de temas para a aplicau00e7u00e3o Expeeria
- * Estes estilos complementam as oju00e7u00f5es de acessibilidade
+ * Definições de temas para a aplicação Expeeria
+ * Estes estilos complementam as opções de acessibilidade
  */
 
-:root {
-  /* Tema padru00e3o - varu00edu00e1veis ju00e1 definidas no CSS principal */
-}
+/* Tema padrão - variáveis já definidas no CSS principal */
 
-/* Tema escuro - tons mais escuros que o padru00e3o */
+/* Tema escuro - tons mais escuros que o padrão */
 .theme-dark {
   --background-principal: #0f172a;
   --background-secundario: #141e33;

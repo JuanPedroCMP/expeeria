@@ -2,7 +2,7 @@
 
 .toggleButton {
   position: fixed;
-  bottom: 140px;
+  bottom: 90px;
   right: 30px;
   width: 44px;
   height: 44px;
@@ -32,7 +32,7 @@
 
 .screenReaderPanel {
   position: fixed;
-  bottom: 190px;
+  bottom: 150px;
   right: 30px;
   width: 280px;
   background-color: var(--background-secundario, #1e293b);

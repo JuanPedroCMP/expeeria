@@ -1,7 +1,7 @@
 /* Estilos para o componente BackToTop */
 .backToTopButton {
   position: fixed;
-  bottom: 100px;
+  bottom: 30px;
   right: 30px;
   width: 44px;
   height: 44px;

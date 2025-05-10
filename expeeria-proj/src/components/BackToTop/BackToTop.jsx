@@ -3,7 +3,7 @@ import styles from './BackToTop.module.css';
 
 /**
  * Componente BackToTop
- * Exibe um botu00e3o para retornar ao topo da pu00e1gina quando o usuu00e1rio rola para baixo
+ * Exibe um botão para retornar ao topo da página quando o usuário rola para baixo
  */
 const BackToTop = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -11,7 +11,7 @@ const BackToTop = () => {
   // Monitorar o evento de rolagem
   useEffect(() => {
     const toggleVisibility = () => {
-      // Mostrar o botu00e3o quando a pu00e1gina rolar mais de 300px
+      // Mostrar o botão quando a página rolar mais de 300px
       if (window.pageYOffset > 300) {
         setIsVisible(true);
       } else {
@@ -22,14 +22,14 @@ const BackToTop = () => {
     // Adicionar o listener de rolagem
     window.addEventListener('scroll', toggleVisibility);
 
-    // Verificar a posiu00e7u00e3o inicial
+    // Verificar a posição inicial
     toggleVisibility();
 
     // Remover o listener quando o componente for desmontado
     return () => window.removeEventListener('scroll', toggleVisibility);
   }, []);
 
-  // Funu00e7u00e3o para rolar de volta ao topo
+  // Função para rolar de volta ao topo
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
@@ -37,7 +37,7 @@ const BackToTop = () => {
     });
   };
 
-  // Renderizar o botu00e3o apenas quando visu00edvel
+  // Renderizar o botão apenas quando visível
   if (!isVisible) {
     return null;
   }
@@ -46,7 +46,7 @@ const BackToTop = () => {
     <button 
       className={styles.backToTopButton}
       onClick={scrollToTop}
-      aria-label="Voltar ao topo da pu00e1gina"
+      aria-label="Voltar ao topo da página"
       title="Voltar ao topo"
     >
       <svg 

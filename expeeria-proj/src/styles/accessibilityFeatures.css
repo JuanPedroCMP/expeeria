@@ -4,8 +4,8 @@
 
 .accessibilityFeatures {
   position: fixed;
-  bottom: 20px;
-  left: 20px;
+  bottom: 150px;
+  right: 30px;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -14,14 +14,14 @@
 
 @media (max-width: 768px) {
   .accessibilityFeatures {
-    bottom: 70px;
-    left: 15px;
+    bottom: 170px;
+    right: 20px;
   }
 }
 
 @media (max-width: 480px) {
   .accessibilityFeatures {
-    bottom: 80px;
-    left: 10px;
+    bottom: 190px;
+    right: 15px;
   }
 }

@@ -28,12 +28,12 @@ export default function App() {
         <BrowserRouter>
           <Router />
           <Notifications />
-          <div className="accessibilityFeatures">
-            <ThemeSelector />
-          </div>
           <AccessibilityMenu />
           <BackToTop />
           <ScreenReader />
+          <div className="accessibilityFeatures">
+            <ThemeSelector />
+          </div>
         </BrowserRouter>
       </AppProvider>
     </ErrorBoundary>
