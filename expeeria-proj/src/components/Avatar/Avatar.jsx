@@ -12,7 +12,7 @@ export const Avatar = ({
   clickable = false,
   onClick = () => {} 
 }) => {
-  // Imagem padrão caso não tenha avatar
+  // Imagem padrão se não tiver avatar
   const defaultAvatar = "/default-avatar.png";
   
   // Classes baseadas no tamanho

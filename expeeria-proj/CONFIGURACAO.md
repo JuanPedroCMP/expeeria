@@ -1,5 +1,6 @@
 # Instruções para Configuração do Projeto Expeeria
 
+
 ## Pré-requisitos
 
 - Node.js (versão 16.x ou superior)
@@ -8,6 +9,7 @@
 - Conta no Cloudinary (opcional, para uploads de imagens)
 
 ## Passos para Iniciar o Projeto
+
 
 ### 1. Configure as Variáveis de Ambiente
 
