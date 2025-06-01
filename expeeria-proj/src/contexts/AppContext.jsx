@@ -1,5 +1,5 @@
 import React from 'react';
-import { createContext, useEffect, useState } from "react";
+import { createContext } from "react";
 import { AuthProvider } from './AuthContext';
 // PostProvider removido - agora usamos o hook usePost diretamente com Supabase
 // CommentProvider removido - agora usamos o hook useComment diretamente com Supabase

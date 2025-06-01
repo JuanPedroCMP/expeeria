@@ -1,14 +1,14 @@
 import supabase from './supabase';
 
 /**
- * Serviu00e7o de API para operau00e7u00f5es com posts usando Supabase
+ * Serviço de API para operações com posts usando Supabase
  */
 export const postService = {
   /**
    * Busca todos os posts
-   * @param {Object} options - Opu00e7u00f5es de filtragem
+   * @param {Object} options - Opções de filtragem
    * @param {number} options.limit - Limite de posts
-   * @param {number} options.page - Pu00e1gina atual
+   * @param {number} options.page - Página atual
    * @param {string} options.category - Categoria para filtrar
    * @returns {Promise} - Lista de posts
    */
@@ -54,7 +54,7 @@ export const postService = {
       };
     } catch (error) {
       console.error('Erro ao buscar posts:', error);
-      throw new Error('Nu00e3o foi possu00edvel carregar os posts. Tente novamente mais tarde.');
+      throw new Error('Não foi possível carregar os posts. Tente novamente mais tarde.');
     }
   },
 
@@ -65,7 +65,7 @@ export const postService = {
    */
   async getPostById(id) {
     try {
-      if (!id) throw new Error('ID do post nu00e3o fornecido');
+      if (!id) throw new Error('ID do post não fornecido');
       
       const { data, error } = await supabase
         .from('posts')
@@ -97,17 +97,17 @@ export const postService = {
         .single();
         
       if (error) throw error;
-      if (!data) throw new Error('Post nu00e3o encontrado');
+      if (!data) throw new Error('Post não encontrado');
       
       return data;
     } catch (error) {
       console.error(`Erro ao buscar post ${id}:`, error);
       
-      if (error.message === 'Post nu00e3o encontrado') {
-        throw new Error('O post que vocu00ea estu00e1 procurando nu00e3o existe ou foi removido.');
+      if (error.message === 'Post não encontrado') {
+        throw new Error('O post que você está procurando não existe ou foi removido.');
       }
       
-      throw new Error('Nu00e3o foi possu00edvel carregar o post. Tente novamente.');
+      throw new Error('Não foi possível carregar o post. Tente novamente.');
     }
   },
 
@@ -118,16 +118,16 @@ export const postService = {
    */
   async createPost(postData) {
     try {
-      // Validau00e7u00e3o de campos obrigatu00f3rios
+      // Validação de campos obrigatórios
       if (!postData.title || postData.title.trim() === '') {
-        throw new Error('O tu00edtulo do post u00e9 obrigatu00f3rio');
+        throw new Error('O título do post é obrigatório');
       }
       
       if (!postData.author_id) {
-        throw new Error('Usuu00e1rio nu00e3o autenticado. Fau00e7a login para criar um post.');
+        throw new Error('Usuário não autenticado. Faça login para criar um post.');
       }
       
-      // Verificar se o usuu00e1rio existe
+      // Verificar se o usuário existe
       const { data: userExists, error: userError } = await supabase
         .from('users')
         .select('id')
@@ -135,17 +135,17 @@ export const postService = {
         .single();
         
       if (userError || !userExists) {
-        console.error('Erro ao verificar usuu00e1rio:', userError);
-        throw new Error('Usuu00e1rio nu00e3o encontrado ou sem permissu00e3o para criar posts');
+        console.error('Erro ao verificar usuário:', userError);
+        throw new Error('Usuário não encontrado ou sem permissão para criar posts');
       }
       
-      // Validau00e7u00e3o e configurau00e7u00e3o de tamanho mu00e1ximo para conteu00fado
+      // Validação e configuração de tamanho máximo para conteúdo
       const content = postData.content || '';
       if (content.length > 50000) {
-        throw new Error('O conteu00fado do post u00e9 muito grande. Limite de 50.000 caracteres.');
+        throw new Error('O conteúdo do post é muito grande. Limite de 50.000 caracteres.');
       }
       
-      // Garantir que os campos obrigatu00f3rios estejam presentes e formatados corretamente
+      // Garantir que os campos obrigatórios estejam presentes e formatados corretamente
       const newPostData = {
         title: postData.title.trim(),
         caption: (postData.caption || '').trim(),
@@ -172,17 +172,17 @@ export const postService = {
       if (error) {
         console.error('Erro detalhado do Supabase ao criar post:', error);
         
-        // Mensagens de erro mais especu00edficas com base no erro do Supabase
+        // Mensagens de erro mais específicas com base no erro do Supabase
         if (error.code === '23505') {
-          throw new Error('Ju00e1 existe um post com este tu00edtulo. Use um tu00edtulo diferente.');
+          throw new Error('Já existe um post com este título. Use um título diferente.');
         } else if (error.code === '23503') {
-          throw new Error('Erro de referu00eancia: verifique se todos os campos estu00e3o corretos.');
+          throw new Error('Erro de referência: verifique se todos os campos estão corretos.');
         } else {
-          throw new Error('Nu00e3o foi possu00edvel criar o post. Por favor, tente novamente.');
+          throw new Error('Não foi possível criar o post. Por favor, tente novamente.');
         }
       }
       
-      // Se houver categorias, adicionar u00e0 tabela de categorias
+      // Se houver categorias, adicionar à tabela de categorias
       if (postData.categories && Array.isArray(postData.categories) && postData.categories.length > 0) {
         const categoriesData = postData.categories.map(category => ({
           post_id: data.id,
@@ -195,11 +195,11 @@ export const postService = {
           
         if (categoryError) {
           console.error('Erro ao adicionar categorias:', categoryError);
-          // Nu00e3o impedimos o fluxo principal, pois o post ju00e1 foi criado
+          // Não impedimos o fluxo principal, pois o post já foi criado
         }
       }
       
-      // Se houver tags, adicionar u00e0 tabela de tags
+      // Se houver tags, adicionar à tabela de tags
       if (postData.tags && Array.isArray(postData.tags) && postData.tags.length > 0) {
         const tagsData = postData.tags.map(tag => ({
           post_id: data.id,
@@ -212,14 +212,14 @@ export const postService = {
           
         if (tagError) {
           console.error('Erro ao adicionar tags:', tagError);
-          // Nu00e3o impedimos o fluxo principal, pois o post ju00e1 foi criado
+          // Não impedimos o fluxo principal, pois o post já foi criado
         }
       }
       
       return data;
     } catch (error) {
       console.error('Erro ao criar post:', error);
-      throw error.message ? new Error(error.message) : new Error('Nu00e3o foi possu00edvel criar o post. Tente novamente.');
+      throw error.message ? new Error(error.message) : new Error('Não foi possível criar o post. Tente novamente.');
     }
   },
 
@@ -231,9 +231,9 @@ export const postService = {
    */
   async updatePost(id, postData) {
     try {
-      if (!id) throw new Error('ID do post nu00e3o fornecido');
+      if (!id) throw new Error('ID do post não fornecido');
       
-      // Verificar se o post existe e u00e9 do usuu00e1rio
+      // Verificar se o post existe e é do usuário
       const { data: existingPost, error: checkError } = await supabase
         .from('posts')
         .select('author_id')
@@ -241,11 +241,11 @@ export const postService = {
         .single();
         
       if (checkError || !existingPost) {
-        throw new Error('Post nu00e3o encontrado ou vocu00ea nu00e3o tem permissu00e3o para editu00e1-lo');
+        throw new Error('Post não encontrado ou você não tem permissão para editá-lo');
       }
       
       if (existingPost.author_id !== postData.author_id) {
-        throw new Error('Vocu00ea nu00e3o tem permissu00e3o para editar este post');
+        throw new Error('Você não tem permissão para editar este post');
       }
       
       // Dados a serem atualizados
@@ -266,18 +266,18 @@ export const postService = {
       return data;
     } catch (error) {
       console.error(`Erro ao atualizar post ${id}:`, error);
-      throw error.message ? new Error(error.message) : new Error('Nu00e3o foi possu00edvel atualizar o post. Tente novamente.');
+      throw error.message ? new Error(error.message) : new Error('Não foi possível atualizar o post. Tente novamente.');
     }
   },
 
   /**
    * Exclui um post
    * @param {string} id - ID do post
-   * @returns {Promise} - Resultado da operau00e7u00e3o
+   * @returns {Promise} - Resultado da operação
    */
   async deletePost(id) {
     try {
-      if (!id) throw new Error('ID do post nu00e3o fornecido');
+      if (!id) throw new Error('ID do post não fornecido');
       
       // Verificar se o post existe antes de excluir
       const { data: existingPost, error: checkError } = await supabase
@@ -287,7 +287,7 @@ export const postService = {
         .single();
         
       if (checkError || !existingPost) {
-        throw new Error('Post nu00e3o encontrado');
+        throw new Error('Post não encontrado');
       }
       
       // Graças ao ON DELETE CASCADE, não precisamos excluir manualmente os registros relacionados
@@ -300,25 +300,25 @@ export const postService = {
         .eq('id', id);
         
       if (error) throw error;
-      return { success: true, message: 'Post excluu00eddo com sucesso' };
+      return { success: true, message: 'Post excluído com sucesso' };
     } catch (error) {
       console.error(`Erro ao excluir post ${id}:`, error);
-      throw error.message ? new Error(error.message) : new Error('Nu00e3o foi possu00edvel excluir o post. Tente novamente.');
+      throw error.message ? new Error(error.message) : new Error('Não foi possível excluir o post. Tente novamente.');
     }
   },
 
   /**
    * Curte ou descurte um post
    * @param {string} postId - ID do post
-   * @param {string} userId - ID do usuu00e1rio
-   * @returns {Promise} - Resultado da operau00e7u00e3o
+   * @param {string} userId - ID do usuário
+   * @returns {Promise} - Resultado da operação
    */
   async toggleLike(postId, userId) {
     try {
-      if (!postId) throw new Error('ID do post nu00e3o fornecido');
-      if (!userId) throw new Error('ID do usuu00e1rio nu00e3o fornecido');
+      if (!postId) throw new Error('ID do post não fornecido');
+      if (!userId) throw new Error('ID do usuário não fornecido');
       
-      // Verificar se o usuu00e1rio ju00e1 curtiu o post
+      // Verificar se o usuário já curtiu o post
       const { data: existingLike, error: checkError } = await supabase
         .from('post_likes')
         .select('*')
@@ -331,7 +331,7 @@ export const postService = {
       let result;
       
       if (existingLike) {
-        // Se ju00e1 curtiu, remove a curtida
+        // Se já curtiu, remove a curtida
         const { error: unlikeError } = await supabase
           .from('post_likes')
           .delete()
@@ -340,12 +340,12 @@ export const postService = {
           
         if (unlikeError) throw unlikeError;
         
-        // Nu00e3o precisamos atualizar o contador manualmente
+        // Não precisamos atualizar o contador manualmente
         // O trigger update_post_like_count criado no SQL faz isso automaticamente
         
         result = { liked: false };
       } else {
-        // Se nu00e3o curtiu, adiciona a curtida
+        // Se não curtiu, adiciona a curtida
         const { error: likeError } = await supabase
           .from('post_likes')
           .insert({ 
@@ -356,7 +356,7 @@ export const postService = {
           
         if (likeError) throw likeError;
         
-        // Nu00e3o precisamos atualizar o contador manualmente
+        // Não precisamos atualizar o contador manualmente
         // O trigger update_post_like_count criado no SQL faz isso automaticamente
         
         result = { liked: true };
@@ -366,19 +366,19 @@ export const postService = {
     } catch (error) {
       console.error('Erro ao alternar curtida:', error);
       
-      if (error.message === 'ID do usuu00e1rio nu00e3o fornecido') {
-        throw new Error('Vocu00ea precisa estar logado para curtir posts.');
+      if (error.message === 'ID do usuário não fornecido') {
+        throw new Error('Você precisa estar logado para curtir posts.');
       }
       
-      throw new Error('Nu00e3o foi possu00edvel processar sua curtida. Tente novamente.');
+      throw new Error('Não foi possível processar sua curtida. Tente novamente.');
     }
   },
 
   /**
-   * Verifica se um usuu00e1rio curtiu um post
+   * Verifica se um usuário curtiu um post
    * @param {string} postId - ID do post
-   * @param {string} userId - ID do usuu00e1rio
-   * @returns {Promise} - Resultado da verificau00e7u00e3o
+   * @param {string} userId - ID do usuário
+   * @returns {Promise} - Resultado da verificação
    */
   async checkLiked(postId, userId) {
     try {
@@ -401,14 +401,14 @@ export const postService = {
   },
 
   /**
-   * Busca posts por usuu00e1rio
-   * @param {string} userId - ID do usuu00e1rio
-   * @param {Object} options - Opu00e7u00f5es de filtragem
+   * Busca posts por usuário
+   * @param {string} userId - ID do usuário
+   * @param {Object} options - Opções de filtragem
    * @returns {Promise} - Lista de posts
    */
   async getPostsByUser(userId, options = {}) {
     try {
-      if (!userId) throw new Error('ID do usuu00e1rio nu00e3o fornecido');
+      if (!userId) throw new Error('ID do usuário não fornecido');
       
       const { limit = 10, page = 1 } = options;
       const offset = (page - 1) * limit;
@@ -440,8 +440,8 @@ export const postService = {
         currentPage: page
       };
     } catch (error) {
-      console.error(`Erro ao buscar posts do usuu00e1rio ${userId}:`, error);
-      throw new Error('Nu00e3o foi possu00edvel carregar os posts deste usuu00e1rio.');
+      console.error(`Erro ao buscar posts do usuário ${userId}:`, error);
+      throw new Error('Não foi possível carregar os posts deste usuário.');
     }
   },
 
@@ -471,7 +471,7 @@ export const postService = {
         
       if (error) throw error;
       
-      // Se nu00e3o houver dados, retorna array vazio
+      // Se não houver dados, retorna array vazio
       if (!data || data.length === 0) {
         return [];
       }
@@ -479,7 +479,7 @@ export const postService = {
       return data;
     } catch (error) {
       console.error('Erro ao buscar posts populares:', error);
-      throw new Error('Nu00e3o foi possu00edvel carregar os posts populares.');
+      throw new Error('Não foi possível carregar os posts populares.');
     }
   },
 
@@ -516,19 +516,19 @@ export const postService = {
       return data || [];
     } catch (error) {
       console.error(`Erro ao pesquisar posts com termo "${searchTerm}":`, error);
-      throw new Error('Nu00e3o foi possu00edvel realizar a pesquisa. Tente novamente.');
+      throw new Error('Não foi possível realizar a pesquisa. Tente novamente.');
     }
   },
   
   /**
    * Busca posts por categoria
    * @param {string} category - Categoria para filtrar
-   * @param {Object} options - Opu00e7u00f5es de filtragem
+   * @param {Object} options - Opções de filtragem
    * @returns {Promise} - Lista de posts
    */
   async getPostsByCategory(category, options = {}) {
     try {
-      if (!category) throw new Error('Categoria nu00e3o fornecida');
+      if (!category) throw new Error('Categoria não fornecida');
       
       const { limit = 10, page = 1 } = options;
       const offset = (page - 1) * limit;
@@ -567,7 +567,7 @@ export const postService = {
       };
     } catch (error) {
       console.error(`Erro ao buscar posts da categoria ${category}:`, error);
-      throw new Error('Nu00e3o foi possu00edvel carregar os posts desta categoria.');
+      throw new Error('Não foi possível carregar os posts desta categoria.');
     }
   }
 };

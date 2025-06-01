@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import { createClient } from '@supabase/supabase-js';
 
 // Configuração para obter variáveis de ambiente independente do ambiente (Vite ou Node.js)

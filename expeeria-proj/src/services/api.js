@@ -273,6 +273,7 @@ const uploadService = {
     }
   },
   
+  // eslint-disable-next-line no-unused-vars
   deleteImage: async (publicId) => {
     // Implementar quando necessário - requer autenticação com API key e secret
     console.warn('Função deleteImage ainda não implementada');
