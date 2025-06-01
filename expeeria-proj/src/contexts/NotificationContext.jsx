@@ -2,6 +2,7 @@ import React, { createContext, useState, useCallback } from 'react';
 import { ToastContainer } from '../components/Toast/Toast';
 
 // Criação do contexto
+// eslint-disable-next-line react-refresh/only-export-components
 export const NotificationContext = createContext({
   notifications: [],
   toasts: [],

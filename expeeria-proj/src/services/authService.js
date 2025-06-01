@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import supabase from './supabase';
 
 /**
@@ -177,8 +178,6 @@ export const authService = {
           session: authData.session
         };
       }
-
-      return authData;
     } catch (error) {
       console.error("Erro no registro:", error);
       
