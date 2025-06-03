@@ -236,14 +236,16 @@
   }
   
   .accessibilityButton {
-    /* Mantu00e9m as propriedades que garantem o formato redondo */
+    /* Mantem as propriedades que garantem o formato redondo */
     width: 50px;
     height: 50px;
     min-width: 50px;
     min-height: 50px;
     max-width: 50px;
     max-height: 50px;
-    background: #0ea5e9; /* Cor su00f3lida para maior contraste */
+    border-radius: 50%;
+
+    background: #0ea5e9; /* Cor solida para maior contraste */
   }
   
   .panelTitle {

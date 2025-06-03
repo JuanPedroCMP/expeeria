@@ -2,37 +2,39 @@ import React, { Component } from 'react';
 import styles from './ErrorBoundary.module.css';
 
 /**
- * Componente ErrorBoundary para capturar erros em componentes filhos
- * e exibir uma UI de fallback em vez de quebrar a aplicau00e7u00e3o inteira
+ * Componente ErrorBoundary
+ * Captura erros em componentes filhos e exibe uma interface alternativa
+ * sem quebrar toda a aplicação.
  */
 class ErrorBoundary extends Component {
   constructor(props) {
     super(props);
-    this.state = { 
-      hasError: false,
-      error: null,
-      errorInfo: null
+    this.state = {
+      hasError: false,   // Define se houve erro
+      error: null,       // Objeto de erro
+      errorInfo: null    // Stack trace e outras informações
     };
   }
 
+  // Atualiza o estado para exibir UI alternativa
   static getDerivedStateFromError(error) {
-    // Atualiza o estado para que a pru00f3xima renderizau00e7u00e3o mostre a UI de fallback
     return { hasError: true };
   }
 
+  // Loga o erro e salva informações adicionais no estado
   componentDidCatch(error, errorInfo) {
-    // Registra o erro para finu de depurau00e7u00e3o
     console.error('ErrorBoundary capturou um erro:', error, errorInfo);
     this.setState({
-      error: error,
-      errorInfo: errorInfo
+      error,
+      errorInfo
     });
-    
-    // Aqui poderia integrar com serviu00e7os de monitoramento de erros como Sentry
+
+    // Aqui você pode enviar os erros para um serviço como Sentry ou LogRocket
   }
 
+  // Permite tentar novamente após um erro
   handleReset = () => {
-    this.setState({ 
+    this.setState({
       hasError: false,
       error: null,
       errorInfo: null
@@ -40,33 +42,37 @@ class ErrorBoundary extends Component {
   }
 
   render() {
+    // Renderiza UI de erro se houver falha
     if (this.state.hasError) {
-      // Renderizar qualquer UI de fallback
       return (
         <div className={styles.errorContainer}>
           <div className={styles.errorCard}>
             <h2 className={styles.errorTitle}>Algo deu errado</h2>
-            <p className={styles.errorMessage}>Desculpe, ocorreu um erro inesperado na aplicau00e7u00e3o.</p>
-            
+            <p className={styles.errorMessage}>
+              Desculpe, ocorreu um erro inesperado na aplicação.
+            </p>
+
+            {/* Exibe detalhes técnicos do erro se ativado via prop */}
             {this.props.showDetails && this.state.error && (
               <div className={styles.errorDetails}>
                 <h3>Detalhes do Erro:</h3>
                 <p>{this.state.error.toString()}</p>
                 <pre>
-                  {this.state.errorInfo && this.state.errorInfo.componentStack}
+                  {this.state.errorInfo?.componentStack}
                 </pre>
               </div>
             )}
-            
+
+            {/* Ações de recuperação */}
             <div className={styles.errorActions}>
-              <button 
+              <button
                 className={styles.resetButton}
                 onClick={this.handleReset}
               >
                 Tentar Novamente
               </button>
-              
-              <button 
+
+              <button
                 className={styles.homeButton}
                 onClick={() => window.location.href = '/'}
               >
@@ -78,7 +84,7 @@ class ErrorBoundary extends Component {
       );
     }
 
-    // Se nu00e3o houver erro, renderizar os componentes filhos normalmente
+    // Se não houver erro, renderiza normalmente
     return this.props.children;
   }
 }

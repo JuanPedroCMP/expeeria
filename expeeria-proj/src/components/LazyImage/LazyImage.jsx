@@ -3,102 +3,83 @@ import styles from './LazyImage.module.css';
 
 /**
  * Componente LazyImage
- * Implementa carregamento lazy de imagens com placeholders e tratamento de erros
- * 
- * @param {Object} props - Propriedades do componente
- * @param {string} props.src - URL da imagem
- * @param {string} props.alt - Texto alternativo da imagem
- * @param {string} props.className - Classes CSS adicionais
- * @param {string} props.placeholderColor - Cor do placeholder (hex ou rgba)
- * @param {function} props.onLoad - Funu00e7u00e3o chamada quando a imagem carrega
- * @param {function} props.onError - Funu00e7u00e3o chamada quando hu00e1 erro no carregamento
- * @param {Object} props.style - Estilos inline adicionais
+ * Carrega imagens sob demanda com placeholder, fallback e IntersectionObserver.
  */
 const LazyImage = ({
-  src,
-  alt = '',
-  className = '',
-  placeholderColor = 'rgba(15, 23, 42, 0.5)',
-  onLoad,
-  onError,
-  style = {},
-  ...props
+  src,                             // URL da imagem
+  alt = '',                        // Texto alternativo
+  className = '',                  // Classes adicionais
+  placeholderColor = 'rgba(15, 23, 42, 0.5)', // Cor do placeholder
+  onLoad,                          // Callback após sucesso
+  onError,                         // Callback ao erro
+  style = {},                      // Estilo inline
+  ...props                         // Outras props passadas ao <img>
 }) => {
-  const [loaded, setLoaded] = useState(false);
-  const [error, setError] = useState(false);
-  const [inView, setInView] = useState(false);
-  const imgRef = useRef(null);
-  const observerRef = useRef(null);
+  const [loaded, setLoaded] = useState(false);    // Estado da imagem carregada
+  const [error, setError] = useState(false);      // Estado de erro de carregamento
+  const [inView, setInView] = useState(false);    // Se está na viewport
 
-  // Efeito para configurar o IntersectionObserver
+  const imgRef = useRef(null);                    // Referência ao wrapper do componente
+  const observerRef = useRef(null);               // Referência ao observer
+
+  // Configurar IntersectionObserver
   useEffect(() => {
-    // Verificar suporte ao IntersectionObserver
     if ('IntersectionObserver' in window) {
       observerRef.current = new IntersectionObserver(
         (entries) => {
           entries.forEach(entry => {
             if (entry.isIntersecting) {
               setInView(true);
-              // Desconectar observador apu00f3s detectar que imagem estu00e1 em vista
-              if (observerRef.current) {
-                observerRef.current.disconnect();
-              }
+              observerRef.current?.disconnect();  // Desliga observer após detectar
             }
           });
         },
-        { threshold: 0.1 } // 10% da imagem visu00edvel ju00e1 inicia carregamento
+        { threshold: 0.1 } // Ativa quando 10% da imagem entra na viewport
       );
 
       if (imgRef.current) {
         observerRef.current.observe(imgRef.current);
       }
     } else {
-      // Fallback para navegadores sem suporte ao IntersectionObserver
+      // Fallback para navegadores sem suporte
       setInView(true);
     }
 
-    return () => {
-      if (observerRef.current) {
-        observerRef.current.disconnect();
-      }
-    };
+    return () => observerRef.current?.disconnect();
   }, []);
 
-  // Handlers de carregamento e erro
+  // Ao carregar a imagem
   const handleLoad = () => {
     setLoaded(true);
-    if (onLoad) onLoad();
+    onLoad?.();
   };
 
+  // Ao falhar o carregamento
   const handleError = () => {
     setError(true);
-    if (onError) onError();
+    onError?.();
   };
 
   return (
-    <div 
+    <div
       className={`${styles.lazyImageContainer} ${className}`}
       ref={imgRef}
       style={style}
     >
-      {/* Placeholder que aparece enquanto a imagem carrega */}
+      {/* Placeholder enquanto a imagem ainda não carrega */}
       {!loaded && (
-        <div 
-          className={styles.placeholder}
-          style={{ backgroundColor: placeholderColor }}
-        >
-          {!inView && (
+        <div className={styles.placeholder} style={{ backgroundColor: placeholderColor }}>
+          {!inView ? (
             <div className={styles.blurredPlaceholder}></div>
-          )}
-          {inView && !error && (
+          ) : !error ? (
             <div className={styles.loadingIndicator}>
               <div className={styles.spinner}></div>
             </div>
-          )}
+          ) : null}
         </div>
       )}
 
-      {/* Fallback para imagem quebrada */}
+      {/* Fallback visual se a imagem falhar */}
       {error && (
         <div className={styles.errorFallback}>
           <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -106,11 +87,11 @@ const LazyImage = ({
             <circle cx="8.5" cy="8.5" r="1.5"></circle>
             <polyline points="21 15 16 10 5 21"></polyline>
           </svg>
-          <span>Imagem indisponu00edvel</span>
+          <span>Imagem indisponível</span>
         </div>
       )}
 
-      {/* Imagem real carregada apenas quando estiver na viewport */}
+      {/* Imagem carregada apenas quando estiver visível */}
       {inView && !error && (
         <img
           src={src}

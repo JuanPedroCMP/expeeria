@@ -4,27 +4,28 @@ import { useComment } from "../../hooks/useComment";
 import styles from "./CommentItem.module.css";
 
 /**
- * Componente para exibir um comentário individual
- * Permite respostas, edição e exclusão
+ * Componente CommentItem
+ * Exibe um comentário individual com suporte a curtidas, respostas, edição e exclusão.
  */
-export const  CommentItem = ({ 
-  comment, 
-  postId, 
-  onReply, 
-  onEdit, 
-  onDelete 
+export const CommentItem = ({ 
+  comment,       // Objeto do comentário principal
+  postId,        // ID do post ao qual o comentário pertence
+  onReply,       // Função chamada ao responder
+  onEdit,        // Função chamada ao editar
+  onDelete       // Função chamada ao excluir
 }) => {
   const { user } = useAuth();
-  const { hasLikedComment, likeComment, unlikeComment, toggleLikeComment } = useComment();
+  const { hasLikedComment, likeComment, unlikeComment } = useComment();
+
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState(comment.content);
   const [showReplyForm, setShowReplyForm] = useState(false);
   const [replyContent, setReplyContent] = useState("");
   const [isLiked, setIsLiked] = useState(false);
-  
+
   const isCommentOwner = user && user.id === comment.user_id;
-  
-  // Verificar se o comentário está curtido quando o componente monta
+
+  // Verifica se o comentário foi curtido por esse usuário
   useEffect(() => {
     if (user && comment.id) {
       const checkLikeStatus = async () => {
@@ -35,55 +36,58 @@ export const  CommentItem = ({
           console.error('Erro ao verificar status de curtida:', error);
         }
       };
-      
+
       checkLikeStatus();
     }
   }, [user, comment.id, hasLikedComment]);
-  
+
+  // Alterna o status de curtida do comentário
   const handleLikeToggle = async (e) => {
     e.preventDefault();
-    
+
     if (!user) {
       alert("Você precisa estar logado para curtir este comentário!");
       return;
     }
-    
+
     try {
       if (isLiked) {
         await unlikeComment(comment.id, postId);
       } else {
         await likeComment(comment.id, postId);
       }
+      setIsLiked(!isLiked);
     } catch (error) {
       console.error("Erro ao processar curtida:", error);
     }
   };
-  
+
+  // Salva edição de conteúdo
   const handleEdit = () => {
     if (editContent.trim() === "") return;
-    
+
     onEdit(comment.id, editContent);
     setIsEditing(false);
   };
-  
+
+  // Envia uma resposta
   const handleReply = () => {
     if (replyContent.trim() === "") return;
-    
+
     onReply(comment.id, replyContent);
     setReplyContent("");
     setShowReplyForm(false);
   };
-  
+
+  // Formatação da data de criação
   const formattedDate = new Date(comment.created_at).toLocaleString('pt-BR', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
+    day: '2-digit', month: '2-digit', year: 'numeric',
+    hour: '2-digit', minute: '2-digit'
   });
-  
+
   return (
     <div className={styles.commentItem}>
+      {/* Cabeçalho do comentário: Avatar, nome, data */}
       <div className={styles.commentHeader}>
         <div className={styles.userInfo}>
           <img 
@@ -91,11 +95,14 @@ export const  CommentItem = ({
             alt={comment.profiles?.username || "Usuário"} 
             className={styles.avatar}
           />
-          <span className={styles.username}>{comment.profiles?.username || "Usuário"}</span>
+          <span className={styles.username}>
+            {comment.profiles?.username || "Usuário"}
+          </span>
         </div>
         <span className={styles.date}>{formattedDate}</span>
       </div>
-      
+
+      {/* Área de edição ou conteúdo simples */}
       {isEditing ? (
         <div className={styles.editForm}>
           <textarea
@@ -111,16 +118,17 @@ export const  CommentItem = ({
       ) : (
         <p className={styles.commentContent}>{comment.content}</p>
       )}
-      
+
+      {/* Ações do comentário: Curtir, Responder, Editar, Excluir */}
       <div className={styles.commentActions}>
         <button 
-          onClick={handleLikeToggle} 
+          onClick={handleLikeToggle}
           className={`${styles.actionBtn} ${isLiked ? styles.liked : ''}`}
           disabled={!user}
         >
           ❤️ {comment.likes || 0}
         </button>
-        
+
         {user && (
           <button 
             onClick={() => setShowReplyForm(!showReplyForm)} 
@@ -129,7 +137,7 @@ export const  CommentItem = ({
             Responder
           </button>
         )}
-        
+
         {isCommentOwner && (
           <>
             <button 
@@ -147,7 +155,8 @@ export const  CommentItem = ({
           </>
         )}
       </div>
-      
+
+      {/* Formulário de resposta */}
       {showReplyForm && (
         <div className={styles.replyForm}>
           <textarea
@@ -162,8 +171,9 @@ export const  CommentItem = ({
           </div>
         </div>
       )}
-      
-      {comment.replies && comment.replies.length > 0 && (
+
+      {/* Exibe respostas, se existirem */}
+      {comment.replies?.length > 0 && (
         <div className={styles.replies}>
           {comment.replies.map(reply => (
             <CommentItem

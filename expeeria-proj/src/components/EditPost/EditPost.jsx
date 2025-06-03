@@ -5,37 +5,36 @@ import { useNotification } from "../../hooks/useNotification";
 import { useAuth } from "../../hooks/useAuth";
 import { usePost } from "../../hooks/usePost";
 
+// Componente para editar um post existente
 export const EditPost = () => {
-  const { id } = useParams();
-  const navigate = useNavigate();
-  const [post, setPost] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const { showSuccess, showError } = useNotification();
-  const { user } = useAuth();
-  const { getPostById, updatePost } = usePost();
+  const { id } = useParams();                          // ID do post da URL
+  const navigate = useNavigate();                      // Navegação programática
+  const [post, setPost] = useState(null);              // Dados do post
+  const [loading, setLoading] = useState(true);        // Estado de carregamento
+  const [error, setError] = useState(null);            // Erros durante carregamento
+  const { showSuccess, showError } = useNotification();// Notificações
+  const { user } = useAuth();                          // Usuário atual
+  const { getPostById, updatePost } = usePost();       // Ações com post
 
-  // Buscar os dados do post usando o hook usePost
+  // Carregar o post ao montar o componente
   useEffect(() => {
     const fetchPost = async () => {
       try {
         setLoading(true);
         setError(null);
-        
-        // Buscar o post usando o hook usePost
-        const postData = await getPostById(id);
+
+        const postData = await getPostById(id);  // Busca post
         if (!postData) throw new Error('Post não encontrado');
-        
-        // Buscar as categorias do post (ainda precisamos fazer isso separadamente)
-        // No futuro podemos melhorar o hook usePost para incluir categorias
+
+        // Buscar categorias associadas a este post
         const { data: categoriesData, error: categoriesError } = await supabase
           .from('post_categories')
           .select('category')
           .eq('post_id', id);
-          
+
         if (categoriesError) throw categoriesError;
-        
-        // Formatar os dados do post para o formato esperado pelo componente NewPost
+
+        // Formatar dados no formato esperado por <NewPost />
         const formattedPost = {
           id: postData.id,
           title: postData.title,
@@ -45,65 +44,62 @@ export const EditPost = () => {
           author: postData.author_id,
           area: categoriesData?.map(cat => cat.category) || []
         };
-        
-        // Verificar se o usuário tem permissão para editar este post
+
+        // Permissões: apenas autor ou admin pode editar
         if (user?.id !== postData.author_id && user?.role !== 'admin') {
           setError('Você não tem permissão para editar este post.');
           setLoading(false);
           return;
         }
-        
+
         setPost(formattedPost);
       } catch (err) {
-        console.error('Erro ao buscar post para edição:', err);
+        console.error('Erro ao buscar post:', err);
         setError('Não foi possível carregar os dados do post. Tente novamente.');
       } finally {
         setLoading(false);
       }
     };
-    
-    if (id) {
-      fetchPost();
-    }
+
+    if (id) fetchPost();
   }, [id, user, getPostById]);
 
-  // Função para salvar a edição do post
+  // Submeter edição do post
   const handleEdit = async (dadosEditados) => {
     try {
-      // Preparar dados para atualização
       const postData = {
         title: dadosEditados.title,
         caption: dadosEditados.caption,
         content: dadosEditados.content,
         image_url: dadosEditados.imageUrl || dadosEditados.image_url
       };
-      
-      // Atualizar o post usando o hook usePost
+
+      // Atualizar o conteúdo textual
       await updatePost(id, postData);
-      
-      // Remover categorias antigas e adicionar as novas
-      if (dadosEditados.area && dadosEditados.area.length > 0) {
-        // Primeiro deletar categorias existentes
+
+      // Atualizar categorias
+      if (dadosEditados.area?.length > 0) {
+        // Remove categorias antigas
         const { error: deleteError } = await supabase
           .from('post_categories')
           .delete()
           .eq('post_id', id);
-          
+
         if (deleteError) throw deleteError;
-        
-        // Adicionar novas categorias
+
+        // Adiciona novas categorias
         const categorias = dadosEditados.area.map(cat => ({
           post_id: id,
           category: cat
         }));
-        
+
         const { error: catError } = await supabase
           .from('post_categories')
           .insert(categorias);
-          
+
         if (catError) throw catError;
       }
-      
+
       showSuccess('Post atualizado com sucesso!');
       navigate(`/post/${id}`);
     } catch (err) {
@@ -112,10 +108,12 @@ export const EditPost = () => {
     }
   };
 
+  // Renderizações condicionais
   if (loading) return <p>Carregando post para edição...</p>;
   if (error) return <p>{error}</p>;
   if (!post) return <p>Post não encontrado.</p>;
 
+  // Renderiza componente de criação com modo de edição ativo
   return (
     <NewPost
       modoEdicao

@@ -3,29 +3,23 @@ import { categoriasPadrao } from "../../utils/categoriasPadrao";
 import styles from "./FeedFilters.module.css";
 
 /**
- * Componente de filtros para o Feed
- * Separado para melhorar a organização e reutilização
+ * Componente FeedFilters
+ * Permite filtrar o conteúdo do feed por busca, categorias, autor, datas e ordenação.
  */
 export const FeedFilters = ({ 
-  search, 
-  setSearch, 
-  selectedAreas, 
-  setSelectedAreas,
-  author,
-  setAuthor,
-  order,
-  setOrder,
-  dateFrom,
-  setDateFrom,
-  dateTo,
-  setDateTo,
+  search, setSearch,
+  selectedAreas, setSelectedAreas,
+  author, setAuthor,
+  order, setOrder,
+  dateFrom, setDateFrom,
+  dateTo, setDateTo,
   onFiltersChanged,
   resetPageSize
 }) => {
-  const [showCategories, setShowCategories] = useState(false);
-  const [dateError, setDateError] = useState("");
+  const [showCategories, setShowCategories] = useState(false); // Mostrar/ocultar categorias
+  const [dateError, setDateError] = useState("");              // Validação de intervalo de datas
 
-  // Validar datas quando mudam
+  // Verificar validade das datas
   useEffect(() => {
     if (dateFrom && dateTo && new Date(dateFrom) > new Date(dateTo)) {
       setDateError("A data inicial não pode ser posterior à data final");
@@ -34,7 +28,7 @@ export const FeedFilters = ({
     }
   }, [dateFrom, dateTo]);
 
-  // Limpar filtros
+  // Limpar todos os filtros
   const limparFiltros = () => {
     setSearch("");
     setSelectedAreas([]);
@@ -44,13 +38,10 @@ export const FeedFilters = ({
     setDateTo("");
     setDateError("");
     resetPageSize();
-    
-    if (onFiltersChanged) {
-      onFiltersChanged();
-    }
+    onFiltersChanged?.(); // Chamada opcional se função existir
   };
 
-  // Gerenciar mudança de data
+  // Handlers para data
   const handleDateFromChange = (e) => {
     setDateFrom(e.target.value);
     resetPageSize();
@@ -63,15 +54,18 @@ export const FeedFilters = ({
 
   return (
     <div className={styles.filtrosPainel}>
+      {/* Busca geral por título, conteúdo ou autor */}
       <input
         type="text"
         placeholder="Buscar por título, conteúdo ou autor..."
         value={search}
-        onChange={e => {
+        onChange={(e) => {
           setSearch(e.target.value);
           resetPageSize();
         }}
       />
+
+      {/* Alternar exibição das categorias */}
       <button
         type="button"
         className={styles.categoriasToggle}
@@ -79,6 +73,8 @@ export const FeedFilters = ({
       >
         {showCategories ? "Ocultar categorias" : "Filtrar por categorias"}
       </button>
+
+      {/* Seleção de categorias */}
       {showCategories && (
         <div className={styles.categoriasBox}>
           {categoriasPadrao.map((cat) => (
@@ -86,10 +82,13 @@ export const FeedFilters = ({
               <input
                 type="checkbox"
                 checked={selectedAreas.includes(cat)}
-                onChange={e => {
+                onChange={(e) => {
                   resetPageSize();
-                  if (e.target.checked) setSelectedAreas([...selectedAreas, cat]);
-                  else setSelectedAreas(selectedAreas.filter(a => a !== cat));
+                  setSelectedAreas(
+                    e.target.checked
+                      ? [...selectedAreas, cat]
+                      : selectedAreas.filter((a) => a !== cat)
+                  );
                 }}
               />
               {cat}
@@ -97,16 +96,20 @@ export const FeedFilters = ({
           ))}
         </div>
       )}
+
+      {/* Filtro por autor */}
       <input
         type="text"
         placeholder="Filtrar por autor"
         value={author}
-        onChange={e => {
+        onChange={(e) => {
           setAuthor(e.target.value);
           resetPageSize();
         }}
         style={{ minWidth: 120 }}
       />
+
+      {/* Intervalo de datas */}
       <div className={styles.datesContainer}>
         <label className={styles.dataLabel}>
           De:
@@ -126,20 +129,29 @@ export const FeedFilters = ({
             min={dateFrom || undefined}
           />
         </label>
+        {/* Exibe erro de intervalo inválido */}
         {dateError && <div className={styles.dateError}>{dateError}</div>}
       </div>
-      <select 
-        value={order} 
-        onChange={e => { 
-          setOrder(e.target.value); 
-          resetPageSize(); 
+
+      {/* Ordenação dos resultados */}
+      <select
+        value={order}
+        onChange={(e) => {
+          setOrder(e.target.value);
+          resetPageSize();
         }}
       >
         <option value="recentes">Mais recentes</option>
         <option value="curtidos">Mais curtidos</option>
         <option value="comentados">Mais comentados</option>
       </select>
-      <button className={styles.limparFiltroBtn} onClick={limparFiltros} type="button">
+
+      {/* Botão para resetar todos os filtros */}
+      <button
+        className={styles.limparFiltroBtn}
+        onClick={limparFiltros}
+        type="button"
+      >
         Limpar filtros
       </button>
     </div>

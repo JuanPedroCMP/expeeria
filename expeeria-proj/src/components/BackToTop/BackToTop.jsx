@@ -3,33 +3,30 @@ import styles from './BackToTop.module.css';
 
 /**
  * Componente BackToTop
- * Exibe um botão para retornar ao topo da página quando o usuário rola para baixo
+ * Exibe um botão que aparece ao rolar a página, permitindo voltar suavemente ao topo.
  */
 const BackToTop = () => {
+  // Estado que controla a visibilidade do botão
   const [isVisible, setIsVisible] = useState(false);
 
-  // Monitorar o evento de rolagem
+  // Hook para escutar o evento de rolagem e definir visibilidade do botão
   useEffect(() => {
+    // Função que determina se o botão deve ser exibido
     const toggleVisibility = () => {
-      // Mostrar o botão quando a página rolar mais de 300px
-      if (window.pageYOffset > 300) {
-        setIsVisible(true);
-      } else {
-        setIsVisible(false);
-      }
+      setIsVisible(window.pageYOffset > 300);
     };
 
-    // Adicionar o listener de rolagem
+    // Adiciona o listener de scroll
     window.addEventListener('scroll', toggleVisibility);
 
-    // Verificar a posição inicial
+    // Verificação inicial na montagem do componente
     toggleVisibility();
 
-    // Remover o listener quando o componente for desmontado
+    // Remove o listener ao desmontar o componente
     return () => window.removeEventListener('scroll', toggleVisibility);
   }, []);
 
-  // Função para rolar de volta ao topo
+  // Função que rola suavemente até o topo da página
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
@@ -37,30 +34,31 @@ const BackToTop = () => {
     });
   };
 
-  // Renderizar o botão apenas quando visível
-  if (!isVisible) {
-    return null;
-  }
+  // Se não for visível, não renderiza nada
+  if (!isVisible) return null;
 
   return (
     <button 
-      className={styles.backToTopButton}
-      onClick={scrollToTop}
-      aria-label="Voltar ao topo da página"
-      title="Voltar ao topo"
+      className={styles.backToTopButton}         // Classe de estilo personalizada
+      onClick={scrollToTop}                      // Ação ao clicar no botão
+      aria-label="Voltar ao topo da página"      // Descrição para leitores de tela
+      title="Voltar ao topo"                     // Tooltip visível ao passar o mouse
+      role="button"                              // Declara como botão para acessibilidade
+      tabIndex={0}                               // Permite foco via teclado
     >
       <svg 
-        xmlns="http://www.w3.org/2000/svg" 
-        width="30" 
-        height="30" 
-        viewBox="0 0 24 24" 
-        fill="none" 
-        stroke="currentColor" 
-        strokeWidth="2.5" 
-        strokeLinecap="round" 
+        xmlns="http://www.w3.org/2000/svg"
+        width="30"
+        height="30"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2.5"
+        strokeLinecap="round"
         strokeLinejoin="round"
       >
-        <path d="M18 15l-6-6-6 6"></path>
+        {/* Ícone de seta apontando para cima */}
+        <path d="M18 15l-6-6-6 6" />
       </svg>
     </button>
   );

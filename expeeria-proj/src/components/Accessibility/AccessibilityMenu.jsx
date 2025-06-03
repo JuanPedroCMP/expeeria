@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import styles from './AccessibilityMenu.module.css';
 
 /**
- * Componente AccessibilityMenu
- * Menu flutuante para ajustes de acessibilidade como tamanho de fonte, contraste e redução de animações
- */
+* Componente AccessibilityMenu
+* Menu flutuante para ajustes de acessibilidade como tamanho de fonte, contraste e redução de animações
+*/
 const AccessibilityMenu = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [settings, setSettings] = useState({
@@ -25,6 +25,7 @@ const AccessibilityMenu = () => {
 
   // Aplicar configurações à página
   const applySettings = (newSettings) => {
+    
     // Aplicar tamanho de fonte
     document.documentElement.setAttribute('data-font-size', newSettings.fontSize);
     
@@ -72,7 +73,7 @@ const AccessibilityMenu = () => {
     setSettings(defaultSettings);
     applySettings(defaultSettings);
   };
-
+  // Botão que abre/fecha o menu de acessibilidade
   return (
     <div className={styles.accessibilityWrapper}>
       <button
@@ -81,6 +82,7 @@ const AccessibilityMenu = () => {
         aria-label="Menu de acessibilidade"
         aria-expanded={isOpen}
       >
+        {/* Ícone SVG representando acessibilidade */}
         <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
           <circle cx="12" cy="12" r="10"></circle>
           <path d="M12 8a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"></path>
@@ -88,13 +90,18 @@ const AccessibilityMenu = () => {
           <path d="M9 16h6"></path>
         </svg>
       </button>
+
+      {/* Painel de acessibilidade, visível apenas se isOpen for true */}
       {isOpen && (
         <div className={styles.accessibilityPanel} role="dialog" aria-label="Opções de acessibilidade">
           <h2 className={styles.panelTitle}>Acessibilidade</h2>
           
+          {/* Grupo de configuração: Tamanho da fonte */}
           <div className={styles.settingGroup}>
             <h3>Tamanho da fonte</h3>
             <div className={styles.optionButtons}>
+
+              {/* Botões de tamanho de fonte: pequena, média, grande, extra grande */}
               <button 
                 className={`${styles.optionButton} ${settings.fontSize === 'small' ? styles.active : ''}`}
                 onClick={() => updateSetting('fontSize', 'small')}
@@ -125,7 +132,8 @@ const AccessibilityMenu = () => {
               </button>
             </div>
           </div>
-          
+
+          {/* Grupo de configuração: Contraste */}
           <div className={styles.settingGroup}>
             <h3>Contraste</h3>
             <div className={styles.optionButtons}>
@@ -145,7 +153,8 @@ const AccessibilityMenu = () => {
               </button>
             </div>
           </div>
-          
+
+           {/* Alternância: Reduzir animações */}
           <div className={styles.settingGroup}>
             <div className={styles.toggleOption}>
               <label htmlFor="reduceMotion" className={styles.toggleLabel}>
@@ -160,6 +169,7 @@ const AccessibilityMenu = () => {
             </div>
           </div>
           
+           {/* Alternância: Fonte para dislexia */}
           <div className={styles.settingGroup}>
             <div className={styles.toggleOption}>
               <label htmlFor="dyslexicFont" className={styles.toggleLabel}>
@@ -174,6 +184,7 @@ const AccessibilityMenu = () => {
             </div>
           </div>
           
+           {/* Rodapé do painel com botões para resetar e fechar */}
           <div className={styles.panelFooter}>
             <button 
               className={styles.resetButton}
