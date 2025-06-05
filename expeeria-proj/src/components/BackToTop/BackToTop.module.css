@@ -10,7 +10,7 @@
   max-width: 50px; /* Limita o tamanho mu00e1ximo */
   max-height: 50px; /* Limita o tamanho mu00e1ximo */
   border-radius: 50%; /* Garante que seja redondo */
-  background: #0ea5e9; /* Cor su00f3lida para maior contraste */
+  background: #0ea5e9; /* Cor solida para maior contraste */
   color: white;
   display: flex;
   align-items: center;
@@ -45,14 +45,14 @@
   .backToTopButton {
     bottom: 20px;
     right: 160px;
-    /* Mantu00e9m as propriedades que garantem o formato redondo */
+    /* Mantem as propriedades que garantem o formato redondo */
     width: 50px;
     height: 50px;
     min-width: 50px;
     min-height: 50px;
     max-width: 50px;
     max-height: 50px;
-    background: #0ea5e9; /* Cor su00f3lida para maior contraste */
+    background: #0ea5e9; /* Cor solida para maior contraste */
   }
   
   .backToTopButton svg {

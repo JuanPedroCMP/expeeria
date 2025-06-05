@@ -2,107 +2,94 @@ import React from 'react';
 import styles from './Pagination.module.css';
 
 /**
- * Componente de paginação reutilizável
- * Pode ser usado em qualquer listagem de dados que precise de paginação
+ * Componente de paginação
+ * Exibe controle de páginas com suporte a elipses e botões de navegação.
  */
 export const Pagination = ({
   currentPage,
   totalPages,
   onPageChange,
-  siblingCount = 1,
-  showFirstButton = true,
-  showLastButton = true,
-  size = 'md',
-  className = ''
+  siblingCount = 1,         // Quantidade de páginas ao redor da atual
+  showFirstButton = true,   // Mostrar página 1 sempre
+  showLastButton = true,    // Mostrar última página sempre
+  size = 'md',              // Tamanho visual ('sm', 'md', 'lg')
+  className = ''            // Classes adicionais
 }) => {
-  // Se houver apenas uma página, não renderiza nada
-  if (totalPages <= 1) return null;
-  
-  // Função para gerar os números das páginas a serem exibidos
+  if (totalPages <= 1) return null; // Não mostra se só há uma página
+
+  // Gera a lista de páginas para exibir (com elipses)
   const getPageNumbers = () => {
-    // Total de itens que sempre aparecem (primeira, última, atual, next, prev)
-    const fixedPagesCount = showFirstButton && showLastButton ? 4 : 2;
-    // Quantidade de itens que podem ser mostrados considerando o espaço disponível
-    const totalNumbers = siblingCount * 2 + 1 + fixedPagesCount;
-    
-    // Se há espaço para mostrar todas as páginas
-    if (totalPages <= totalNumbers) {
-      return Array.from({ length: totalPages }, (_, index) => index + 1);
+    const totalVisible = siblingCount * 2 + 5; // Máximo de botões visíveis
+    if (totalPages <= totalVisible) {
+      return Array.from({ length: totalPages }, (_, i) => i + 1);
     }
-    
-    // Cálculo dos irmãos à esquerda e à direita
-    const leftSiblingIndex = Math.max(currentPage - siblingCount, 1);
-    const rightSiblingIndex = Math.min(currentPage + siblingCount, totalPages);
-    
-    // Decide se mostra os pontos de elipse
-    const showLeftDots = leftSiblingIndex > 2;
-    const showRightDots = rightSiblingIndex < totalPages - 1;
-    
-    // Caso 1: só pontos à direita
+
+    const left = Math.max(currentPage - siblingCount, 1);
+    const right = Math.min(currentPage + siblingCount, totalPages);
+
+    const showLeftDots = left > 2;
+    const showRightDots = right < totalPages - 1;
+
     if (!showLeftDots && showRightDots) {
-      const leftItemCount = 3 + 2 * siblingCount;
-      const leftRange = Array.from({ length: leftItemCount }, (_, index) => index + 1);
+      const leftRange = Array.from({ length: 3 + 2 * siblingCount }, (_, i) => i + 1);
       return [...leftRange, '...', totalPages];
     }
-    
-    // Caso 2: só pontos à esquerda
+
     if (showLeftDots && !showRightDots) {
-      const rightItemCount = 3 + 2 * siblingCount;
       const rightRange = Array.from(
-        { length: rightItemCount },
-        (_, index) => totalPages - rightItemCount + index + 1
+        { length: 3 + 2 * siblingCount },
+        (_, i) => totalPages - (3 + 2 * siblingCount) + i + 1
       );
       return [1, '...', ...rightRange];
     }
-    
-    // Caso 3: pontos em ambos os lados
+
     if (showLeftDots && showRightDots) {
-      const middleRange = Array.from(
-        { length: rightSiblingIndex - leftSiblingIndex + 1 },
-        (_, index) => leftSiblingIndex + index
-      );
+      const middleRange = Array.from({ length: right - left + 1 }, (_, i) => left + i);
       return [1, '...', ...middleRange, '...', totalPages];
     }
   };
-  
+
   const pageNumbers = getPageNumbers();
-  
+
   return (
     <nav className={`${styles.pagination} ${styles[size]} ${className}`}>
       <ul className={styles.pageList}>
-        {/* Botão de página anterior */}
+        {/* Página anterior */}
         <li className={styles.pageItem}>
           <button
             className={`${styles.pageButton} ${currentPage === 1 ? styles.disabled : ''}`}
             onClick={() => onPageChange(currentPage - 1)}
             disabled={currentPage === 1}
+            aria-label="Página anterior"
           >
             &lt;
           </button>
         </li>
-        
-        {/* Números de página */}
+
+        {/* Números de página + elipses */}
         {pageNumbers.map((page, index) => (
           <li key={index} className={styles.pageItem}>
             {page === '...' ? (
-              <span className={styles.ellipsis}>...</span>
+              <span className={styles.ellipsis}>…</span>
             ) : (
               <button
                 className={`${styles.pageButton} ${currentPage === page ? styles.active : ''}`}
                 onClick={() => onPageChange(page)}
+                aria-current={currentPage === page ? 'page' : undefined}
               >
                 {page}
               </button>
             )}
           </li>
         ))}
-        
-        {/* Botão de próxima página */}
+
+        {/* Próxima página */}
         <li className={styles.pageItem}>
           <button
             className={`${styles.pageButton} ${currentPage === totalPages ? styles.disabled : ''}`}
             onClick={() => onPageChange(currentPage + 1)}
             disabled={currentPage === totalPages}
+            aria-label="Próxima página"
           >
             &gt;
           </button>

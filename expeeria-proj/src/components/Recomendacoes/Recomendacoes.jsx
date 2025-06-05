@@ -4,33 +4,39 @@ import { useEffect, useState } from "react";
 import { Card } from "../Card/Card";
 import { useNavigate } from "react-router-dom";
 
+/**
+ * Componente Recomendacoes
+ * Exibe posts recomendados com base nos interesses e nas conexões do usuário.
+ */
 const Recomendacoes = () => {
   const { user } = useAuth();
   const { posts } = usePost();
   const [recommended, setRecommended] = useState([]);
   const navigate = useNavigate();
 
+  // Gera recomendações com base em interesses e conexões
   useEffect(() => {
     if (!user) return setRecommended([]);
-    // Posts de quem sigo
-    const byFollowing = posts.filter((p) => user.following?.includes(p.userId));
-    // Posts das categorias/interesses do usuário
-    const byInterest = posts.filter((p) =>
+
+    const byFollowing = posts.filter(p => user.following?.includes(p.userId));
+    const byInterest = posts.filter(p =>
       Array.isArray(p.area)
-        ? p.area.some((cat) => user.interests?.includes(cat))
+        ? p.area.some(cat => user.interests?.includes(cat))
         : user.interests?.includes(p.area)
     );
-    // Junta e remove duplicados
-    const all = [...byFollowing, ...byInterest].filter(
-      (post, idx, arr) => arr.findIndex((p) => p.id === post.id) === idx
+
+    const merged = [...byFollowing, ...byInterest].filter(
+      (post, i, arr) => arr.findIndex(p => p.id === post.id) === i
     );
-    setRecommended(all.slice(0, 8)); // Mostra até 8 recomendações
+
+    setRecommended(merged.slice(0, 8)); // Limita a 8 itens
   }, [user, posts]);
 
+  // Se não há usuário ou nenhuma recomendação, não renderiza
   if (!user || recommended.length === 0) return null;
 
   return (
-    <div
+    <section
       style={{
         background: "#181c24",
         borderRadius: 8,
@@ -49,7 +55,7 @@ const Recomendacoes = () => {
           gap: "1.5rem",
         }}
       >
-        {recommended.map((post) => (
+        {recommended.map(post => (
           <div
             key={post.id}
             onClick={() => navigate(`/post/${post.id}`)}
@@ -64,9 +70,11 @@ const Recomendacoes = () => {
             <Card
               TituloCard={post.title}
               SubTitulo={
-                Array.isArray(post.area) ? post.area.join(", ") : post.area
+                Array.isArray(post.area)
+                  ? post.area.join(", ")
+                  : post.area
               }
-              Descrisao={post.caption}
+              Descricao={post.caption} // Corrigido typo
               likes={post.likes}
               id={post.id}
               imageUrl={post.imageUrl}
@@ -74,7 +82,7 @@ const Recomendacoes = () => {
           </div>
         ))}
       </div>
-    </div>
+    </section>
   );
 };
 
