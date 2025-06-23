@@ -3,47 +3,29 @@ import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { LoadingSpinner } from '../LoadingSpinner';
 
-// Componente para rota protegida - versão aprimorada para maior confiabilidade
+// Componente para rota protegida - versão corrigida
 export function PrivateRoute({ children }) {
   const location = useLocation();
   const { user, loading, sessionChecked } = useAuth();
-  const [showFallback, setShowFallback] = useState(false);
-  const [authTimeout, setAuthTimeout] = useState(false);
+  const [showSpinner, setShowSpinner] = useState(false);
   
-  // Timeout de segurança para não deixar usuário preso em tela de loading
+  // Timeout para mostrar spinner após um delay
   useEffect(() => {
-    // Se demorar mais de 3 segundos para verificar a sessão, considera um timeout
-    const securityTimer = setTimeout(() => {
-      if (loading && !sessionChecked) {
-        console.warn('Timeout de autenticação acionado no PrivateRoute');
-        setAuthTimeout(true);
-      }
-    }, 3000);
-    
-    return () => clearTimeout(securityTimer);
-  }, [loading, sessionChecked]);
-  
-  // Redireciona para login se:
-  // 1. A sessão foi verificada e não há usuário, ou
-  // 2. Ocorreu um timeout de autenticação
-  if ((sessionChecked && !user) || authTimeout) {
-    console.log('Redirecionando para login: sessionChecked=', sessionChecked, 'user=', !!user, 'authTimeout=', authTimeout);
-    return <Navigate to="/login" state={{ from: location, message: authTimeout ? "Falha na verificação da sessão. Por favor, faça login novamente." : undefined }} replace />;
-  }
-  
-  // Efeito para mostrar o fallback após 300ms se ainda estiver carregando
-  useEffect(() => {
-    // Só mostra o fallback se estiver carregando para evitar flash
-    if (loading) {
-      const timer = setTimeout(() => setShowFallback(true), 300);
+    if (loading && !sessionChecked) {
+      const timer = setTimeout(() => setShowSpinner(true), 300);
       return () => clearTimeout(timer);
+    } else {
+      setShowSpinner(false);
     }
-    
-    setShowFallback(false);
-  }, [loading]);
-  
-  // Se ainda está carregando e passou tempo suficiente, mostra o spinner
-  if ((loading || !sessionChecked) && showFallback && !authTimeout) {
+  }, [loading, sessionChecked]);
+
+  // Se a sessão foi verificada e não há usuário, redireciona para login
+  if (sessionChecked && !user) {
+    return <Navigate to="/login" state={{ from: location.pathname }} replace />;
+  }
+
+  // Se ainda está verificando a sessão e passou tempo suficiente, mostra spinner
+  if (!sessionChecked && showSpinner) {
     return (
       <div className="auth-container fade-in">
         <div className="auth-card" style={{ maxWidth: '400px', textAlign: 'center', padding: '2rem' }}>
@@ -56,9 +38,8 @@ export function PrivateRoute({ children }) {
       </div>
     );
   }
-  
-  // Redireciona para login se não houver usuário autenticado
-  // Preserva a rota original no state para redirecionamento após login
+
+  // Se não há usuário autenticado após verificação, redireciona
   if (!user) {
     return <Navigate to="/login" state={{ from: location.pathname }} replace />;
   }
