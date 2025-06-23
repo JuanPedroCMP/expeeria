@@ -3,34 +3,14 @@ import { AuthContext } from '../contexts/AuthContext';
 
 /**
  * Hook personalizado para facilitar o acesso e manipulação da autenticação
- * Unifica funcionalidades relacionadas ao usuário em um único lugar
- * @returns {Object} Objeto com propriedades e métodos de autenticação
  */
 export const useAuth = () => {
   const authContext = useContext(AuthContext);
   
   if (!authContext) {
-    console.error('Erro crítico: useAuth usado fora de um AuthProvider');
-    throw new Error("useAuth deve ser usado dentro de um AuthProvider. Verifique se o componente está dentro do AuthProvider no App.jsx");
+    throw new Error("useAuth deve ser usado dentro de um AuthProvider");
   }
   
-  // Garantir que sessionChecked exista antes de usá-lo
-  if (authContext.sessionChecked === undefined) {
-    console.error('ERRO CRÍTICO: sessionChecked não está definido no contexto de autenticação');
-    // Forçar um valor default para evitar problemas no PrivateRoute
-    authContext.sessionChecked = true;
-  }
-  
-  // Adicionar log para depuração detalhada
-  console.log('Estado atual do AuthContext:', {
-    temUsuario: !!authContext.user,
-    loading: authContext.loading,
-    temErro: !!authContext.error,
-    sessionChecked: authContext.sessionChecked,
-    autenticado: !!authContext.user && authContext.sessionChecked
-  });
-  
-  // Extrair valores com garantia para sessionChecked
   const { 
     user, 
     loading, 
@@ -39,9 +19,10 @@ export const useAuth = () => {
     logout, 
     register, 
     updateProfile, 
+    resetPassword,
     isAuthenticated,
-    // Garantia explícita que sessionChecked será retornado, mesmo se indefinido
-    sessionChecked = true 
+    resetAuthState,
+    sessionChecked = true // Default para evitar problemas 
   } = authContext;
   
   // Verificar se o usuário é o autor do conteúdo
@@ -68,62 +49,14 @@ export const useAuth = () => {
     return isOwner(contentUserId) || hasPermission('delete_all_content');
   }, [user, isOwner, hasPermission]);
   
-  // Verifica se a sessão está expirada ou quase expirando
-  const checkSessionStatus = useCallback(() => {
-    if (!user || !user.session) return { valid: false, expiresIn: 0 };
-    
-    try {
-      const expiresAt = new Date(user.session.expires_at || user.session.expiresAt);
-      const now = new Date();
-      const diffMs = expiresAt - now;
-      const diffMinutes = Math.floor(diffMs / (1000 * 60));
-      
-      return {
-        valid: diffMs > 0,
-        expiresIn: diffMinutes,
-        isExpiring: diffMinutes < 10 // Considerar sessão quase expirando se < 10 minutos
-      };
-    } catch (error) {
-      console.error('Erro ao verificar status da sessão:', error);
-      return { valid: false, expiresIn: 0, error };
-    }
-  }, [user]);
-  
-  // Verificar se o token atual é válido
-  const getAuthToken = useCallback(() => {
-    if (!user || !user.session) return null;
-    
-    const { valid } = checkSessionStatus();
-    return valid ? user.session.access_token : null;
-  }, [user, checkSessionStatus]);
-  
   // Pegar nome de usuário formatado
   const getDisplayName = useCallback(() => {
     if (!user) return '';
     
-    // Verifica se há dados do perfil extra
-    if (user.profile) {
-      return user.profile.name || user.profile.username || (user.email?.split('@')[0] || 'Usuário');
-    }
-    
-    // Fallback para metadata do Supabase Auth ou dados do usuário
-    return user.user_metadata?.full_name || 
-           user.user_metadata?.username || 
-           user.name || 
+    return user.name || 
            user.username || 
            user.email?.split('@')[0] || 
            'Usuário';
-  }, [user]);
-  
-  // Verificar se a conta é nova (criada há menos de 24h)
-  const isNewAccount = useCallback(() => {
-    if (!user || !user.created_at) return false;
-    
-    const createdAt = new Date(user.created_at);
-    const now = new Date();
-    const diffHours = (now - createdAt) / (1000 * 60 * 60);
-    
-    return diffHours < 24;
   }, [user]);
 
   return {
@@ -134,16 +67,14 @@ export const useAuth = () => {
     logout,
     register,
     updateProfile,
+    resetPassword,
     isAuthenticated,
     sessionChecked,
+    resetAuthState,
     isOwner,
     hasPermission,
     canEdit,
     canDelete,
-    // Novas funções
-    checkSessionStatus,
-    getAuthToken,
-    getDisplayName,
-    isNewAccount
+    getDisplayName
   };
 };

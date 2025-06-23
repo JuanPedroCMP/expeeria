@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "../../hooks/useAuth";
 import { Link, useNavigate } from "react-router-dom";
 import { LoadingSpinner } from "../../components/LoadingSpinner";
@@ -6,7 +6,7 @@ import { isValidEmail, isStrongPassword, isValidUsername } from "../../utils/val
 import styles from "./SignUp.module.css";
 
 export function SignUp() {
-  const { register, loading, error: authError } = useAuth();
+  const { register, loading, error: authError, user, sessionChecked } = useAuth();
   const [formData, setFormData] = useState({
     fullName: "",
     username: "",
@@ -17,6 +17,13 @@ export function SignUp() {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
+  // Redirecionar usuários já autenticados
+  useEffect(() => {
+    if (sessionChecked && user) {
+      navigate("/", { replace: true });
+    }
+  }, [user, sessionChecked, navigate]);
+  
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({

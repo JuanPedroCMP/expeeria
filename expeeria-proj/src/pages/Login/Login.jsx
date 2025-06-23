@@ -5,7 +5,7 @@ import { LoadingSpinner } from "../../components/LoadingSpinner";
 import styles from "./Login.module.css";
 
 export function Login() {
-  const { login, loading, error: authError } = useAuth();
+  const { login, loading, error: authError, user, sessionChecked } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -24,6 +24,13 @@ export function Login() {
       navigate(location.pathname, { replace: true });
     }
   }, [location, navigate]);
+  
+  // Redirecionar usuários já autenticados
+  useEffect(() => {
+    if (sessionChecked && user) {
+      navigate(from, { replace: true });
+    }
+  }, [user, sessionChecked, navigate, from]);
   
   const handleSubmit = async (e) => {
     e.preventDefault();
