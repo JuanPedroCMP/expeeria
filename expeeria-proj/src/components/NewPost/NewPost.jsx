@@ -2,16 +2,12 @@ import { useState, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
 import style from "./NewPost.module.css";
 import { Button } from "../Button";
-// import { categorizePost } from "../../utils/categorizePost";
 import { categoriasPadrao } from "../../utils/categoriasPadrao";
 import { useAuth } from "../../hooks/useAuth";
 import { UploadImage } from "../UploadImage/UploadImage";
 import { useNotification } from "../../hooks/useNotification";
 import { usePost } from "../../hooks/usePost";
 import supabase from "../../services/supabase";
-
-// Import de funções de log para debugging
-const DEBUG = true; // Ative para modo de desenvolvimento, desative para produção
 
 export const NewPost = ({
   modoEdicao = false,
@@ -23,10 +19,7 @@ export const NewPost = ({
   const { createPost } = usePost();
   const [title, setTitle] = useState(postOriginal?.title || "");
   const [caption, setCaption] = useState(postOriginal?.caption || "");
-  const [content, setContent] = useState(postOriginal?.content || "");
-  const [imageUrl, setImageUrl] = useState(postOriginal?.imageUrl || "");
-  // eslint-disable-next-line no-unused-vars
-  const [author, setAuthor] = useState(postOriginal?.author || "");
+  const [content, setContent] = useState(postOriginal?.content || "");  const [imageUrl, setImageUrl] = useState(postOriginal?.imageUrl || "");
   const [area, setArea] = useState(postOriginal?.area || []);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -34,12 +27,10 @@ export const NewPost = ({
   const [categoriasOpen, setCategoriasOpen] = useState(false);
 
   useEffect(() => {
-    if (postOriginal) {
-      setTitle(postOriginal.title || "");
+    if (postOriginal) {      setTitle(postOriginal.title || "");
       setCaption(postOriginal.caption || "");
       setContent(postOriginal.content || "");
       setImageUrl(postOriginal.imageUrl || "");
-      setAuthor(postOriginal.author || "");
       setArea(postOriginal.area || []);
     }
   }, [postOriginal]);
@@ -48,28 +39,24 @@ export const NewPost = ({
     e.preventDefault();
     setError("");
     setSuccess("");
-    setLoading(true);
-
-    if (!title || !caption || !content || !user?.id || !area.length) {
+    setLoading(true);    if (!title || !caption || !content || !user?.id || !area.length) {
       setError("Preencha todos os campos obrigatórios.");
       setLoading(false);
       return;
     }
     
-    // Verificar se o usuário está autenticado
     if (!user?.id) {
       setError("Você precisa estar logado para criar um post.");
       setLoading(false);
       return;
     }
 
-    try {
-      // Preparar os dados do post adaptados para o Supabase
-      const postData = {
+    try {      const postData = {
         title,
         caption,
         content,
         author_id: user.id,
+        author_name: user.name || user.email || 'Usuário',
         image_url: imageUrl,
         status: 'published',
         created_at: new Date().toISOString(),
@@ -81,47 +68,39 @@ export const NewPost = ({
         metadata: JSON.stringify({ readTime: Math.ceil(content.length / 1000) })
       };
 
-      console.log("Enviando dados do post:", postData);
-
-      if (modoEdicao && onSubmitEdicao) {
+      console.log("Enviando dados do post:", postData);      if (modoEdicao && onSubmitEdicao) {
         await onSubmitEdicao(postData);
         setSuccess("Post editado com sucesso!");
         showSuccess("Post editado com sucesso!");
       } else {
         try {
-          // Usar o hook usePost para criar o post
           const novoPost = await createPost(postData);
           
           if (!novoPost) throw new Error('Falha ao criar o post');
           
           console.log("Post criado com sucesso:", novoPost);
           
-          // Adicionar categorias ao post
           if (area && area.length > 0) {
             const categorias = area.map(cat => ({
               post_id: novoPost.id,
               category: cat
             }));
             
-            const { error: catError } = await supabase
-              .from('post_categories')
+            const { error: catError } = await supabase              .from('post_categories')
               .insert(categorias);
               
             if (catError) {
               console.error("Erro ao adicionar categorias:", catError);
-              // Não impede o fluxo principal, pois o post já foi criado
             }
           }
           
           setSuccess("Post criado com sucesso!");
           showSuccess("Post criado com sucesso!");
           
-          // Limpar formulário
           setTitle("");
           setCaption("");
           setContent("");
           setImageUrl("");
-          setAuthor("");
           setArea([]);
         } catch (error) {
           console.error("Erro ao criar post:", error);

@@ -655,19 +655,19 @@
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  width: 3rem;
-  height: 3rem;
-  background: rgba(15, 23, 42, 0.8);
+  width: 2rem;
+  height: 2rem;
+  background: rgba(15, 23, 42, 0.37);
   color: white;
   border: none;
   border-radius: 50%;
-  font-size: 1.5rem;
+  font-size: 1rem;
   cursor: pointer;
   z-index: 10;
   display: flex;
   justify-content: center;
   align-items: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
   transition: all 0.2s ease;
 }
 

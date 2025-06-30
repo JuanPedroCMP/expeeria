@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { usePost } from "../../hooks/usePost";
 import { useAuth } from "../../hooks/useAuth";
 import { LikeButton } from "../LikeButton/LikeButton";
@@ -6,12 +6,10 @@ import { LazyImage } from "../LazyImage/LazyImage";
 import { ShareButton } from "../ShareButton/ShareButton";
 import styles from "./Card.module.css";
 
-/**
- * Componente Card para exibir posts no feed
- * Versão melhorada com visual aprimorado e animações
- */
 const Card = (props) => {
-  // Verify props to prevent errors
+  const { likePost, unlikePost, hasLikedPost } = usePost();
+  const { user } = useAuth();
+  
   if (!props) return null;
 
   const { 
@@ -25,7 +23,6 @@ const Card = (props) => {
     author,
     createdAt,
     onClick,
-    // Compatibilidade com diferentes formatos de dados
     title,
     caption,
     content,
@@ -36,15 +33,12 @@ const Card = (props) => {
     image_url,
     created_at,
     author_name,
-    // Suporte a propriedades adicionais
     category,
     categoria,
     tags,
-    // Nova propriedade para controlar visibilidade do botão compartilhar
     hideShareButton = false
   } = props;
   
-  // Normalizando os dados para garantir compatibilidade com diferentes formatos
   const normalizedTitle = TituloCard || title || '';
   const normalizedSubtitle = SubTitulo || '';
   const normalizedDescription = Descricao || caption || (content?.substring(0, 120) + (content?.length > 120 ? '...' : '')) || '';
@@ -54,10 +48,7 @@ const Card = (props) => {
   const normalizedAuthor = author || author_name || '';
   const normalizedCreatedAt = createdAt || created_at || '';
   const normalizedCategory = category || categoria || '';
-  const normalizedTags = tags || []; // Suporte para tags
-  
-  const { likePost, unlikePost, hasLikedPost } = usePost();
-  const { user } = useAuth();
+  const normalizedTags = tags || [];
   
   const isLiked = hasLikedPost && hasLikedPost(id);
   
@@ -79,41 +70,32 @@ const Card = (props) => {
     }
   };
   
-  // Formatar data se disponível
   const formattedDate = normalizedCreatedAt ? new Date(normalizedCreatedAt).toLocaleDateString('pt-BR', {
     day: '2-digit',
     month: '2-digit',
     year: 'numeric'
   }) : '';
-
-  const [imageError, setImageError] = useState(false);
-
-  // Handler para erros de carregamento de imagem
-  const handleImageError = () => {
-    setImageError(true);
-  };
   
   return (
-    <div className={`${styles.card} card post-card slide-up`} onClick={handleCardClick}>
-      {normalizedImageUrl ? (
+    <div className={styles.card} onClick={handleCardClick}>
+      {normalizedImageUrl && (
         <div className={styles.imageContainer}>
           <LazyImage
             src={normalizedImageUrl}
             alt={normalizedTitle}
             className={styles.cardImage}
-            onError={handleImageError}
             placeholderColor="rgba(15, 23, 42, 0.6)"
           />
         </div>
-      ) : null}
+      )}
       
-      <div className={`${styles.cardContent} post-content`}>
+      <div className={styles.cardContent}>
         {normalizedCategory && (
           <div className={styles.cardCategory}>{normalizedCategory}</div>
         )}
-        <h3 className={`${styles.cardTitle} post-title`}>{normalizedTitle}</h3>
-        {normalizedSubtitle && <div className="badge badge-primary mb-sm">{normalizedSubtitle}</div>}
-        <p className={`${styles.cardDescription} post-caption`}>{normalizedDescription}</p>
+        <h3 className={styles.cardTitle}>{normalizedTitle}</h3>
+        {normalizedSubtitle && <div className={styles.cardSubtitle}>{normalizedSubtitle}</div>}
+        <p className={styles.cardDescription}>{normalizedDescription}</p>
         
         {normalizedTags && normalizedTags.length > 0 && (
           <div className={styles.cardTags}>
@@ -124,14 +106,14 @@ const Card = (props) => {
         )}
         
         {normalizedAuthor && (
-          <div className="post-author mt-sm mb-sm">
-            <small className="text-secondary">Por {normalizedAuthor}</small>
-            {formattedDate && <small className="text-terciario">{' • '}{formattedDate}</small>}
+          <div className={styles.cardAuthor}>
+            <span>Por {normalizedAuthor}</span>
+            {formattedDate && <span> • {formattedDate}</span>}
           </div>
         )}
         
         <div className={styles.cardFooter}>
-          <div className="post-stats">
+          <div className={styles.cardStats}>
             <LikeButton 
               count={normalizedLikes}
               isLiked={isLiked}
@@ -141,7 +123,7 @@ const Card = (props) => {
               size="md"
             />
             
-            <span title="Comentários" className={styles.commentCount}>
+            <span className={styles.commentCount}>
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
               </svg>

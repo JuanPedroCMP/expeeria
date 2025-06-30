@@ -253,37 +253,7 @@ const Inicial = () => {
                   </div>
                 </div>
               </div>
-            )}
-            
-            {/* Continue de onde parou - posts visualizados recentemente */}
-            {user && recentlyViewedPosts.length > 0 && (
-              <div className={style.recentlyViewedSection}>
-                <h3>
-                  <span className={style.icon}>📝</span>
-                  Continue de onde parou
-                </h3>
-                <div className={style.recentlyViewedGrid}>
-                  {recentlyViewedPosts.map((post) => (
-                    <div
-                      key={post.id}
-                      onClick={() => navigate(`/post/${post.id}`)}
-                      className={style.recentCard}
-                    >
-                      <Card
-                        TituloCard={post.title}
-                        SubTitulo={
-                          post.categories?.length > 0 ? post.categories.join(", ") : "Geral"
-                        }
-                        Descricao={post.caption}
-                        likes={post.likeCount || 0}
-                        id={post.id}
-                        imageUrl={post.imageUrl}
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+            )}           
             
             {/* Seção de Categorias Populares */}
             {popularCategories.length > 0 && (
