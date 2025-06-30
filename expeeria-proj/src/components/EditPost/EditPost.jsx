@@ -4,6 +4,7 @@ import { NewPost } from "../NewPost/NewPost";
 import { useNotification } from "../../hooks/useNotification";
 import { useAuth } from "../../hooks/useAuth";
 import { usePost } from "../../hooks/usePost";
+import supabase from "../../services/supabase";
 
 export const EditPost = () => {
   const { id } = useParams();
@@ -41,7 +42,7 @@ export const EditPost = () => {
           title: postData.title,
           caption: postData.caption,
           content: postData.content,
-          imageUrl: postData.image_url,
+          imageUrl: postData.image_url || postData.imageUrl,
           author: postData.author_id,
           area: categoriesData?.map(cat => cat.category) || []
         };
@@ -75,14 +76,15 @@ export const EditPost = () => {
         title: dadosEditados.title,
         caption: dadosEditados.caption,
         content: dadosEditados.content,
-        image_url: dadosEditados.imageUrl || dadosEditados.image_url
+        image_url: dadosEditados.imageUrl || dadosEditados.image_url,
+        updated_at: new Date().toISOString()
       };
       
       // Atualizar o post usando o hook usePost
       await updatePost(id, postData);
       
-      // Remover categorias antigas e adicionar as novas
-      if (dadosEditados.area && dadosEditados.area.length > 0) {
+      // Gerenciar categorias se foram fornecidas
+      if (dadosEditados.area) {
         // Primeiro deletar categorias existentes
         const { error: deleteError } = await supabase
           .from('post_categories')
@@ -91,17 +93,19 @@ export const EditPost = () => {
           
         if (deleteError) throw deleteError;
         
-        // Adicionar novas categorias
-        const categorias = dadosEditados.area.map(cat => ({
-          post_id: id,
-          category: cat
-        }));
-        
-        const { error: catError } = await supabase
-          .from('post_categories')
-          .insert(categorias);
+        // Adicionar novas categorias se houver
+        if (dadosEditados.area.length > 0) {
+          const categorias = dadosEditados.area.map(cat => ({
+            post_id: id,
+            category: cat
+          }));
           
-        if (catError) throw catError;
+          const { error: catError } = await supabase
+            .from('post_categories')
+            .insert(categorias);
+            
+          if (catError) throw catError;
+        }
       }
       
       showSuccess('Post atualizado com sucesso!');

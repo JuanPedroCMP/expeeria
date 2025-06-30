@@ -10,17 +10,8 @@ const PAGE_SIZE = 6;
 
 export const Feed = () => {
   const { posts, loading, filterPosts } = usePost();
-  
-  // Filtros
+    // Filtros
   const [search, setSearch] = useState(() => localStorage.getItem("feed_search") || "");
-  const [selectedAreas, setSelectedAreas] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem("feed_areas")) || [];
-    } catch {
-      return [];
-    }
-  });
-  const [author, setAuthor] = useState(() => localStorage.getItem("feed_author") || "");
   const [order, setOrder] = useState(() => localStorage.getItem("feed_order") || "recentes");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
@@ -31,14 +22,11 @@ export const Feed = () => {
   
   // Loading visual
   const [loadingVisual, setLoadingVisual] = useState(false);
-
   // Salva filtros no localStorage
   useEffect(() => {
     localStorage.setItem("feed_search", search);
-    localStorage.setItem("feed_areas", JSON.stringify(selectedAreas));
-    localStorage.setItem("feed_author", author);
     localStorage.setItem("feed_order", order);
-  }, [search, selectedAreas, author, order]);
+  }, [search, order]);
 
   // Carregamento infinito
   useEffect(() => {
@@ -58,17 +46,14 @@ export const Feed = () => {
   }, []);
 
   // Atualiza loading visual quando os filtros ou posts mudam
-  useEffect(() => {
-    setLoadingVisual(true);
+  useEffect(() => {    setLoadingVisual(true);
     const timeout = setTimeout(() => setLoadingVisual(false), 400);
     return () => clearTimeout(timeout);
-  }, [search, selectedAreas, author, order, dateFrom, dateTo, posts]);
+  }, [search, order, dateFrom, dateTo, posts]);
 
   // Aplicar filtros usando o hook usePost
   const filtered = filterPosts({
     search,
-    categories: selectedAreas,
-    author,
     dateFrom: dateFrom || null,
     dateTo: dateTo || null,
     orderBy: order
@@ -81,14 +66,9 @@ export const Feed = () => {
   const resetPageSize = () => setShowCount(PAGE_SIZE);
 
   return (
-    <div>
-      <FeedFilters 
+    <div>      <FeedFilters 
         search={search}
         setSearch={setSearch}
-        selectedAreas={selectedAreas}
-        setSelectedAreas={setSelectedAreas}
-        author={author}
-        setAuthor={setAuthor}
         order={order}
         setOrder={setOrder}
         dateFrom={dateFrom}

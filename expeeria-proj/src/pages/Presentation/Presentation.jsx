@@ -166,51 +166,7 @@ export function Presentation() {
             <path d="M7 13l5 5 5-5"></path>
           </svg>
         </button>
-      </section>
-
-      {/* Popular Content Section */}
-      <section className={`${styles.section} ${styles.contentSection}`} ref={el => sectionRefs.current[2] = el}>
-        <h2 className={styles.sectionTitle}>Conteúdos <span className={styles.gradientText}>Populares</span></h2>
-        {loading ? (
-          <div className={styles.loadingContainer}>Carregando conteúdos...</div>
-        ) : (
-          <div className={styles.contentCards}>
-            {featuredPosts.length > 0 ? (
-              featuredPosts.map((post) => (
-                <div key={post.id} className={styles.contentCard}>
-                  <div 
-                    className={styles.contentImage} 
-                    style={{
-                      backgroundColor: '#3498db'
-                    }}
-                  ></div>
-                  <div className={styles.contentCategory}>
-                    {post.subject}
-                  </div>
-                  <h3>{post.title}</h3>
-                  <p>{post.caption}...</p>
-                  <div className={styles.contentMeta}>
-                    <span>Por {post.author}</span>
-                    <span>{post.likes} curtidas</span>
-                  </div>
-                  <Link to='/explore' className={styles.contentLink}>Ler mais</Link>
-                </div>
-              ))
-            ) : (
-              <div className={styles.contentCard}>
-                <h3>Nenhum post encontrado</h3>
-                <p>Não foi possível carregar os posts de exemplo.</p>
-              </div>
-            )}
-          </div>
-        )}
-        <button className={styles.scrollDownButton} onClick={scrollToNextSection}>
-          <span>Ver mais</span>
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M7 13l5 5 5-5"></path>
-          </svg>
-        </button>
-      </section>
+      </section>     
 
       {/* How It Works */}
       <section className={`${styles.section} ${styles.howSection}`} ref={el => sectionRefs.current[3] = el}>
@@ -265,55 +221,6 @@ export function Presentation() {
         </div>
         <button className={styles.scrollDownButton} onClick={scrollToNextSection}>
           <span>Ver mais</span>
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M7 13l5 5 5-5"></path>
-          </svg>
-        </button>
-      </section>
-
-      {/* Testimonials */}
-      <section className={`${styles.section} ${styles.testimonialsSection}`} ref={el => sectionRefs.current[3] = el}>
-        <h2 className={styles.sectionTitle}>O que dizem sobre a <span className={styles.gradientText}>Expeeria</span></h2>
-        <div className={styles.testimonials}>
-          <div className={styles.testimonialCard}>
-            <div className={styles.testimonialContent}>
-              <p>"A Expeeria revolucionou a forma como compartilho meus projetos educacionais. A comunidade é extremamente acolhedora e os feedbacks têm sido fundamentais para o desenvolvimento do meu trabalho."</p>
-            </div>
-            <div className={styles.testimonialAuthor}>
-              <div className={styles.authorAvatar}></div>
-              <div className={styles.authorInfo}>
-                <h4>Maria Silva</h4>
-                <p>Professora de Ciências</p>
-              </div>
-            </div>
-          </div>
-          <div className={styles.testimonialCard}>
-            <div className={styles.testimonialContent}>
-              <p>"Como estudante, encontrei na Expeeria um espaço onde posso aprender com as experiências de outros e também compartilhar minhas descobertas. É uma plataforma que realmente valoriza o conhecimento colaborativo."</p>
-            </div>
-            <div className={styles.testimonialAuthor}>
-              <div className={styles.authorAvatar}></div>
-              <div className={styles.authorInfo}>
-                <h4>Pedro Santos</h4>
-                <p>Estudante de Engenharia</p>
-              </div>
-            </div>
-          </div>
-          <div className={styles.testimonialCard}>
-            <div className={styles.testimonialContent}>
-              <p>"A diversidade de conteúdos e a facilidade de navegação fazem da Expeeria uma ferramenta indispensável para quem busca inovação educacional. Recomendo a todos os educadores!"</p>
-            </div>
-            <div className={styles.testimonialAuthor}>
-              <div className={styles.authorAvatar}></div>
-              <div className={styles.authorInfo}>
-                <h4>Ana Oliveira</h4>
-                <p>Coordenadora Pedagógica</p>
-              </div>
-            </div>
-          </div>
-        </div>
-        <button className={styles.scrollDownButton} onClick={scrollToNextSection}>
-          <span>Quase lá</span>
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M7 13l5 5 5-5"></path>
           </svg>
