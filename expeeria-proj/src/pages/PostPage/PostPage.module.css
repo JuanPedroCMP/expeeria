@@ -43,16 +43,7 @@
 }
 
 .likeBtn {
-  background: none;
-  border: none;
-  color: #e74c3c;
-  font-size: 1.3rem;
-  cursor: pointer;
   margin-bottom: 1rem;
-  transition: transform 0.1s;
-}
-.likeBtn:hover {
-  transform: scale(1.15);
 }
 
 .postDate {

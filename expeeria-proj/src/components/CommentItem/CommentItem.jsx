@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../../hooks/useAuth";
 import { useComment } from "../../hooks/useComment";
+import { LikeButton } from "../LikeButton/LikeButton";
 import styles from "./CommentItem.module.css";
 
 /**
@@ -15,7 +16,7 @@ export const  CommentItem = ({
   onDelete 
 }) => {
   const { user } = useAuth();
-  const { hasLikedComment, likeComment, unlikeComment, toggleLikeComment } = useComment();
+  const { hasLikedComment, likeComment, unlikeComment } = useComment();
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState(comment.content);
   const [showReplyForm, setShowReplyForm] = useState(false);
@@ -113,13 +114,14 @@ export const  CommentItem = ({
       )}
       
       <div className={styles.commentActions}>
-        <button 
-          onClick={handleLikeToggle} 
-          className={`${styles.actionBtn} ${isLiked ? styles.liked : ''}`}
+        <LikeButton 
+          count={comment.likes || 0}
+          isLiked={isLiked}
+          onLike={handleLikeToggle}
+          onUnlike={handleLikeToggle}
           disabled={!user}
-        >
-          ❤️ {comment.likes || 0}
-        </button>
+          size="sm"
+        />
         
         {user && (
           <button 

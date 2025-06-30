@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import style from "./PostPage.module.css";
 import { Button, CommentItem, Pagination } from "../../components";
+import { LikeButton } from "../../components/LikeButton/LikeButton";
 import { useAuth } from "../../hooks/useAuth";
 import { usePost } from "../../hooks/usePost";
 import { useComment } from "../../hooks/useComment";
@@ -18,8 +19,9 @@ export const PostPage = () => {
   const [error, setError] = useState(null);
   const [comment, setComment] = useState("");
   const [userInput, setUserInput] = useState("");
+  const [isLiked, setIsLiked] = useState(false);
   const { user } = useAuth();
-  const { getPostById, toggleLikePost } = usePost();
+  const { getPostById, toggleLikePost, hasLikedPost } = usePost();
   const { loadComments, addComment, deleteComment } = useComment();
   const { showSuccess, showError } = useNotification();
 
@@ -98,6 +100,16 @@ export const PostPage = () => {
         setComments(processedComments || []);
         setError(null);
         
+        // Verificar se o usuário curtiu este post
+        if (user && hasLikedPost) {
+          try {
+            const liked = await hasLikedPost(id);
+            setIsLiked(liked);
+          } catch (err) {
+            console.error('Erro ao verificar curtida:', err);
+          }
+        }
+        
         // Registrar visualização no localStorage
         if (user) {
           try {
@@ -122,7 +134,7 @@ export const PostPage = () => {
     if (id) {
       fetchPostAndComments();
     }
-  }, [id, user, getPostById]);
+  }, [id, user, getPostById, loadComments, hasLikedPost]);
 
   // Função para excluir o post
   const handleDelete = async (e) => {
@@ -256,8 +268,11 @@ export const PostPage = () => {
     }
     
     try {
-      // Atualização otimista da UI antes da resposta da API
-      const newLikeCount = post.likeCount + 1; // Incremento otimista
+      // Atualização otimista da UI
+      const newIsLiked = !isLiked;
+      const newLikeCount = newIsLiked ? post.likeCount + 1 : post.likeCount - 1;
+      
+      setIsLiked(newIsLiked);
       setPost(prev => ({ ...prev, likeCount: newLikeCount }));
       
       // Chamar a função toggleLikePost do hook usePost
@@ -265,15 +280,14 @@ export const PostPage = () => {
       
       if (!result.success) {
         // Se falhar, reverter a atualização otimista
-        setPost(prev => ({ ...prev, likeCount: prev.likeCount - 1 }));
+        setIsLiked(isLiked);
+        setPost(prev => ({ ...prev, likeCount: post.likeCount }));
         throw new Error('Falha ao processar curtida');
       }
       
-      // Atualizar o estado com o valor real retornado
-      setPost(prev => ({
-        ...prev,
-        likeCount: result.liked ? prev.likeCount : prev.likeCount - 2 // Ajustar com base no resultado real
-      }));
+      // Sincronizar com o resultado real
+      setIsLiked(result.liked);
+      setPost(prev => ({ ...prev, likeCount: result.likeCount || newLikeCount }));
     } catch (err) {
       console.error('Erro ao curtir post:', err);
       showError("Erro ao curtir o post. Tente novamente.");
@@ -364,13 +378,15 @@ export const PostPage = () => {
         <div className={style.postContent}>
           <ReactMarkdown>{post.content}</ReactMarkdown>
         </div>
-        <button
-          onClick={handleLike}
-          className={style.likeBtn}
+        <LikeButton 
+          count={post.likeCount || 0}
+          isLiked={isLiked}
+          onLike={handleLike}
+          onUnlike={handleLike}
           disabled={!user}
-        >
-          ❤️ {post.likeCount || 0}
-        </button>
+          size="lg"
+          className={style.likeBtn}
+        />
         <p className={style.postDate}>
           Publicado em {new Date(post.createdAt).toLocaleString()}
         </p>

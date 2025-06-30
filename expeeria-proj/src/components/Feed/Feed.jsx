@@ -114,17 +114,16 @@ export const Feed = () => {
               key={post.id}
               to={`/post/${post.id}`}
               className={style.postLink}
-            >
-              <Card
+            >              <Card
                 TituloCard={post.title || "Post sem título"}
                 SubTitulo={
                   Array.isArray(post.area)
-                    ? post.area.join(", ") + " • " + post.author
-                    : post.area + " • " + post.author
+                    ? post.area.join(", ") + " • " + (post.author || post.author_name || 'Usuário')
+                    : (post.area || 'Geral') + " • " + (post.author || post.author_name || 'Usuário')
                 }
                 Descricao={post.caption}
-                imageUrl={post.imageUrl}
-                likes={post.likes}
+                imageUrl={post.imageUrl || post.image_url}
+                likes={post.likes || post.like_count || 0}
                 id={post.id}
               />
             </Link>
