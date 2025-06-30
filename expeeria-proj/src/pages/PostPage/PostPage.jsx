@@ -414,11 +414,11 @@ export const PostPage = () => {
           <button type="submit">Comentar</button>
         </form>
 
-        <div className={style.commentsContainer}>
+        {/* <div className={style.commentsContainer}>
           {comments.length > 0 ? (
             <>
               {comments
-                .slice((currentPage - 1) * commentsPerPage, currentPage * commentsPerPage)
+             j  .slice((currentPage - 1) * commentsPerPage, currentPage * commentsPerPage)
                 .map((c) => (
                   <CommentItem 
                     key={c.id || `${c.user}-${c.text}-${Math.random()}`}
@@ -441,7 +441,7 @@ export const PostPage = () => {
           ) : (
             <p style={{ color: "#aaa" }}>Nenhum comentário ainda.</p>
           )}
-        </div>
+        </div> */}
       </div>
     </>
   );

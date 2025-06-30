@@ -161,7 +161,7 @@ export function Explore() {
           onChange={e => { setSearch(e.target.value); setShowCount(PAGE_SIZE); }}
           className={style.input}
         />
-        <button
+        {/* <button
           type="button"
           className={style.categoriasToggle}
           onClick={() => setShowCategories((v) => !v)}
@@ -185,15 +185,15 @@ export function Explore() {
               </label>
             ))}
           </div>
-        )}
-        <input
+        )} */}
+        {/* <input
           type="text"
           placeholder="Filtrar por autor"
           value={author}
           onChange={e => { setAuthor(e.target.value); setShowCount(PAGE_SIZE); }}
           className={style.input}
           style={{ minWidth: 120 }}
-        />
+        /> */}
         <label className={style.dataLabel}>
           De:
           <input
