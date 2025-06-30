@@ -390,7 +390,7 @@ export const PostPage = () => {
         <p className={style.postDate}>
           Publicado em {new Date(post.createdAt).toLocaleString()}
         </p>
-        <hr />
+        {/* <hr />
         <h3 className={style.commentsTitle}>Comentários</h3>
         <form onSubmit={handleComment} className={style.commentForm}>
           <input
@@ -412,7 +412,7 @@ export const PostPage = () => {
             maxLength={300}
           />
           <button type="submit">Comentar</button>
-        </form>
+        </form> */}
 
         {/* <div className={style.commentsContainer}>
           {comments.length > 0 ? (
