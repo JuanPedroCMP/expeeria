@@ -1,0 +1,1 @@
+export { Recomendacoes } from './Recomendacoes';

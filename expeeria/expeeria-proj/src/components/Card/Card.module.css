@@ -1,0 +1,664 @@
+/* Estilos para o componente Card - Tema Escuro Moderno */
+.card {
+  background-color: var(--elementos-secundarios);
+  border-radius: var(--borda-lg);
+  padding: var(--space-md);
+  margin-bottom: var(--space-lg);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15), 0 1px 3px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  transition: all 0.3s ease;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  position: relative;
+  z-index: 1;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: var(--gradiente-destaques);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 0;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--sombra-media);
+}
+
+.card:hover::before {
+  opacity: 1;
+}
+
+.card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: var(--gradiente-botoes);
+  opacity: 0;
+  transition: opacity var(--transicao-media);
+}
+
+.card:hover::after {
+  opacity: 1;
+}
+
+.imageContainer {
+  width: 100%;
+  height: 180px;
+  overflow: hidden;
+  position: relative;
+  background-color: rgba(15, 23, 42, 0.5);
+  min-height: 120px;
+}
+
+.fallbackImage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(45deg, rgba(30, 41, 59, 0.7), rgba(15, 23, 42, 0.9));
+}
+
+.imageFallback {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.6);
+  height: 100%;
+  width: 100%;
+  text-align: center;
+  padding: 1rem;
+}
+
+.imageFallback svg {
+  margin-bottom: 0.5rem;
+  opacity: 0.7;
+}
+
+.imageFallback span {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.imageContainer::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    to bottom,
+    transparent 70%,
+    rgba(15, 23, 42, 0.5) 100%
+  );
+  z-index: 1;
+}
+
+.cardImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--transicao-media);
+}
+
+.cardCategory {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  background: linear-gradient(135deg, rgba(14, 165, 233, 0.85), rgba(56, 189, 248, 0.85));
+  color: white;
+  padding: 0.3rem 0.75rem;
+  border-radius: var(--borda-pill);
+  font-size: 0.75rem;
+  font-weight: 600;
+  z-index: 10;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  backdrop-filter: blur(2px);
+  max-width: 90%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card:hover .cardImage {
+  transform: scale(1.05);
+}
+
+.cardContent {
+  padding: var(--space-lg);
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.cardTitle {
+  margin: 0 0 var(--space-sm) 0;
+  font-size: 1.25rem;
+  color: var(--texto-principal);
+  font-weight: 600;
+  font-family: var(--fonte-titulos);
+  letter-spacing: -0.01em;
+}
+
+.cardSubtitle {
+  margin: 0 0 var(--space-sm) 0;
+  font-size: 0.9rem;
+  color: var(--destaque-secundario);
+  font-weight: 500;
+  font-family: var(--fonte-subtitulos);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.cardDescription {
+  margin: 0;
+  flex-grow: 1;
+  color: var(--texto-secundario);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin-bottom: var(--space-md);
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  max-height: 4.8em; /* Altura máxima para 3 linhas */
+}
+
+.cardTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: var(--space-md);
+}
+
+.cardTag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.6rem;
+  background-color: rgba(14, 165, 233, 0.1);
+  color: var(--destaque-secundario);
+  font-size: 0.75rem;
+  font-weight: 500;
+  border-radius: var(--borda-pill);
+  transition: all var(--transicao-rapida);
+}
+
+.cardTag:hover {
+  background-color: rgba(14, 165, 233, 0.2);
+  transform: translateY(-1px);
+}
+
+.cardFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+  padding-top: var(--space-sm);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.cardStats {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.commentCount {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--texto-terciario);
+  font-size: 0.85rem;
+  transition: color var(--transicao-rapida);
+}
+
+.commentCount:hover {
+  color: var(--texto-principal);
+}
+
+.shareButton {
+  margin-left: 0.5rem;
+}
+
+.cardStat {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--texto-terciario);
+  font-size: 0.85rem;
+  transition: color var(--transicao-rapida);
+}
+
+.cardStat:hover {
+  color: var(--texto-principal);
+}
+
+.cardStatIcon {
+  transition: transform var(--transicao-rapida);
+}
+
+.cardStat:hover .cardStatIcon {
+  transform: scale(1.1);
+  color: var(--destaque-primario);
+}
+
+.cardDate {
+  font-size: 0.8rem;
+  color: var(--texto-terciario);
+}
+
+.likeBtn {
+  background: none;
+  border: none;
+  color: var(--texto-terciario);
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all var(--transicao-rapida);
+  padding: 0.4rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.likeBtn:hover {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: var(--alerta-erro);
+  transform: scale(1.15);
+}
+
+.liked {
+  color: var(--alerta-erro);
+}
+
+.deleteBtn {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: var(--alerta-erro);
+  border: none;
+  border-radius: var(--borda-md);
+  padding: 0.3rem 0.9rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transicao-rapida);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.deleteBtn:hover {
+  background-color: rgba(239, 68, 68, 0.2);
+  transform: translateY(-1px);
+}
+
+.editBtn {
+  background-color: rgba(14, 165, 233, 0.1);
+  color: var(--destaque-secundario);
+  border: none;
+  border-radius: var(--borda-md);
+  padding: 0.3rem 0.9rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transicao-rapida);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-right: 0.5rem;
+}
+
+.editBtn:hover {
+  background-color: rgba(14, 165, 233, 0.2);
+  transform: translateY(-1px);
+}
+
+.actionBtns {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: var(--space-sm);
+}
+
+.FixoFooter {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin-top: auto;
+  padding-top: var(--space-sm);
+  background: transparent;
+  position: initial;
+}
+
+.authorInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: var(--space-md);
+}
+
+.authorAvatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.authorName {
+  font-weight: 500;
+  color: var(--texto-principal);
+  font-size: 0.9rem;
+}
+
+.cardBadge {
+  position: absolute;
+  top: var(--space-sm);
+  right: var(--space-sm);
+  background: var(--gradiente-botoes);
+  color: var(--texto-principal);
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--borda-pill);
+  z-index: 2;
+  box-shadow: var(--sombra-suave);
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-md);
+  padding-bottom: var(--space-sm);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.cardAvatar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.cardTitle {
+  font-family: var(--fonte-titulos);
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: var(--texto-principal);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.cardSubtitle {
+  font-size: 0.85rem;
+  color: var(--texto-secundario);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.cardBody {
+  color: var(--texto-secundario);
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+
+.cardBody p {
+  margin-bottom: var(--space-md);
+}
+
+.cardBody p:last-child {
+  margin-bottom: 0;
+}
+
+.cardFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: var(--space-md);
+  padding-top: var(--space-sm);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.cardActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.cardActionButton {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  background: transparent;
+  border: none;
+  color: var(--texto-secundario);
+  font-size: 0.9rem;
+  padding: var(--space-xs);
+  cursor: pointer;
+  transition: color var(--transicao-rapida);
+  border-radius: var(--borda-sm);
+}
+
+.cardActionButton:hover {
+  color: var(--destaque-secundario);
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.cardActionButton svg {
+  width: 1.2em;
+  height: 1.2em;
+}
+
+.cardMedia {
+  margin: var(--space-md) -var(--space-md);
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--borda-sm);
+}
+
+.cardMedia img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  transition: transform var(--transicao-media);
+}
+
+.cardMedia:hover img {
+  transform: scale(1.02);
+}
+
+.cardTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  margin-top: var(--space-sm);
+}
+
+.cardTag {
+  background-color: rgba(255, 255, 255, 0.08);
+  color: var(--texto-secundario);
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--borda-lg);
+  font-size: 0.75rem;
+  transition: all var(--transicao-rapida);
+}
+
+.cardTag:hover {
+  background-color: var(--destaque-secundario);
+  color: var(--background-principal);
+}
+
+.featuredCard {
+  border-left: 4px solid var(--destaque-primario);
+  background: linear-gradient(to right, rgba(14, 165, 233, 0.05), transparent 50%);
+}
+
+.compactCard {
+  padding: var(--space-sm);
+}
+
+.compactCard .cardHeader {
+  margin-bottom: var(--space-xs);
+}
+
+.expandable {
+  cursor: pointer;
+}
+
+.expandableContent {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height var(--transicao-media);
+}
+
+.expanded .expandableContent {
+  max-height: 500px;
+}
+
+.cardGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--space-lg);
+}
+
+.glassCard {
+  background: rgba(30, 41, 59, 0.7);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Efeito de carta virada */
+.flipCard {
+  perspective: 1000px;
+  height: 300px;
+}
+
+.flipCardInner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.8s;
+  transform-style: preserve-3d;
+}
+
+.flipCard:hover .flipCardInner {
+  transform: rotateY(180deg);
+}
+
+.flipCardFront, .flipCardBack {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: var(--borda-lg);
+  padding: var(--space-md);
+}
+
+.flipCardBack {
+  transform: rotateY(180deg);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Estilos para o modo escuro */
+.darkModeCard {
+  background-color: rgba(15, 23, 42, 0.8);
+  border-color: rgba(51, 65, 85, 0.5);
+}
+
+/* Efeitos de destaque */
+.highlightOnHover:hover {
+  border-color: var(--destaque-secundario);
+}
+
+/* Variante com borda gradiente */
+.gradientBorder {
+  position: relative;
+  background-clip: padding-box;
+  border: 1px solid transparent;
+}
+
+.gradientBorder::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  margin: -1px;
+  border-radius: inherit;
+  background: var(--gradiente-botoes);
+  z-index: -1;
+}
+
+/* Card com efeito de foco */
+.focusable:focus-within {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.3);
+}
+
+/* Animação sutil ao aparecer */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animated {
+  animation: fadeIn 0.3s ease-out;
+}
+
+@media (max-width: 768px) {
+  .cardTitle {
+    font-size: 1.1rem;
+  }
+  
+  .cardSubtitle {
+    font-size: 0.8rem;
+  }
+  
+  .cardDescription {
+    font-size: 0.9rem;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+  }
+  
+  .imageContainer {
+    height: 150px;
+  }
+  
+  .cardContent {
+    padding: var(--space-md);
+  }
+}
+
+@media (max-width: 480px) {
+  .cardStats {
+    gap: var(--space-sm);
+  }
+  
+  .actionBtns {
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: flex-end;
+  }
+  
+  .editBtn {
+    margin-right: 0;
+  }
+}

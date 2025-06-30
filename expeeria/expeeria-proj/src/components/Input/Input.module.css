@@ -1,0 +1,329 @@
+.container {
+  margin-bottom: var(--space-md);
+  width: 100%;
+}
+
+/* Estilos aprimorados para o componente Input */
+.inputContainer {
+  position: relative;
+  margin-bottom: var(--space-lg);
+  width: 100%;
+}
+
+.label {
+  display: block;
+  margin-bottom: var(--space-xs);
+  color: var(--texto-secundario);
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: color var(--transicao-rapida);
+}
+
+.inputContainer:focus-within .label {
+  color: var(--destaque-secundario);
+}
+
+.input {
+  width: 100%;
+  background-color: var(--elementos-secundarios);
+  color: var(--texto-principal);
+  border: 1px solid rgba(203, 213, 225, 0.1);
+  border-radius: var(--borda-md);
+  padding: var(--space-md) var(--space-lg);
+  font-size: 1rem;
+  transition: all var(--transicao-rapida);
+  box-shadow: var(--sombra-interna);
+}
+
+.input::placeholder {
+  color: var(--texto-terciario);
+  opacity: 0.7;
+}
+
+.input:hover {
+  background-color: rgba(45, 55, 72, 0.9);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--destaque-secundario);
+  box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.2);
+  background-color: rgba(45, 55, 72, 0.8);
+}
+
+.inputIcon {
+  position: absolute;
+  top: 50%;
+  right: var(--space-md);
+  transform: translateY(-50%);
+  color: var(--texto-terciario);
+  transition: color var(--transicao-rapida);
+  cursor: pointer;
+}
+
+.inputContainer:hover .inputIcon,
+.inputContainer:focus-within .inputIcon {
+  color: var(--destaque-secundario);
+}
+
+.inputError {
+  border-color: var(--alerta-erro);
+}
+
+.inputError:focus {
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+}
+
+.errorMessage {
+  color: var(--alerta-erro);
+  font-size: 0.8rem;
+  margin-top: var(--space-xs);
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.errorMessage svg {
+  flex-shrink: 0;
+}
+
+/* Variante para campos de busca */
+.searchInput {
+  padding-left: calc(var(--space-lg) + 20px);
+  background-position: var(--space-md) center;
+  background-repeat: no-repeat;
+  background-size: 16px;
+}
+
+/* Variantes de tamanho */
+.inputSm {
+  padding: var(--space-sm) var(--space-md);
+  font-size: 0.875rem;
+}
+
+.inputLg {
+  padding: var(--space-lg) var(--space-xl);
+  font-size: 1.125rem;
+}
+
+/* Efeito de foco animado */
+.inputAnimated {
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.inputAnimated::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--gradiente-destaques);
+  transition: width var(--transicao-media) ease;
+  z-index: 2;
+}
+
+.inputAnimated:focus-within::after {
+  width: 100%;
+}
+
+.required {
+  color: var(--alerta-erro);
+  margin-left: var(--space-xs);
+}
+
+.requiredMark {
+  color: #e63946;
+  margin-left: 0.25rem;
+}
+
+.inputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input, .textarea {
+  width: 100%;
+  font-family: inherit;
+  font-size: 1rem;
+  color: #343a40;
+  background-color: #fff;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  padding: 0.5rem 0.75rem;
+  transition: all 0.2s ease;
+}
+
+.textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.input:focus, .textarea:focus {
+  outline: none;
+  border-color: #8ecae6;
+  box-shadow: 0 0 0 3px rgba(142, 202, 230, 0.25);
+}
+
+.icon {
+  position: absolute;
+  left: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6c757d;
+}
+
+.withIcon .input, .withIcon .textarea {
+  padding-left: 2.5rem;
+}
+
+.helperText {
+  font-size: 0.75rem;
+  margin-top: 0.35rem;
+  color: #6c757d;
+}
+
+.errorText {
+  color: #e63946;
+}
+
+/* Variantes de estilo */
+.outlined {
+  /* Estilo padrão definido acima */
+}
+
+.filled .input, .filled .textarea {
+  background-color: #f8f9fa;
+  border-color: #f8f9fa;
+}
+
+.filled .input:focus, .filled .textarea:focus {
+  background-color: #fff;
+}
+
+.underlined .input, .underlined .textarea {
+  border: none;
+  border-bottom: 1px solid #ced4da;
+  border-radius: 0;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.underlined .input:focus, .underlined .textarea:focus {
+  border-bottom-color: #8ecae6;
+  box-shadow: none;
+}
+
+.underlined.withIcon .input, .underlined.withIcon .textarea {
+  padding-left: 1.75rem;
+}
+
+.underlined .icon {
+  left: 0;
+}
+
+/* Estados */
+.error .input, .error .textarea {
+  border-color: #e63946;
+}
+
+.error .input:focus, .error .textarea:focus {
+  box-shadow: 0 0 0 3px rgba(230, 57, 70, 0.25);
+}
+
+.disabled .input, .disabled .textarea {
+  background-color: #e9ecef;
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.disabled .label {
+  opacity: 0.65;
+}
+
+/* Tamanhos */
+.sm .input, .sm .textarea {
+  font-size: 0.875rem;
+  padding: 0.25rem 0.5rem;
+}
+
+.sm .label {
+  font-size: 0.75rem;
+}
+
+.md .input, .md .textarea {
+  font-size: 1rem;
+  padding: 0.5rem 0.75rem;
+}
+
+.lg .input, .lg .textarea {
+  font-size: 1.125rem;
+  padding: 0.625rem 0.875rem;
+}
+
+.lg .label {
+  font-size: 1rem;
+}
+
+/* Opções adicionais */
+.fullWidth {
+  width: 100%;
+}
+
+@media (max-width: 576px) {
+  .input, .textarea {
+    font-size: 16px; /* Evita zoom em dispositivos móveis */
+  }
+}
+
+.input {
+  width: 100%;
+  padding: var(--space-sm) var(--space-md);
+  background-color: var(--elementos-secundarios);
+  border: 1px solid transparent;
+  border-radius: var(--borda-md);
+  color: var(--texto-principal);
+  font-family: var(--fonte-corpo);
+  font-size: 1rem;
+  transition: all var(--transicao-rapida);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--destaque-secundario);
+  box-shadow: 0 0 0 2px rgba(28, 119, 195, 0.25);
+}
+
+.input:hover:not(:disabled) {
+  background-color: rgba(26, 43, 77, 0.8);
+}
+
+.input::placeholder {
+  color: var(--texto-secundario);
+  opacity: 0.7;
+}
+
+.input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.error {
+  border-color: var(--alerta-erro);
+}
+
+.error:focus {
+  border-color: var(--alerta-erro);
+  box-shadow: 0 0 0 2px rgba(229, 56, 59, 0.25);
+}
+
+.errorMessage {
+  margin-top: var(--space-xs);
+  color: var(--alerta-erro);
+  font-size: 0.85rem;
+  font-family: var(--fonte-corpo);
+}

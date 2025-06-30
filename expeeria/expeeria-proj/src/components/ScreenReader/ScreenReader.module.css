@@ -1,0 +1,211 @@
+/* Estilos para o componente ScreenReader */
+
+.toggleButton {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 50px; /* Tamanho fixo */
+  height: 50px; /* Mesma medida para garantir um cu00edrculo perfeito */
+  min-width: 50px; /* Evita que seja redimensionado */
+  min-height: 50px; /* Evita que seja redimensionado */
+  max-width: 50px; /* Limita o tamanho mu00e1ximo */
+  max-height: 50px; /* Limita o tamanho mu00e1ximo */
+  border-radius: 50%; /* Garante que seja redondo */
+  background: #0369a1; /* Cor su00f3lida para maior contraste */
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 999; /* Aumentado para garantir visibilidade */
+  padding: 0; /* Remove qualquer padding que possa distorcer o formato */
+}
+
+.toggleButton:hover {
+  opacity: 1;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.toggleButton:active {
+  transform: translateY(0);
+}
+
+.screenReaderPanel {
+  position: fixed;
+  bottom: 90px;
+  right: 30px;
+  width: 280px;
+  background-color: var(--background-secundario, #1e293b);
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+  z-index: 999;
+  overflow: hidden;
+  animation: slideIn 0.3s ease-out;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.panelHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: rgba(14, 165, 233, 0.2);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.panelHeader h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--texto-principal, #e2e8f0);
+}
+
+.closeButton {
+  background: transparent;
+  border: none;
+  color: var(--texto-principal, #e2e8f0);
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+}
+
+.closeButton:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.panelContent {
+  padding: 16px;
+}
+
+.instructions {
+  font-size: 0.85rem;
+  color: var(--texto-secundario, #94a3b8);
+  margin-bottom: 16px;
+  padding: 8px;
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+}
+
+.controls {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.actionButton {
+  flex: 1;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  background: linear-gradient(135deg, var(--primary-500, #0ea5e9), var(--primary-600, #0284c7));
+  color: white;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.actionButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.actionButton:active {
+  transform: translateY(0);
+}
+
+.stopButton {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+}
+
+.statusIndicator {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+}
+
+.indicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: #10b981;
+}
+
+.active {
+  animation: pulse 1.5s infinite;
+}
+
+.paused {
+  background-color: #f59e0b;
+}
+
+@keyframes pulse {
+  0% { transform: scale(0.95); opacity: 0.8; }
+  70% { transform: scale(1.1); opacity: 1; }
+  100% { transform: scale(0.95); opacity: 0.8; }
+}
+
+/* Estilos responsivos */
+@media (max-width: 768px) {
+  .toggleButton {
+    bottom: 20px;
+    right: 90px;
+    /* Mantu00e9m as propriedades que garantem o formato redondo */
+    width: 50px;
+    height: 50px;
+    min-width: 50px;
+    min-height: 50px;
+    max-width: 50px;
+    max-height: 50px;
+    background: #0369a1; /* Cor su00f3lida para maior contraste */
+  }
+  
+  .screenReaderPanel {
+    bottom: 80px;
+    right: 20px;
+    width: 260px;
+  }
+}
+
+@media (max-width: 480px) {
+  .toggleButton {
+    bottom: 15px;
+    right: 70px;
+    /* Mantu00e9m as propriedades que garantem o formato redondo */
+    width: 50px;
+    height: 50px;
+    min-width: 50px;
+    min-height: 50px;
+    max-width: 50px;
+    max-height: 50px;
+  }
+  
+  .screenReaderPanel {
+    bottom: 80px;
+    right: 15px;
+    width: 240px;
+  }
+  
+  .controls {
+    flex-direction: column;
+  }
+}

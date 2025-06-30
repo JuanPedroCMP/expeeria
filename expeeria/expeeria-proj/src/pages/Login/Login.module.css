@@ -1,0 +1,155 @@
+.loginContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 80px);
+  padding: 2rem 1rem;
+}
+
+.authForm {
+  background: #23283a;
+  border-radius: 0.7rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  padding: 2rem 2.5rem;
+  max-width: 450px;
+  width: 100%;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.authForm h2 {
+  margin-bottom: 0.5rem;
+  color: #8ecae6;
+  text-align: center;
+  font-size: 1.8rem;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.formGroup label {
+  font-size: 0.9rem;
+  color: #e0e0e0;
+  font-weight: 500;
+}
+
+.authForm input {
+  background: #181c24;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 0.4rem;
+  padding: 0.7rem 1rem;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.authForm input:focus {
+  border-color: #0575e6;
+  box-shadow: 0 0 0 2px rgba(5, 117, 230, 0.3);
+}
+
+.authForm input:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.forgotPassword {
+  text-align: right;
+  font-size: 0.85rem;
+  margin-top: -0.5rem;
+}
+
+.forgotPassword a {
+  color: #8ecae6;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.forgotPassword a:hover {
+  color: #00f260;
+  text-decoration: underline;
+}
+
+.loginButton {
+  background: linear-gradient(90deg, #0575e6, #00f260);
+  color: #fff;
+  border: none;
+  border-radius: 0.4rem;
+  padding: 0.8rem 1.2rem;
+  font-size: 1.1rem;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  transition: filter 0.2s;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 48px;
+}
+
+.loginButton:hover {
+  filter: brightness(1.1);
+}
+
+.loginButton:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  filter: grayscale(0.5);
+}
+
+.errorMessage {
+  background-color: rgba(220, 38, 38, 0.1);
+  color: #f87171;
+  padding: 0.8rem;
+  border-radius: 0.4rem;
+  text-align: center;
+  font-size: 0.9rem;
+  border-left: 3px solid #ef4444;
+}
+
+.successMessage {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: #6ee7b7;
+  padding: 0.8rem;
+  border-radius: 0.4rem;
+  text-align: center;
+  font-size: 0.9rem;
+  border-left: 3px solid #10b981;
+}
+
+.registerLink {
+  margin: 1rem 0 0 0;
+  font-size: 0.98rem;
+  text-align: center;
+  color: #e0e0e0;
+}
+
+.registerLink a {
+  color: #00f260;
+  text-decoration: underline;
+  margin-left: 5px;
+  transition: color 0.2s;
+}
+
+.registerLink a:hover {
+  color: #8ecae6;
+}
+
+@media (max-width: 480px) {
+  .authForm {
+    padding: 1.5rem;
+  }
+  
+  .authForm h2 {
+    font-size: 1.6rem;
+  }
+  
+  .loginButton {
+    font-size: 1rem;
+  }
+}

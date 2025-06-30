@@ -1,0 +1,27 @@
+/**
+ * Estilos para o container de recursos de acessibilidade
+ */
+
+.accessibilityFeatures {
+  position: fixed;
+  bottom: 150px;
+  right: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 98;
+}
+
+@media (max-width: 768px) {
+  .accessibilityFeatures {
+    bottom: 170px;
+    right: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .accessibilityFeatures {
+    bottom: 190px;
+    right: 15px;
+  }
+}

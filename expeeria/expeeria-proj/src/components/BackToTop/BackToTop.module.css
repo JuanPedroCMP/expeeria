@@ -1,0 +1,72 @@
+/* Estilos para o componente BackToTop */
+.backToTopButton {
+  position: fixed;
+  bottom: 30px;
+  right: 90px;
+  width: 50px; /* Tamanho fixo */
+  height: 50px; /* Mesma medida para garantir um cu00edrculo perfeito */
+  min-width: 50px; /* Evita que seja redimensionado */
+  min-height: 50px; /* Evita que seja redimensionado */
+  max-width: 50px; /* Limita o tamanho mu00e1ximo */
+  max-height: 50px; /* Limita o tamanho mu00e1ximo */
+  border-radius: 50%; /* Garante que seja redondo */
+  background: #0ea5e9; /* Cor su00f3lida para maior contraste */
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 999; /* Aumentado para garantir visibilidade */
+  padding: 0; /* Remove qualquer padding que possa distorcer o formato */
+  transform: translateY(0);
+  animation: fadeIn 0.3s ease-out;
+}
+
+.backToTopButton:hover {
+  opacity: 1;
+  transform: translateY(-5px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.backToTopButton:active {
+  transform: translateY(0);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 0.8; transform: translateY(0); }
+}
+
+/* Estilo para dispositivos móveis */
+@media (max-width: 768px) {
+  .backToTopButton {
+    bottom: 20px;
+    right: 160px;
+    /* Mantu00e9m as propriedades que garantem o formato redondo */
+    width: 50px;
+    height: 50px;
+    min-width: 50px;
+    min-height: 50px;
+    max-width: 50px;
+    max-height: 50px;
+    background: #0ea5e9; /* Cor su00f3lida para maior contraste */
+  }
+  
+  .backToTopButton svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+/* Garantir que o botão não interfira com o menu de acessibilidade em telas pequenas */
+@media screen and (max-width: 480px) {
+  .backToTopButton {
+    bottom: 15px;
+    right: 150px;
+    width: 50px;
+    height: 50px;
+  }
+}
