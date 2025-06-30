@@ -5,14 +5,11 @@ import style from "./Inicial.module.css";
 import { useEffect, useState, useRef } from "react";
 import { Card } from "../../components/Card/Card";
 import { usePost } from "../../hooks/usePost";
-import { categoriasPadrao } from "../../utils/categoriasPadrao";
 
 const Inicial = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [allPosts, setAllPosts] = useState([]);
   const [trendingPosts, setTrendingPosts] = useState([]);
-  const [recentlyViewedPosts, setRecentlyViewedPosts] = useState([]);
   const [categorizedPosts, setCategorizedPosts] = useState({});
   const [popularCategories, setPopularCategories] = useState([]);
   const [currentCarouselIndex, setCurrentCarouselIndex] = useState(0);
@@ -32,10 +29,8 @@ const Inicial = () => {
         
         // Usar o hook usePost para buscar todos os posts
         const postsData = await getPosts();
-        
-        if (!postsData || postsData.length === 0) {
+          if (!postsData || postsData.length === 0) {
           console.log('Nenhum post encontrado');
-          setAllPosts([]);
           setTrendingPosts([]);
           setLoading(false);
           return;
@@ -44,7 +39,6 @@ const Inicial = () => {
         console.log('Posts encontrados:', postsData.length);
         
         // Posts já vem processados do hook usePost
-        setAllPosts(postsData);
         
         // Ordenar por curtidas para trending posts
         const trending = [...postsData]
@@ -94,33 +88,12 @@ const Inicial = () => {
         setError('Falha ao carregar posts. Tente novamente mais tarde.');
       } finally {
         setLoading(false);
-      }
-    };
-    
-    fetchPosts();
+      }    };
+      fetchPosts();
     // Removendo activeCategory das dependências para evitar chamadas desnecessárias à API
     // quando o usuário apenas altera a categoria visualizada
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, getPosts]);
-
-  // Carregar posts recentemente visualizados do localStorage
-  useEffect(() => {
-    if (user && allPosts.length > 0) {
-      try {
-        const viewedPostsData = localStorage.getItem(`viewedPosts_${user.id}`);
-        if (viewedPostsData) {
-          const viewedPostIds = JSON.parse(viewedPostsData);
-          // Filtrar os posts que o usuário visualizou recentemente
-          const recentPosts = allPosts.filter(post => 
-            viewedPostIds.includes(post.id)
-          ).slice(0, 3); // Limitar a 3 posts
-          
-          setRecentlyViewedPosts(recentPosts);
-        }
-      } catch (error) {
-        console.error("Erro ao carregar posts visualizados:", error);
-      }
-    }
-  }, [allPosts, user]);
   
   // Configura um timer para o carrossel automático
   useEffect(() => {
@@ -204,22 +177,19 @@ const Inicial = () => {
                   >
                     ❮
                   </button>
-                  
-                  <div className={style.carouselTrack} style={{ transform: `translateX(-${currentCarouselIndex * 100}%)` }}>
-                    {trendingPosts.map((post, index) => (
+                    <div className={style.carouselTrack} style={{ transform: `translateX(-${currentCarouselIndex * 100}%)` }}>
+                    {trendingPosts.map((post) => (
                       <div 
                         key={post.id}
                         className={style.carouselSlide}
                         onClick={() => navigate(`/post/${post.id}`)}
-                      >
-                        <Card
+                      >                        <Card
                           id={post.id}
                           title={post.title}
                           caption={post.caption}
                           content={post.content}
                           imageUrl={post.imageUrl}
                           likeCount={post.likeCount}
-                          commentCount={post.commentCount}
                           author={post.author}
                           createdAt={post.createdAt || post.created_at}
                           categories={post.categories}

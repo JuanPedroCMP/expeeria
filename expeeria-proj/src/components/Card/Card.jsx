@@ -17,7 +17,6 @@ const Card = (props) => {
     SubTitulo, 
     Descricao, 
     likes = 0, 
-    comments = 0,
     id, 
     imageUrl, 
     author,
@@ -28,22 +27,18 @@ const Card = (props) => {
     content,
     like_count,
     likeCount,
-    comment_count,
-    commentCount,
     image_url,
     created_at,
     author_name,
     category,
     categoria,
-    tags,
-    hideShareButton = false
+    tags
   } = props;
   
   const normalizedTitle = TituloCard || title || '';
   const normalizedSubtitle = SubTitulo || '';
   const normalizedDescription = Descricao || caption || (content?.substring(0, 120) + (content?.length > 120 ? '...' : '')) || '';
   const normalizedLikes = parseInt(likes || likeCount || like_count || 0, 10);
-  const normalizedComments = parseInt(comments || commentCount || comment_count || 0, 10);
   const normalizedImageUrl = imageUrl || image_url || '';
   const normalizedAuthor = author || author_name || '';
   const normalizedCreatedAt = createdAt || created_at || '';
@@ -123,14 +118,7 @@ const Card = (props) => {
               size="md"
             />
             
-            <span className={styles.commentCount}>
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-              </svg>
-              {normalizedComments}
-            </span>
-            
-            {!hideShareButton && (
+            {/* {!hideShareButton && (
               <ShareButton 
                 url={window.location.origin + `/post/${id}`}
                 title={normalizedTitle}
@@ -138,7 +126,7 @@ const Card = (props) => {
                 size="sm"
                 className={styles.shareButton}
               />
-            )}
+            )} */}
           </div>
         </div>
       </div>

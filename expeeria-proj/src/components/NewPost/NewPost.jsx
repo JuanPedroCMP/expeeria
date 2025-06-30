@@ -56,14 +56,13 @@ export const NewPost = ({
         caption,
         content,
         author_id: user.id,
-        author_name: user.name || user.email || 'Usuário',
-        image_url: imageUrl,
+        author_name: user.name || user.email || 'Usuário',        image_url: imageUrl,
+        area: area, // Incluir categorias no postData para edição
         status: 'published',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
         published_at: new Date().toISOString(),
         like_count: 0,
-        comment_count: 0,
         view_count: 0,
         metadata: JSON.stringify({ readTime: Math.ceil(content.length / 1000) })
       };
@@ -229,7 +228,7 @@ export const NewPost = ({
       <br />
       <div className={style.markdownPreview}>
         <span>
-          <span className={style.destaque}>BETA</span> Pré-visualização do
+          Pré-visualização do
           conteúdo:{" "}
         </span>
         <div className={style.previewBox}>
