@@ -1,5 +1,7 @@
 # Expeeria – Plataforma Educacional Colaborativa
 
+### Escola: ETEC Fernando Prestes
+
 👉 **Acesse agora:** [https://expeeria.vercel.app/apresentacao](https://expeeria.vercel.app/apresentacao)
 
 ## ⚠️ AVISO
