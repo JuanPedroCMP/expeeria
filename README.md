@@ -4,8 +4,6 @@
 
 ## ⚠️ AVISO
 - O projeto está em desenvolvimento e ainda não possui funcionalidade completa.
-- Quando você estiver enfrentando dificuldades no site, por favor, **limpe os dados do site no dispositivo e tente novamente**. (Exemplo: No Chrome, vá em Configurações > Privacidade e segurança > Cookies e dados do site > Limpar dados do site.)
-- Ainda temos alguns defeitos que ainda não foram corrigidos porque não deu tempo.
 -  A edição de perfil e de posts ainda não está funcionando.
 - Contato: juan.pereira26@etec.sp.gov.br ou juanpedrocmp.15@gmail.com
 
@@ -48,9 +46,7 @@ As informações exibidas nesta página foram estruturadas para demonstrar a pro
 8. [Soluções Técnicas Implementadas](#8-soluções-técnicas-implementadas)
 9. [Padrões de Código e Boas Práticas](#9-padrões-de-código-e-boas-práticas)
 10. [Integrantes do Grupo](#10-integrantes-do-grupo)
-11. [Planos Futuros](#11-planos-futuros)
-12. [Ideia da Startup](#12-sobre-a-ideia-da-startup)
-13. [Recentes Melhorias de Sistema](#13-recentes-melhorias-de-sistema)
+11. [Ideia da Startup](#12-sobre-a-ideia-da-startup)
 
 ---
 
@@ -249,44 +245,7 @@ Implementamos diversas práticas de desenvolvimento moderno para garantir a qual
 
 ---
 
-## 11. Planos Futuros
-
-<div align="center">
-  <h3>🚀 Roadmap do Expeeria</h3>
-</div>
-
-### Fase 1: Infraestrutura Robusta
-- 🔐 **Banco de dados permanente**: Migração para MongoDB, PostgreSQL ou Supabase
-- 🛡️ **Segurança avançada**: Implementação de JWT, redefinição de senha e verificação de email
-- 📱 **Responsividade completa**: Otimização para todos os dispositivos
-
-### Fase 2: Experiência de Usuário Aprimorada
-- 🧩 **Sistema de perfis expandido**: Badges, níveis de experiência e perfis personalizáveis
-- 💬 **Sistema de mensagens diretas**: Comunicação privada entre usuários
-- 🔍 **Busca avançada**: Filtros complexos e sugestões inteligentes
-- 📝 **Editor avançado**: WYSIWYG, suporte a vídeos, enquetes e anexos
-
-### Fase 3: Integrações e Expansão
-- 🔄 **Login social**: Integração com GitHub, Google, LinkedIn e Discord
-- 📚 **Plataforma de cursos gratuitos**: Trilhas de aprendizado, quizzes e certificados
-- 🎮 **Gamificação**: Sistema de pontos, conquistas e rankings
-- 📲 **Aplicativo mobile**: Versão React Native para iOS e Android
-
-### Fase 4: Inovação e Crescimento
-- 🤖 **Feed personalizado com IA**: Recomendações baseadas em interesses e comportamento
-- 📊 **Dashboard administrativo**: Moderação de conteúdo, analytics e relatórios
-- 📅 **Sistema de eventos**: Webinars, calendário e transmissões ao vivo
-- 🏆 **Marketplace de mentorias**: Conexão entre mentores e aprendizes
-
-### Fase 5: Consolidação e Expansão Global
-- 🌐 **Suporte multilíngue**: Internacionalização completa da plataforma
-- ♿ **Acessibilidade total**: Recursos avançados para PCD
-- 🧰 **API pública**: Ferramentas para desenvolvedores externos
-- 🌱 **Expansão de comunidades**: Suporte para grupos locais e temas especializados
-
----
-
-## 12. Sobre a Ideia da startup
+## 11. Sobre a Ideia da startup
 
 O **Expeeria** é uma plataforma digital onde pessoas compartilham, trocam e adquirem conhecimentos práticos diretamente com outras pessoas — uma verdadeira rede de trocas de experiências e habilidades. O nome nasce da união de **"Experience" (experiência) e "Peer" (par)**, refletindo o conceito central de aprendizado entre iguais.
 
@@ -334,32 +293,3 @@ O **Expeeria** é uma plataforma digital onde pessoas compartilham, trocam e adq
 
 ---
 
-## 13. Recentes Melhorias de Sistema
-
-### Visualização de Posts
-
-Implementamos soluções robustas para resolver os problemas de visualização de posts:
-
-- **Mecanismo de Auto-Recuperação**: O sistema agora detecta automaticamente problemas na sessão e limpa o localStorage sem necessidade de intervenção manual.
-
-- **Simplificação do Carregamento de Dados**: Reformulamos a forma como os posts e comentários são carregados, tornando o processo mais estável e reduzindo a chance de falhas.
-
-- **Melhor Tratamento de Erros**: Implementamos feedbacks mais claros durante o processo de autenticação e carregamento de dados.
-
-### Interface de Usuário
-
-Melhoramos significativamente o CSS dos componentes principais:
-
-- **Página de Post**:
-  - Layout mais moderno e responsivo
-  - Melhores espaçamentos e hierarquia visual
-  - Botões com efeitos visuais aprimorados
-  - Exibição otimizada para dispositivos móveis
-
-- **Criação de Post**:
-  - Formulário mais organizado e acessível
-  - Editor de markdown com melhor usabilidade
-  - Seleção de categorias mais intuitiva
-  - Design consistente em todos os elementos
-
-Essas melhorias tornam o sistema mais robusto e oferecem uma melhor experiência ao usuário, mantendo a integridade dos dados e a fluidez na navegação.
