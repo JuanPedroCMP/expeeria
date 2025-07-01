@@ -1,41 +1,12 @@
 import React, { createContext, useState, useEffect, useCallback } from "react";
 import { authService } from "../services/authService";
-import supabase from "../services/supabase";
+import { supabase } from "../services/supabase";
 
 // Criando o contexto de autenticação
 // eslint-disable-next-line react-refresh/only-export-components
 export const AuthContext = createContext({});
 
-// Função para limpar o localStorage de forma segura
-const cleanLocalStorage = () => {
-  try {
-    const itemsToKeep = {};
-    const supabaseKeysPattern = /sb-|supabase/;
 
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key && !supabaseKeysPattern.test(key)) {
-        try {
-          itemsToKeep[key] = localStorage.getItem(key);
-        } catch (e) {
-          console.warn("Erro ao acessar item do localStorage:", key);
-        }
-      }
-    }
-
-    localStorage.clear();
-
-    Object.keys(itemsToKeep).forEach((key) => {
-      localStorage.setItem(key, itemsToKeep[key]);
-    });
-
-    console.log("LocalStorage limpo com sucesso de dados problemáticos do Supabase");
-    return true;
-  } catch (error) {
-    console.error("Erro ao limpar localStorage:", error);
-    return false;
-  }
-};
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
@@ -44,136 +15,38 @@ export function AuthProvider({ children }) {
   const [sessionChecked, setSessionChecked] = useState(false);
 
   // Inicialização da autenticação - VERSÃO CORRIGIDA SEM LOOP
-  useEffect(() => {
-    let isMounted = true;
-    let initialized = false;
+ useEffect(() => {
+  const initializeAuth = async () => {
+    const { data: { session }, error } = await supabase.auth.getSession()
+    if (error) {
+      console.error('Erro ao recuperar sessão:', error)
+      setUser(null)
+    } else if (session?.user) {
+      setUser(session.user)
+    } else {
+      setUser(null)
+    }
 
-    const initializeAuth = async () => {
-      if (initialized || !isMounted) return;
-      initialized = true;
+    setLoading(false)
+    setSessionChecked(true)
+  }
 
-      try {
-        console.log("Inicializando autenticação...");
-        const { data, error } = await supabase.auth.getSession();
+  initializeAuth()
 
-        if (!isMounted) return;
+  const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    if (session?.user) {
+      setUser(session.user)
+    } else {
+      setUser(null)
+    }
+    setLoading(false)
+    setSessionChecked(true)
+  })
 
-        if (error) {
-          console.error("Erro ao obter sessão:", error);
-          setUser(null);
-        } else if (data?.session?.user) {
-          const userData = data.session.user;
-          console.log("Sessão ativa encontrada:", userData.email);
-
-          try {
-            const { data: profileData } = await supabase
-              .from("profiles")
-              .select("*")
-              .eq("id", userData.id)
-              .single();
-
-            if (isMounted) {
-              setUser({
-                id: userData.id,
-                email: userData.email,
-                role: userData.user_metadata?.role || "user",
-                name: profileData?.name,
-                username: profileData?.username,
-                avatar: profileData?.avatar,
-              });
-            }
-          } catch (profileError) {
-            console.warn("Erro ao buscar perfil:", profileError);
-            if (isMounted) {
-              setUser({
-                id: userData.id,
-                email: userData.email,
-                role: userData.user_metadata?.role || "user",
-              });
-            }
-          }
-        } else {
-          console.log("Nenhuma sessão ativa");
-          setUser(null);
-        }
-      } catch (error) {
-        console.error("Erro na inicialização:", error);
-        if (isMounted) {
-          setUser(null);
-        }
-      } finally {
-        if (isMounted) {
-          setLoading(false);
-          setSessionChecked(true);
-          console.log("Inicialização da autenticação concluída");
-        }
-      }
-    };
-
-    // Timeout de segurança
-    const safetyTimeout = setTimeout(() => {
-      if (isMounted && loading) {
-        console.log("Timeout de segurança acionado");
-        setLoading(false);
-        setSessionChecked(true);
-      }
-    }, 5000);
-
-    initializeAuth();
-
-    // Listener para mudanças de autenticação
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (!isMounted) return;
-
-      console.log("Auth state changed:", event);
-
-      if (event === "SIGNED_IN" && session?.user) {
-        const userData = session.user;
-        try {
-          const { data: profileData } = await supabase
-            .from("profiles")
-            .select("*")
-            .eq("id", userData.id)
-            .single();
-
-          if (isMounted) {
-            setUser({
-              id: userData.id,
-              email: userData.email,
-              role: userData.user_metadata?.role || "user",
-              ...profileData,
-            });
-          }
-        } catch (profileError) {
-          console.warn("Erro ao buscar perfil após login:", profileError);
-          if (isMounted) {
-            setUser({
-              id: userData.id,
-              email: userData.email,
-              role: userData.user_metadata?.role || "user",
-            });
-          }
-        }
-      } else if (event === "SIGNED_OUT") {
-        if (isMounted) {
-          setUser(null);
-        }
-      }
-
-      if (isMounted) {
-        setLoading(false);
-        setSessionChecked(true);
-      }
-    });
-
-    return () => {
-      isMounted = false;
-      clearTimeout(safetyTimeout);
-      subscription.unsubscribe();
-    };
-  }, []); // Array vazio para executar apenas uma vez
+  return () => {
+    subscription.unsubscribe()
+  }
+}, [])
 
   // Função de login
   const login = useCallback(async (email, password) => {
