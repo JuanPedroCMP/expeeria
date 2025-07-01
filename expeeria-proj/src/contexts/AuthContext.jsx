@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect, useCallback } from "react";
 import { authService } from "../services/authService";
-import { supabase } from "../services/supabase";
+import  supabase  from "../services/supabase";
 
 // Criando o contexto de autenticação
 // eslint-disable-next-line react-refresh/only-export-components
