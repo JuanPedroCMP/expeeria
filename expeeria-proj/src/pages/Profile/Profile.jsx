@@ -10,7 +10,7 @@ import { Card } from "../../components/Card/Card";
 import { Skeleton } from "../../components/Skeleton/Skeleton";
 
 export function Profile() {
-  const { user, signOut, setUser } = useAuth();
+  const { user, logout } = useAuth();
   const { id } = useParams();
   const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
@@ -48,7 +48,7 @@ export function Profile() {
   }
 
   const isOwnerOrAdmin =
-    user && profile && (user.email === profile.email || user.role === "admin");
+    user && profile && (user.id === profile.id || user.email === profile.email || user.role === "admin");
 
   // Busca todos os usuários
   const fetchAllUsers = async () => {
@@ -208,8 +208,10 @@ export function Profile() {
   };
 
   useEffect(() => {
-    fetchProfile();
-    fetchAllUsers();
+    if (user || id) {
+      fetchProfile();
+      fetchAllUsers();
+    }
   }, [user, id]);
 
   // Função para seguir outro usuário
@@ -236,30 +238,39 @@ export function Profile() {
 
         // Buscar ambos os perfis para atualizar campos de arrays
         const [userResp, targetResp] = await Promise.all([
-          supabase.from('users').select('following').eq('id', user.id).single(),
-          supabase.from('users').select('followers').eq('id', targetId).single()
+          supabase.from('profiles').select('following').eq('id', user.id).single(),
+          supabase.from('profiles').select('followers').eq('id', targetId).single()
+        ]);
+        
+        // Verificar erros e tentar tabela 'users' se necessário
+        const [userProfileData, targetProfileData] = await Promise.all([
+          userResp.error ? supabase.from('users').select('following').eq('id', user.id).single() : Promise.resolve(userResp),
+          targetResp.error ? supabase.from('users').select('followers').eq('id', targetId).single() : Promise.resolve(targetResp)
         ]);
 
-        if (userResp.error || targetResp.error) {
+        if (userProfileData.error && targetProfileData.error) {
           throw new Error('Falha ao buscar perfis para atualizar');
         }
 
-        const userFollowing = toMultiArray(userResp.data?.following);
-        const targetFollowers = toMultiArray(targetResp.data?.followers);
+        const userFollowing = toMultiArray(userProfileData.data?.following);
+        const targetFollowers = toMultiArray(targetProfileData.data?.followers);
         
         // Verificar duplicação
         if (userFollowing.includes(targetId)) {
           throw new Error('Você já segue este usuário');
         }
 
+        // Determinar a tabela a ser usada
+        const table = userResp.error ? 'users' : 'profiles';
+
         // Fazer as atualizações
         await Promise.all([
           supabase
-            .from('users')
+            .from(table)
             .update({ following: [...userFollowing, targetId] })
             .eq('id', user.id),
           supabase
-            .from('users')
+            .from(table)
             .update({ followers: [...targetFollowers, user.id] })
             .eq('id', targetId)
         ]);
@@ -275,7 +286,11 @@ export function Profile() {
       setError('Não foi possível seguir este usuário. Tente novamente.');
     } finally {
       setLoadingAction(false);
-      setTimeout(() => setSuccess(''), 3000);
+      // Limpar mensagem de sucesso após 3 segundos se houver
+      setTimeout(() => {
+        setSuccess('');
+        setError('');
+      }, 3000);
     }
   };
 
@@ -294,35 +309,44 @@ export function Profile() {
         .match({ user_id: targetId, follower_id: user.id });
       
       if (unfollowError) {
-        // Se ocorrer erro, tentar atualizar arrays na tabela de usuários
+        // Se ocorrer erro, tentar atualizar arrays na tabela de perfis
         console.log('Tentando método alternativo de unfollow:', unfollowError);
 
         // Buscar ambos os perfis para atualizar campos de arrays
         const [userResp, targetResp] = await Promise.all([
-          supabase.from('users').select('following').eq('id', user.id).single(),
-          supabase.from('users').select('followers').eq('id', targetId).single()
+          supabase.from('profiles').select('following').eq('id', user.id).single(),
+          supabase.from('profiles').select('followers').eq('id', targetId).single()
+        ]);
+        
+        // Verificar erros e tentar tabela 'users' se necessário
+        const [userProfileData, targetProfileData] = await Promise.all([
+          userResp.error ? supabase.from('users').select('following').eq('id', user.id).single() : Promise.resolve(userResp),
+          targetResp.error ? supabase.from('users').select('followers').eq('id', targetId).single() : Promise.resolve(targetResp)
         ]);
 
-        if (userResp.error || targetResp.error) {
+        if (userProfileData.error && targetProfileData.error) {
           throw new Error('Falha ao buscar perfis para atualizar');
         }
 
-        const userFollowing = toMultiArray(userResp.data?.following);
-        const targetFollowers = toMultiArray(targetResp.data?.followers);
+        const userFollowing = toMultiArray(userProfileData.data?.following);
+        const targetFollowers = toMultiArray(targetProfileData.data?.followers);
         
         // Verificar se é preciso deixar de seguir
         if (!userFollowing.includes(targetId)) {
           throw new Error('Você não segue este usuário');
         }
 
+        // Determinar a tabela a ser usada
+        const table = userResp.error ? 'users' : 'profiles';
+
         // Fazer as atualizações
         await Promise.all([
           supabase
-            .from('users')
+            .from(table)
             .update({ following: userFollowing.filter(id => id !== targetId) })
             .eq('id', user.id),
           supabase
-            .from('users')
+            .from(table)
             .update({ followers: targetFollowers.filter(id => id !== user.id) })
             .eq('id', targetId)
         ]);
@@ -338,7 +362,11 @@ export function Profile() {
       setError('Não foi possível deixar de seguir este usuário. Tente novamente.');
     } finally {
       setLoadingAction(false);
-      setTimeout(() => setSuccess(''), 3000);
+      // Limpar mensagem de sucesso após 3 segundos se houver
+      setTimeout(() => {
+        setSuccess('');
+        setError('');
+      }, 3000);
     }
   };
 
@@ -366,6 +394,8 @@ export function Profile() {
         username: username.trim(),
         // Não permitimos atualizar o email por aqui por segurança
       };
+      
+      console.log("Tentando atualizar com:", updatedProfile);
       
       // Tentar atualizar na tabela 'profiles' primeiro
       let updateResponse = await supabase
@@ -401,11 +431,16 @@ export function Profile() {
         throw updateResponse.error;
       }
       
+      console.log("Atualização bem-sucedida");
+      
       setSuccess("Perfil atualizado com sucesso!");
-      setEditing(false);
       
       // Recarregar dados do perfil
-      fetchProfile();
+      await fetchProfile();
+      setEditing(false);
+      
+      // Limpar mensagem de sucesso após 3 segundos
+      setTimeout(() => setSuccess(''), 3000);
     } catch (error) {
       console.error('Erro ao salvar perfil:', error);
       setError("Erro ao salvar perfil. Tente novamente.");
@@ -423,53 +458,6 @@ export function Profile() {
   const handleAvatarClick = () => {
     if (isOwnerOrAdmin && editing) {
       avatarInputRef.current?.click();
-    }
-  };
-
-  // Função para upload de avatar
-  const handleAvatarUpload = async (file) => {
-    if (!file) return;
-    
-    // Validar tipo de arquivo
-    if (!file.type.startsWith('image/')) {
-      setError('Por favor, selecione apenas arquivos de imagem.');
-      return;
-    }
-    
-    // Validar tamanho do arquivo (máximo 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      setError('A imagem deve ter no máximo 5MB.');
-      return;
-    }
-    
-    try {
-      setLoadingAction(true);
-      setError('');
-      
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${user.id}_${Date.now()}.${fileExt}`;
-      
-      const { data, error } = await supabase.storage
-        .from('avatars') // certifique-se de que esse bucket existe
-        .upload(fileName, file);
-
-      if (error) {
-        throw error;
-      }
-      
-      const { data: urlData } = supabase.storage
-        .from('avatars')
-        .getPublicUrl(fileName);
-        
-      if (urlData?.publicUrl) {
-        setAvatar(urlData.publicUrl);
-        setSuccess('Imagem de perfil atualizada! Lembre-se de salvar as alterações.');
-      }
-    } catch (uploadError) {
-      console.error('Erro ao fazer upload do avatar:', uploadError);
-      setError('Erro ao atualizar imagem de perfil. Tente novamente.');
-    } finally {
-      setLoadingAction(false);
     }
   };
 
@@ -503,10 +491,54 @@ export function Profile() {
                       ref={avatarInputRef}
                       accept="image/*"
                       style={{ display: 'none' }}
-                      onChange={(e) => {
+                      onChange={async (e) => {
                         const file = e.target.files[0];
                         if (file) {
-                          handleAvatarUpload(file);
+                          // Validar tipo de arquivo
+                          if (!file.type.startsWith('image/')) {
+                            setError('Por favor, selecione apenas arquivos de imagem.');
+                            setTimeout(() => setError(''), 3000);
+                            return;
+                          }
+                          
+                          // Validar tamanho do arquivo (máximo 5MB)
+                          if (file.size > 5 * 1024 * 1024) {
+                            setError('A imagem deve ter no máximo 5MB.');
+                            setTimeout(() => setError(''), 3000);
+                            return;
+                          }
+                          
+                          try {
+                            setLoadingAction(true);
+                            setError('');
+                            
+                            const fileExt = file.name.split('.').pop();
+                            const fileName = `${user.id}_${Date.now()}.${fileExt}`;
+                            
+                            const { data, error } = await supabase.storage
+                              .from('avatars') // certifique-se de que esse bucket existe
+                              .upload(fileName, file);
+
+                            if (error) {
+                              throw error;
+                            }
+                            
+                            const { data: urlData } = supabase.storage
+                              .from('avatars')
+                              .getPublicUrl(fileName);
+                              
+                            if (urlData?.publicUrl) {
+                              setAvatar(urlData.publicUrl);
+                              setSuccess('Imagem de perfil atualizada! Lembre-se de salvar as alterações.');
+                              setTimeout(() => setSuccess(''), 5000);
+                            }
+                          } catch (uploadError) {
+                            console.error('Erro ao fazer upload do avatar:', uploadError);
+                            setError('Erro ao atualizar imagem de perfil. Tente novamente.');
+                            setTimeout(() => setError(''), 3000);
+                          } finally {
+                            setLoadingAction(false);
+                          }
                         }
                       }}
                     />
@@ -621,13 +653,32 @@ export function Profile() {
                         <>
                           <button 
                             className={style.actionButton}
-                            onClick={() => setEditing(true)}
+                            onClick={() => {
+                              setName(profile.name || "");
+                              setBio(profile.bio || "");
+                              setUsername(profile.username || "");
+                              setInterests(toMultiArray(profile.interests));
+                              setEditing(true);
+                            }}
                           >
                             Editar Perfil
                           </button>
                           <button 
                             className={`${style.actionButton} ${style.logoutButton}`}
-                            onClick={signOut}
+                            onClick={async () => {
+                              try {
+                                const { error } = await logout();
+                                if (!error) {
+                                  navigate("/login"); // Redireciona para a página de login
+                                } else {
+                                  console.error("Erro ao sair:", error);
+                                  setError("Erro ao sair. Tente novamente.");
+                                }
+                              } catch (err) {
+                                console.error("Erro ao fazer logout:", err);
+                                setError("Erro ao sair. Tente novamente.");
+                              }
+                            }}
                           >
                             Sair
                           </button>
@@ -716,9 +767,9 @@ export function Profile() {
                     >
                       <Card
                         TituloCard={post.title}
-                        SubTitulo={post.categories?.length > 0 ? post.categories.join(", ") : "Geral"}
+                        SubTitulo={post.categories?.length > 0 ? post.categories.join(", ") : (post.area ? (Array.isArray(post.area) ? post.area.join(", ") : post.area) : "Geral")}
                         Descricao={post.caption}
-                        likes={post.likeCount || 0}
+                        likes={post.like_count || post.likeCount || 0}
                         id={post.id}
                         imageUrl={post.imageUrl}
                       />
@@ -818,17 +869,18 @@ export function Profile() {
                           </div>
                           {user && user.id !== follower.id && (
                             <button 
-                              className={`${style.followButton} ${user.following?.includes(follower.id) ? style.unfollowButton : style.followButton}`}
+                              className={`${style.followButton} ${following.includes(follower.id) ? style.unfollowButton : style.followButton}`}
                               onClick={(e) => {
                                 e.stopPropagation();
-                                if (user.following?.includes(follower.id)) {
+                                if (following.includes(follower.id)) {
                                   handleUnfollow(follower.id);
                                 } else {
                                   handleFollow(follower.id);
                                 }
                               }}
+                              disabled={loadingAction}
                             >
-                              {user.following?.includes(follower.id) ? 'Seguindo' : 'Seguir'}
+                              {following.includes(follower.id) ? 'Seguindo' : 'Seguir'}
                             </button>
                           )}
                         </div>
@@ -905,6 +957,7 @@ export function Profile() {
                                 e.stopPropagation();
                                 handleUnfollow(followedUser.id);
                               }}
+                              disabled={loadingAction}
                             >
                               Deixar de seguir
                             </button>
