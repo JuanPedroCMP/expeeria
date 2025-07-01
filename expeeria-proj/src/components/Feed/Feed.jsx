@@ -97,9 +97,11 @@ export const Feed = () => {
             >              <Card
                 TituloCard={post.title || "Post sem título"}
                 SubTitulo={
-                  Array.isArray(post.area)
+                  Array.isArray(post.categories) && post.categories.length > 0
+                    ? post.categories.join(", ") + " • " + (post.author || post.author_name || 'Usuário')
+                    : Array.isArray(post.area) && post.area.length > 0
                     ? post.area.join(", ") + " • " + (post.author || post.author_name || 'Usuário')
-                    : (post.area || 'Geral') + " • " + (post.author || post.author_name || 'Usuário')
+                    : (post.categories?.[0] || post.area || 'Geral') + " • " + (post.author || post.author_name || 'Usuário')
                 }
                 Descricao={post.caption}
                 imageUrl={post.imageUrl || post.image_url}

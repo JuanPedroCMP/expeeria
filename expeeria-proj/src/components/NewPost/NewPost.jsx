@@ -7,7 +7,6 @@ import { useAuth } from "../../hooks/useAuth";
 import { UploadImage } from "../UploadImage/UploadImage";
 import { useNotification } from "../../hooks/useNotification";
 import { usePost } from "../../hooks/usePost";
-import supabase from "../../services/supabase";
 
 export const NewPost = ({
   modoEdicao = false,
@@ -19,19 +18,21 @@ export const NewPost = ({
   const { createPost } = usePost();
   const [title, setTitle] = useState(postOriginal?.title || "");
   const [caption, setCaption] = useState(postOriginal?.caption || "");
-  const [content, setContent] = useState(postOriginal?.content || "");  const [imageUrl, setImageUrl] = useState(postOriginal?.imageUrl || "");
-  const [area, setArea] = useState(postOriginal?.area || []);
+  const [content, setContent] = useState(postOriginal?.content || "");
+  const [imageUrl, setImageUrl] = useState(postOriginal?.imageUrl || "");
+  const [categories, setCategories] = useState(postOriginal?.categories || postOriginal?.area || []);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [categoriasOpen, setCategoriasOpen] = useState(false);
 
   useEffect(() => {
-    if (postOriginal) {      setTitle(postOriginal.title || "");
+    if (postOriginal) {
+      setTitle(postOriginal.title || "");
       setCaption(postOriginal.caption || "");
       setContent(postOriginal.content || "");
       setImageUrl(postOriginal.imageUrl || "");
-      setArea(postOriginal.area || []);
+      setCategories(postOriginal.categories || postOriginal.area || []);
     }
   }, [postOriginal]);
 
@@ -39,7 +40,7 @@ export const NewPost = ({
     e.preventDefault();
     setError("");
     setSuccess("");
-    setLoading(true);    if (!title || !caption || !content || !user?.id || !area.length) {
+    setLoading(true);    if (!title || !caption || !content || !user?.id || !categories.length) {
       setError("Preencha todos os campos obrigatórios.");
       setLoading(false);
       return;
@@ -56,8 +57,8 @@ export const NewPost = ({
         caption,
         content,
         author_id: user.id,
-        author_name: user.name || user.email || 'Usuário',        image_url: imageUrl,
-        area: area, // Incluir categorias no postData para edição
+        image_url: imageUrl,
+        categories: categories, // Usar categories em vez de area
         status: 'published',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
@@ -79,20 +80,6 @@ export const NewPost = ({
           
           console.log("Post criado com sucesso:", novoPost);
           
-          if (area && area.length > 0) {
-            const categorias = area.map(cat => ({
-              post_id: novoPost.id,
-              category: cat
-            }));
-            
-            const { error: catError } = await supabase              .from('post_categories')
-              .insert(categorias);
-              
-            if (catError) {
-              console.error("Erro ao adicionar categorias:", catError);
-            }
-          }
-          
           setSuccess("Post criado com sucesso!");
           showSuccess("Post criado com sucesso!");
           
@@ -100,7 +87,7 @@ export const NewPost = ({
           setCaption("");
           setContent("");
           setImageUrl("");
-          setArea([]);
+          setCategories([]);
         } catch (error) {
           console.error("Erro ao criar post:", error);
           setError(`Não foi possível criar o post: ${error.message || 'Erro desconhecido'}`);
@@ -189,18 +176,18 @@ export const NewPost = ({
                     <input
                       type="checkbox"
                       value={cat}
-                      checked={Array.isArray(area) && area.includes(cat)}
+                      checked={Array.isArray(categories) && categories.includes(cat)}
                       disabled={
-                        !(Array.isArray(area) && area.includes(cat)) &&
-                        Array.isArray(area) &&
-                        area.length >= 3
+                        !(Array.isArray(categories) && categories.includes(cat)) &&
+                        Array.isArray(categories) &&
+                        categories.length >= 3
                       }
                       onChange={(e) => {
                         if (e.target.checked) {
-                          if (Array.isArray(area) && area.length < 3)
-                            setArea([...area, cat]);
+                          if (Array.isArray(categories) && categories.length < 3)
+                            setCategories([...categories, cat]);
                         } else {
-                          setArea(area.filter((i) => i !== cat));
+                          setCategories(categories.filter((i) => i !== cat));
                         }
                       }}
                     />

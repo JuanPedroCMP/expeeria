@@ -433,7 +433,11 @@ export const getFilteredExamplePosts = (filters) => {
     
     if (filters.areas && filters.areas.length > 0) {
       filtered = filtered.filter(post => {
-        return post.area.some(area => filters.areas.includes(area));
+        // Verificar se o post tem categorias (novo formato) ou area (formato antigo)
+        const categories = post.categories || post.area || [];
+        return Array.isArray(categories) 
+          ? categories.some(category => filters.areas.includes(category))
+          : filters.areas.includes(categories);
       });
     }
     

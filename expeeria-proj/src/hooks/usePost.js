@@ -29,7 +29,18 @@ export const usePost = () => {
     try {
       const { data, error: postError } = await supabase
         .from('posts')
-        .select('*')
+        .select(`
+          *,
+          post_categories (
+            category
+          ),
+          users!author_id (
+            id,
+            name,
+            username,
+            avatar
+          )
+        `)
         .eq('id', id)
         .single();
       
@@ -56,7 +67,18 @@ export const usePost = () => {
     try {
       const { data, error: postsError } = await supabase
         .from('posts')
-        .select('*')
+        .select(`
+          *,
+          post_categories (
+            category
+          ),
+          users!author_id (
+            id,
+            name,
+            username,
+            avatar
+          )
+        `)
         .order('created_at', { ascending: false });
       
       if (postsError) throw postsError;
@@ -186,17 +208,25 @@ export const usePost = () => {
         });
       }
       
-      // Filtro por categorias - melhorado para lidar com diferentes formatos
+      // Filtro por categorias - usar tabela post_categories
       if (categories && categories.length > 0) {
         filteredPosts = filteredPosts.filter(post => {
-          // Tratar diferentes formatos de armazenamento de área/categoria
-          if (!post.area) return false;
-          
-          if (Array.isArray(post.area)) {
-            return categories.some(cat => post.area.includes(cat));
-          } else if (typeof post.area === 'string') {
-            return categories.includes(post.area);
+          // Verificar se o post tem categorias associadas
+          if (post.post_categories && Array.isArray(post.post_categories)) {
+            return categories.some(cat => 
+              post.post_categories.some(pc => pc.category === cat)
+            );
           }
+          
+          // Fallback para compatibilidade com dados antigos que usam 'area'
+          if (post.area) {
+            if (Array.isArray(post.area)) {
+              return categories.some(cat => post.area.includes(cat));
+            } else if (typeof post.area === 'string') {
+              return categories.includes(post.area);
+            }
+          }
+          
           return false;
         });
       }
@@ -355,11 +385,14 @@ export const usePost = () => {
     setError(null);
     
     try {
+      // Extrair categories do postData e remover antes de inserir na tabela posts
+      const { categories, ...postDataWithoutCategories } = postData;
+      
       // Inserir o post na tabela posts
       const { data, error: insertError } = await supabase
         .from('posts')
         .insert({
-          ...postData,
+          ...postDataWithoutCategories,
           author_id: user.id,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
@@ -368,6 +401,23 @@ export const usePost = () => {
         .single();
       
       if (insertError) throw insertError;
+      
+      // Se houver categorias, inserir na tabela post_categories
+      if (categories && Array.isArray(categories) && categories.length > 0) {
+        const categoriesData = categories.map(category => ({
+          post_id: data.id,
+          category: category
+        }));
+        
+        const { error: categoriesError } = await supabase
+          .from('post_categories')
+          .insert(categoriesData);
+          
+        if (categoriesError) {
+          console.error('Erro ao inserir categorias:', categoriesError);
+          // Não falha o processo principal, apenas log do erro
+        }
+      }
       
       // Atualizar o cache local
       setPosts(prev => [data, ...prev]);

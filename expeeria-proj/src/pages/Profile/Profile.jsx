@@ -71,19 +71,32 @@ export function Profile() {
     }
   };
 
-  // Funu00e7u00e3o auxiliar para buscar posts de um usuau00e1rio
+  // Função auxiliar para buscar posts de um usuário
   const getUserPosts = async (userId) => {
     try {
-      console.log('Buscando posts para o usuau00e1rio:', userId);
+      console.log('Buscando posts para o usuário:', userId);
       const { data: posts, error } = await supabase
         .from('posts')
-        .select('*')
-        .eq('author_id', userId);
+        .select(`
+          *,
+          post_categories (
+            category
+          )
+        `)
+        .eq('author_id', userId)
+        .order('created_at', { ascending: false });
         
       if (error) throw error;
-      return posts || [];
+      
+      // Transformar as categorias em um array simples para compatibilidade
+      const postsWithCategories = (posts || []).map(post => ({
+        ...post,
+        categories: post.post_categories?.map(pc => pc.category) || []
+      }));
+      
+      return postsWithCategories;
     } catch (error) {
-      console.error('Erro ao buscar posts do usuau00e1rio:', error);
+      console.error('Erro ao buscar posts do usuário:', error);
       return [];
     }
   };
@@ -146,9 +159,32 @@ export function Profile() {
         setEmail(profileData?.email || "");
         setUsername(profileData?.username || "");
         
-        // Definir seguidores e seguindo
-        const followersList = toMultiArray(profileData.followers);
-        const followingList = toMultiArray(profileData.following);
+        // Definir seguidores e seguindo usando a tabela user_followers
+        let followersList = [];
+        let followingList = [];
+        
+        try {
+          // Buscar seguidores (quem segue este usuário)
+          const { data: followersData } = await supabase
+            .from('user_followers')
+            .select('follower_id')
+            .eq('user_id', profileData.id);
+          
+          // Buscar quem este usuário segue
+          const { data: followingData } = await supabase
+            .from('user_followers')
+            .select('user_id')
+            .eq('follower_id', profileData.id);
+            
+          followersList = followersData?.map(f => f.follower_id) || [];
+          followingList = followingData?.map(f => f.user_id) || [];
+        } catch (followError) {
+          console.error('Erro ao buscar seguidores:', followError);
+          // Fallback para arrays nos campos do usuário se a tabela user_followers não funcionar
+          followersList = toMultiArray(profileData.followers);
+          followingList = toMultiArray(profileData.following);
+        }
+        
         setFollowers(followersList);
         setFollowing(followingList);
         
@@ -184,55 +220,46 @@ export function Profile() {
       setLoadingAction(true);
       setError('');
       
-      // Criar o registro na tabela de seguidores
+      // Criar o registro na tabela user_followers
       const { error: followError } = await supabase
-        .from('followers')
+        .from('user_followers')
         .insert({
+          user_id: targetId,
           follower_id: user.id,
-          following_id: targetId,
           created_at: new Date().toISOString()
         });
       
       if (followError) {
-        // Se ocorrer erro, verificar se u00e9 por poluu00edtica de segurana
+        // Se ocorrer erro, verificar se é por política de segurança
         // e tentar atualizar arrays na tabela de usuários
-        console.log('Tentando mu00e9todo alternativo de follow:', followError);
+        console.log('Tentando método alternativo de follow:', followError);
 
         // Buscar ambos os perfis para atualizar campos de arrays
         const [userResp, targetResp] = await Promise.all([
-          supabase.from('profiles').select('following').eq('id', user.id).single(),
-          supabase.from('profiles').select('followers').eq('id', targetId).single()
-        ]);
-        
-        // Verificar erros e tentar tabela 'users' se necessau00e1rio
-        const [userProfileData, targetProfileData] = await Promise.all([
-          userResp.error ? supabase.from('users').select('following').eq('id', user.id).single() : Promise.resolve(userResp),
-          targetResp.error ? supabase.from('users').select('followers').eq('id', targetId).single() : Promise.resolve(targetResp)
+          supabase.from('users').select('following').eq('id', user.id).single(),
+          supabase.from('users').select('followers').eq('id', targetId).single()
         ]);
 
-        if (userProfileData.error && targetProfileData.error) {
+        if (userResp.error || targetResp.error) {
           throw new Error('Falha ao buscar perfis para atualizar');
         }
 
-        const userFollowing = toMultiArray(userProfileData.data?.following);
-        const targetFollowers = toMultiArray(targetProfileData.data?.followers);
+        const userFollowing = toMultiArray(userResp.data?.following);
+        const targetFollowers = toMultiArray(targetResp.data?.followers);
         
         // Verificar duplicação
         if (userFollowing.includes(targetId)) {
           throw new Error('Você já segue este usuário');
         }
 
-        // Determinar a tabela a ser usada
-        const table = userResp.error ? 'users' : 'profiles';
-
         // Fazer as atualizações
         await Promise.all([
           supabase
-            .from(table)
+            .from('users')
             .update({ following: [...userFollowing, targetId] })
             .eq('id', user.id),
           supabase
-            .from(table)
+            .from('users')
             .update({ followers: [...targetFollowers, user.id] })
             .eq('id', targetId)
         ]);
@@ -241,8 +268,8 @@ export function Profile() {
       setSuccess(`Você agora está seguindo este usuário.`);
       
       // Atualizar perfil e lista de usuários
-      fetchProfile();
-      fetchAllUsers();
+      await fetchProfile();
+      await fetchAllUsers();
     } catch (error) {
       console.error('Erro ao seguir usuário:', error);
       setError('Não foi possível seguir este usuário. Tente novamente.');
@@ -260,51 +287,42 @@ export function Profile() {
       setLoadingAction(true);
       setError('');
       
-      // Tentar remover da tabela de seguidores primeiro (método preferido)
+      // Tentar remover da tabela user_followers primeiro (método preferido)
       const { error: unfollowError } = await supabase
-        .from('followers')
+        .from('user_followers')
         .delete()
-        .match({ follower_id: user.id, following_id: targetId });
+        .match({ user_id: targetId, follower_id: user.id });
       
       if (unfollowError) {
-        // Se ocorrer erro, tentar atualizar arrays na tabela de perfis
+        // Se ocorrer erro, tentar atualizar arrays na tabela de usuários
         console.log('Tentando método alternativo de unfollow:', unfollowError);
 
         // Buscar ambos os perfis para atualizar campos de arrays
         const [userResp, targetResp] = await Promise.all([
-          supabase.from('profiles').select('following').eq('id', user.id).single(),
-          supabase.from('profiles').select('followers').eq('id', targetId).single()
-        ]);
-        
-        // Verificar erros e tentar tabela 'users' se necessário
-        const [userProfileData, targetProfileData] = await Promise.all([
-          userResp.error ? supabase.from('users').select('following').eq('id', user.id).single() : Promise.resolve(userResp),
-          targetResp.error ? supabase.from('users').select('followers').eq('id', targetId).single() : Promise.resolve(targetResp)
+          supabase.from('users').select('following').eq('id', user.id).single(),
+          supabase.from('users').select('followers').eq('id', targetId).single()
         ]);
 
-        if (userProfileData.error && targetProfileData.error) {
+        if (userResp.error || targetResp.error) {
           throw new Error('Falha ao buscar perfis para atualizar');
         }
 
-        const userFollowing = toMultiArray(userProfileData.data?.following);
-        const targetFollowers = toMultiArray(targetProfileData.data?.followers);
+        const userFollowing = toMultiArray(userResp.data?.following);
+        const targetFollowers = toMultiArray(targetResp.data?.followers);
         
         // Verificar se é preciso deixar de seguir
         if (!userFollowing.includes(targetId)) {
           throw new Error('Você não segue este usuário');
         }
 
-        // Determinar a tabela a ser usada
-        const table = userResp.error ? 'users' : 'profiles';
-
         // Fazer as atualizações
         await Promise.all([
           supabase
-            .from(table)
+            .from('users')
             .update({ following: userFollowing.filter(id => id !== targetId) })
             .eq('id', user.id),
           supabase
-            .from(table)
+            .from('users')
             .update({ followers: targetFollowers.filter(id => id !== user.id) })
             .eq('id', targetId)
         ]);
@@ -313,18 +331,14 @@ export function Profile() {
       setSuccess(`Você deixou de seguir este usuário.`);
       
       // Atualizar perfil e lista de usuários
-      fetchProfile();
-      fetchAllUsers();
+      await fetchProfile();
+      await fetchAllUsers();
     } catch (error) {
       console.error('Erro ao deixar de seguir usuário:', error);
       setError('Não foi possível deixar de seguir este usuário. Tente novamente.');
     } finally {
       setLoadingAction(false);
-      
-      // Limpar mensagem de sucesso após 3 segundos
-      if (success) {
-        setTimeout(() => setSuccess(''), 3000);
-      }
+      setTimeout(() => setSuccess(''), 3000);
     }
   };
 
@@ -412,6 +426,53 @@ export function Profile() {
     }
   };
 
+  // Função para upload de avatar
+  const handleAvatarUpload = async (file) => {
+    if (!file) return;
+    
+    // Validar tipo de arquivo
+    if (!file.type.startsWith('image/')) {
+      setError('Por favor, selecione apenas arquivos de imagem.');
+      return;
+    }
+    
+    // Validar tamanho do arquivo (máximo 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      setError('A imagem deve ter no máximo 5MB.');
+      return;
+    }
+    
+    try {
+      setLoadingAction(true);
+      setError('');
+      
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user.id}_${Date.now()}.${fileExt}`;
+      
+      const { data, error } = await supabase.storage
+        .from('avatars') // certifique-se de que esse bucket existe
+        .upload(fileName, file);
+
+      if (error) {
+        throw error;
+      }
+      
+      const { data: urlData } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(fileName);
+        
+      if (urlData?.publicUrl) {
+        setAvatar(urlData.publicUrl);
+        setSuccess('Imagem de perfil atualizada! Lembre-se de salvar as alterações.');
+      }
+    } catch (uploadError) {
+      console.error('Erro ao fazer upload do avatar:', uploadError);
+      setError('Erro ao atualizar imagem de perfil. Tente novamente.');
+    } finally {
+      setLoadingAction(false);
+    }
+  };
+
   return (
     <div className={style.profileContainer}>
       {loading ? (
@@ -440,7 +501,14 @@ export function Profile() {
                     <input
                       type="file"
                       ref={avatarInputRef}
+                      accept="image/*"
                       style={{ display: 'none' }}
+                      onChange={(e) => {
+                        const file = e.target.files[0];
+                        if (file) {
+                          handleAvatarUpload(file);
+                        }
+                      }}
                     />
                   </div>
                 )}
@@ -449,6 +517,66 @@ export function Profile() {
               <div className={style.userDetails}>
                 <h2 className={style.userName}>{profile.name || "Usuário"}</h2>
                 <p className={style.userUsername}>@{profile.username || profile.email.split('@')[0]}</p>
+
+                {editing && (
+                  <div className={style.editSection}>
+                    <label htmlFor="edit-name" className={style.editLabel}>Nome</label>
+                    <input
+                      id="edit-name"
+                      type="text"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      className={style.editInput}
+                      placeholder="Digite seu nome"
+                    />
+
+                    <label htmlFor="edit-username" className={style.editLabel}>Nome de usuário</label>
+                    <input
+                      id="edit-username"
+                      type="text"
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                      className={style.editInput}
+                      placeholder="Digite seu nome de usuário"
+                    />
+
+                    <label htmlFor="edit-bio" className={style.editLabel}>Bio</label>
+                    <textarea
+                      id="edit-bio"
+                      value={bio}
+                      onChange={(e) => setBio(e.target.value)}
+                      className={style.editTextarea}
+                      placeholder="Conte um pouco sobre você"
+                      maxLength={500}
+                    />
+
+                    <label htmlFor="edit-interests" className={style.editLabel}>
+                      Interesses
+                      <span className={style.helpText}> (selecione até 5)</span>
+                    </label>
+                    <div className={style.interestsGrid}>
+                      {categoriasPadrao.map((categoria) => (
+                        <label key={categoria} className={style.interestCheckbox}>
+                          <input
+                            type="checkbox"
+                            checked={interests.includes(categoria)}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                if (interests.length < 5) {
+                                  setInterests([...interests, categoria]);
+                                }
+                              } else {
+                                setInterests(interests.filter(i => i !== categoria));
+                              }
+                            }}
+                            disabled={!interests.includes(categoria) && interests.length >= 5}
+                          />
+                          <span>{categoria}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                )}
                 
                 <div className={style.userStats}>
                   <div className={style.statItem}>

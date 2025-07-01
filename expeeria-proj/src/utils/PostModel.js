@@ -151,7 +151,7 @@ function convertLegacyPostToNewModel(legacyPost) {
     content: legacyPost.content,
     imageUrl: legacyPost.imageUrl || '',
     authorId: legacyPost.userId || legacyPost.author, // Adapta dependendo do campo usado
-    categories: legacyPost.area || [],
+    categories: legacyPost.categories || legacyPost.area || [],
     status: 'published',
     createdAt: legacyPost.createdAt ? new Date(legacyPost.createdAt) : new Date(),
     updatedAt: new Date(),
