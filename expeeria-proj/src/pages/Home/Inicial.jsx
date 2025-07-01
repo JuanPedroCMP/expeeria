@@ -24,44 +24,59 @@ const Inicial = () => {
     const fetchPosts = async () => {
       try {
         setLoading(true);
-        setError(null); // Limpar erros anteriores
+        setError(null);
         console.log('Iniciando busca de posts usando usePost...');
         
         // Usar o hook usePost para buscar todos os posts
         const postsData = await getPosts();
-          if (!postsData || postsData.length === 0) {
+        
+        if (!postsData || postsData.length === 0) {
           console.log('Nenhum post encontrado');
           setTrendingPosts([]);
+          setCategorizedPosts({});
+          setPopularCategories([]);
           setLoading(false);
           return;
         }
         
         console.log('Posts encontrados:', postsData.length);
+        console.log('Exemplo de post:', postsData[0]);
         
-        // Posts já vem processados do hook usePost
+        // Transformar posts para garantir estrutura consistente
+        const processedPosts = postsData.map(post => {
+          // Extrair categorias de post_categories se disponível
+          const categories = post.post_categories 
+            ? post.post_categories.map(pc => pc.category)
+            : (post.categories || post.area || []);
+          
+          return {
+            ...post,
+            categories,
+            likeCount: post.like_count || post.likeCount || 0,
+            commentCount: post.comment_count || post.commentCount || 0,
+            imageUrl: post.image_url || post.imageUrl || '',
+            author: post.users?.name || post.author_name || post.author || 'Usuário'
+          };
+        });
         
         // Ordenar por curtidas para trending posts
-        const trending = [...postsData]
-          .sort((a, b) => b.likeCount - a.likeCount)
-          .slice(0, 5); // Aumentando para 5 posts em destaque para o carrossel
+        const trending = [...processedPosts]
+          .sort((a, b) => (b.likeCount || 0) - (a.likeCount || 0))
+          .slice(0, 5);
         setTrendingPosts(trending);
         
         // Categorizar posts
         const categorized = {};
         const categoryCount = {};
         
-        // Processar posts em categorias e contar ocorrências
-        postsData.forEach(post => {
-          // Garantir que post.categories seja sempre um array
+        processedPosts.forEach(post => {
           const categories = Array.isArray(post.categories) ? post.categories : [];
           
           if (categories.length === 0) {
-            // Se não houver categorias, adicionar a 'Geral'
             if (!categorized['Geral']) categorized['Geral'] = [];
             categorized['Geral'].push(post);
             categoryCount['Geral'] = (categoryCount['Geral'] || 0) + 1;
           } else {
-            // Adicionar a todas as categorias que o post pertence
             categories.forEach(category => {
               if (!categorized[category]) categorized[category] = [];
               categorized[category].push(post);
@@ -72,14 +87,14 @@ const Inicial = () => {
         
         setCategorizedPosts(categorized);
         
-        // Encontrar as categorias mais populares (com mais posts)
+        // Encontrar as categorias mais populares
         const popularCats = Object.keys(categoryCount)
           .sort((a, b) => categoryCount[b] - categoryCount[a])
-          .slice(0, 5); // Pegar as 5 categorias mais populares
+          .slice(0, 5);
         
         setPopularCategories(popularCats);
         
-        // Definir a categoria ativa inicialmente como a mais popular
+        // Definir a categoria ativa inicialmente
         if (popularCats.length > 0 && !activeCategory) {
           setActiveCategory(popularCats[0]);
         }
@@ -88,11 +103,10 @@ const Inicial = () => {
         setError('Falha ao carregar posts. Tente novamente mais tarde.');
       } finally {
         setLoading(false);
-      }    };
-      fetchPosts();
-    // Removendo activeCategory das dependências para evitar chamadas desnecessárias à API
-    // quando o usuário apenas altera a categoria visualizada
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+      }
+    };
+    
+    fetchPosts();
   }, [user, getPosts]);
   
   // Configura um timer para o carrossel automático

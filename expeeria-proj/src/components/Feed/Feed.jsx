@@ -9,7 +9,7 @@ import { Link } from "react-router-dom";
 const PAGE_SIZE = 6;
 
 export const Feed = () => {
-  const { posts, loading, filterPosts } = usePost();
+  const { posts, loading, filterPosts, loadAllPosts } = usePost();
     // Filtros
   const [search, setSearch] = useState(() => localStorage.getItem("feed_search") || "");
   const [order, setOrder] = useState(() => localStorage.getItem("feed_order") || "recentes");
@@ -22,6 +22,20 @@ export const Feed = () => {
   
   // Loading visual
   const [loadingVisual, setLoadingVisual] = useState(false);
+
+  // Carregar posts quando o componente monta
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        await loadAllPosts();
+      } catch (error) {
+        console.error('Erro ao carregar posts no Feed:', error);
+      }
+    };
+    
+    fetchPosts();
+  }, [loadAllPosts]);
+
   // Salva filtros no localStorage
   useEffect(() => {
     localStorage.setItem("feed_search", search);
