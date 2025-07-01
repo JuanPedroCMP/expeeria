@@ -244,7 +244,7 @@ const Inicial = () => {
               <div className={style.categoriesSection}>
                 <h3>
                   <span className={style.icon}>📃</span>
-                  Explore por categoria
+                  Explore outos posts
                 </h3>
                 <div className={style.categoriesTabs}>
                   {popularCategories.map(category => (
