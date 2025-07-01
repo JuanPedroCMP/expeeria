@@ -16,15 +16,17 @@ if (typeof import.meta !== 'undefined' && import.meta.env) {
 }
 
 if (!supabaseUrl || !supabaseAnonKey) {
-  console.error('⚠️ ERRO: Variáveis de ambiente do Supabase não encontradas');
+  console.error('⚠ ERRO: Variáveis de ambiente do Supabase não encontradas');
   console.error('Verifique se o arquivo .env.local contém VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY');
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+// Criação do cliente Supabase
+const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     persistSession: true,
     autoRefreshToken: true,
     detectSessionInUrl: false,
+    flowType: 'pkce' // Adiciona PKCE para segurança
   },
   global: {
     headers: {
@@ -34,3 +36,9 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 });
 
 console.log('Cliente Supabase inicializado');
+
+// Export default para compatibilidade com AuthContext
+export default supabase;
+
+// Export nomeado para compatibilidade com outros arquivos
+export { supabase };
